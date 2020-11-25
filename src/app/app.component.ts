@@ -27,8 +27,8 @@ export class AppComponent {
             label: 'About',
             link: '/about'
         }, {
-            label: 'Calculator',
-            link: '/calculator'
+            label: 'Visualizer',
+            link: '/visualizer'
         }, {
             label: 'Documentation',
             link: '/docs'
@@ -45,7 +45,7 @@ export class AppComponent {
     socialLinks: ISocialLink[] = [
         {
             name: 'github',
-            href: 'https://github.com/SWxTREC/vector-code'
+            href: 'https://github.com/SWxTREC/enlil-code'
         }
     ];
 
