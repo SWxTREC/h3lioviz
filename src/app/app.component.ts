@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
-
+import {
+    LaspBaseAppSnippetsService
+} from 'lasp-base-app-snippets';
 import {
     IImageLink,
     INavItem,
     ISocialLink,
     IVersion
 } from 'lasp-footer';
-
-import {
-    LaspBaseAppSnippetsService
-} from 'lasp-base-app-snippets';
 
 import { environment } from '../environments/environment';
 
