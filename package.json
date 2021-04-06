@@ -39,7 +39,7 @@
     "lasp-nav": "^1.3.2",
     "lasp-search": "^1.0.6",
     "moment": "^2.24.0",
-    "ngx-markdown": "^8.2.2",
+    "ngx-markdown": "^11.1.2",
     "rxjs": "^6.5.5",
     "tslib": "^1.13.0",
     "zone.js": "~0.10.3"
