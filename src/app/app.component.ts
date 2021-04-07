@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
-
+import {
+    LaspBaseAppSnippetsService
+} from 'lasp-base-app-snippets';
 import {
     IImageLink,
     INavItem,
     ISocialLink,
     IVersion
 } from 'lasp-footer';
-
-import {
-    LaspBaseAppSnippetsService
-} from 'lasp-base-app-snippets';
 
 import { environment } from '../environments/environment';
 
@@ -24,9 +22,6 @@ export class AppComponent {
     // please have no more than 7 items in the nav menu
     navItems: INavItem[] = [
         {
-            label: 'About',
-            link: '/about'
-        }, {
             label: 'Visualizer',
             link: '/visualizer'
         }, {
