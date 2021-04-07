@@ -15,7 +15,6 @@
         "skipLibCheck": true,
         "target": "es5",
         "typeRoots": [
-            "./types",
             "node_modules/@types"
         ],
         "lib": [
@@ -24,7 +23,6 @@
         ]
     },
     "exclude": [
-        "node_modules",
-        "types"
+        "node_modules"
     ]
 }
