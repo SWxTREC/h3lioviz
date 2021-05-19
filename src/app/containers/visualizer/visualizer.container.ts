@@ -1,37 +1,84 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import vtkConeSource from 'vtk.js/Sources/Filters/Sources/ConeSource';
-import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
-import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
-import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
+import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
+import SmartConnect from 'wslink/src/SmartConnect';
+import vtkRemoteView, {
+    connectImageStream,
+} from 'vtk.js/Sources/Rendering/Misc/RemoteView';
 
 @Component({
     selector: 'swt-visualizer',
     templateUrl: './visualizer.container.html',
-    styleUrls: [ './visualizer.container.scss' ]
+    styleUrls: ['./visualizer.container.scss']
 })
-export class VisualizerComponent implements AfterViewInit  {
+export class VisualizerComponent implements AfterViewInit {
     @ViewChild('content', { read: ElementRef }) content: ElementRef;
 
-    fullscreenRenderWindow = null;
+    hostElement: HTMLElement; // Native element hosting the SVG container
 
-
-    constructor(
-    ) {}
+    constructor(private elRef: ElementRef) {
+        this.hostElement = this.elRef.nativeElement;
+    }
 
     ngAfterViewInit(): void {
-        this.fullscreenRenderWindow = vtkFullScreenRenderWindow.newInstance();
-        const cone = vtkConeSource.newInstance();
-        const actor = vtkActor.newInstance();
-        const mapper = vtkMapper.newInstance();
+        vtkWSLinkClient.setSmartConnectClass(SmartConnect);
 
-        actor.setMapper(mapper);
-        mapper.setInputConnection(cone.getOutputPort());
+        const divRenderer = this.hostElement
 
-        const renderer = this.fullscreenRenderWindow.getRenderer();
-        renderer.addActor(actor);
-        renderer.resetCamera();
+        // Need this styling for the element otherwise things are stretched out
+        divRenderer.style.position = 'relative';
+        divRenderer.style.width = '100vw';
+        divRenderer.style.height = '100vh';
+        divRenderer.style.overflow = 'hidden';
 
-        const renderWindow = this.fullscreenRenderWindow.getRenderWindow();
-        renderWindow.render();
+        const view = vtkRemoteView.newInstance({
+            rpcWheelEvent: 'viewport.mouse.zoom.wheel',
+        });
+        view.setContainer(divRenderer);
+        view.setInteractiveRatio(0.7); // the scaled image compared to the clients view resolution
+        view.setInteractiveQuality(50); // jpeg quality
+
+        window.addEventListener('resize', view.resize);
+
+        const clientToConnect = vtkWSLinkClient.newInstance();
+
+        // Error
+        clientToConnect.onConnectionError((httpReq) => {
+            const message =
+                (httpReq && httpReq.response && httpReq.response.error) ||
+                `Connection error`;
+            console.error(message);
+            console.log(httpReq);
+        });
+
+        // Close
+        clientToConnect.onConnectionClose((httpReq) => {
+            const message =
+                (httpReq && httpReq.response && httpReq.response.error) ||
+                `Connection close`;
+            console.error(message);
+            console.log(httpReq);
+        });
+
+        // hint: if you use the launcher.py and ws-proxy just leave out sessionURL
+        // (it will be provided by the launcher)
+        const config = {
+            application: 'cone',
+            sessionURL: 'ws://localhost:1234/ws',
+        };
+
+        // Connect
+        clientToConnect
+            .connect(config)
+            .then((validClient) => {
+                connectImageStream(validClient.getConnection().getSession());
+
+                const session = validClient.getConnection().getSession();
+                view.setSession(session);
+                view.setViewId(-1);
+                view.render();
+            })
+            .catch((error) => {
+                console.error(error);
+            });
     }
 }
