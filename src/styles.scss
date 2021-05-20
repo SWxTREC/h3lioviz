@@ -29,3 +29,11 @@
 .mat-card-title {
     color: $color-primary;
 }
+
+.upper-footer {
+    background-color: darken($color-primary, 5%) !important;
+}
+
+body > * > .page-content > *:not(router-outlet) {
+    padding: 0;
+}

@@ -1,1 +1,10 @@
-<div #content></div>
+<mat-card cdkDrag class="control-panel">
+    <mat-card-title>Control Panel <small>(drag me…)</small></mat-card-title>
+    <div class="control-panel__controls">
+        mouse zoom {{ zoomState }}
+        <mat-slide-toggle (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+    </div>
+</mat-card>
+<div class="pv__container">
+    <div #pvContent class="pv__content"></div>
+</div>
