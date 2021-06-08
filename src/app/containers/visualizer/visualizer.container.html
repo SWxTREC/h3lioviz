@@ -1,9 +1,26 @@
 <mat-card cdkDrag class="control-panel">
     <mat-card-title>Control Panel <small>(drag me…)</small></mat-card-title>
     <div class="control-panel__controls">
-        mouse zoom {{ zoomState }}
-        <mat-slide-toggle (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+        Mouse zoom {{ zoomState }}
+        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
     </div>
+    <mat-divider class="control-panel__spacer"></mat-divider>
+    <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
+        <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="bvec" [indeterminate]="isIndeterminate.bvec" (click)="determineChildStatus('bvec', 'magneticFields')">Magnetic fields</mat-checkbox>
+        <span formGroupName='magneticFields'>
+            <div class="control-panel__controls control-panel__controls--child control-panel__controls--column">
+                <mat-checkbox color="primary" formControlName="x" (click)="determineParentStatus('bvec', 'magneticFields')">x</mat-checkbox>
+                <mat-checkbox color="primary" formControlName="y" (click)="determineParentStatus('bvec', 'magneticFields')">y</mat-checkbox>
+                <mat-checkbox color="primary" formControlName="z" (click)="determineParentStatus('bvec', 'magneticFields')">z</mat-checkbox>
+            </div>
+        </span>
+        <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic plane</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="latSlice">Meridonal section</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="data">Data</mat-checkbox>
+    </form>
 </mat-card>
 <div class="pv__container">
     <div #pvContent class="pv__content"></div>
