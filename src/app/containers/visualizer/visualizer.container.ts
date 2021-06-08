@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
     connectImageStream
@@ -39,7 +40,6 @@ export class VisualizerComponent implements AfterViewInit {
         });
 
         clientToConnect.onConnectionReady((validClient) => {
-            console.log('connection ready');
             const session = validClient.getConnection().getSession();
 
             const viewStream = validClient.getImageStream().createViewStream(-1);
@@ -52,24 +52,15 @@ export class VisualizerComponent implements AfterViewInit {
 
             window.addEventListener('resize', this.pvView.resize);
 
-            console.log(validClient);
-            console.log(session);
             // connectImageStream(session);
             // this.pvView.setSession(session);
             // this.pvView.setViewId(-1);
             this.pvView.render();
         });
 
-        // hint: if you use the launcher.py and ws-proxy just leave out sessionURL
-        // (it will be provided by the launcher)
-        const config = {
-            application: 'visualizer'
-            // sessionManagerURL: 'http://localhost:9000/paraview'
-            // sessionURL: 'ws://localhost:1234/ws'
-        };
+        // only need sessionURL in development environment
+        const config = environmentConfig;
 
-        console.log(config);
-        console.log(clientToConnect);
 
         // Connect
         clientToConnect.connect(config);
