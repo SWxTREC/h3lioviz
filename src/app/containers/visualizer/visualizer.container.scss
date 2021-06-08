@@ -7,7 +7,17 @@
     z-index: 2;
     &__controls{
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
+        &--child {
+            margin-left: 2rem;
+        }
+        &--column {
+            flex-direction: column;
+        }
+    }
+    &__spacer {
+        position: relative !important;
+        margin: 1rem 0;
     }
 }
 
