@@ -17,6 +17,14 @@
                 "build": {
                     "builder": "@angular-builders/custom-webpack:browser",
                     "options": {
+                        "allowedCommonJsDependencies": [
+                          "lodash",
+                          "moment",
+                          "moment-timezone",
+                          "rxjs",
+                          "seedrandom"
+                        ],
+
                         "aot": true,
                         "customWebpackConfig": {
                             "path": "./webpack.config.js"
