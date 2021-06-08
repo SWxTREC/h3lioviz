@@ -17,17 +17,8 @@ export class VisualizerComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-
-        const divRenderer = this.pvContent.nativeElement;
-
-        this.pvView = vtkRemoteView.newInstance();
-        this.pvView.setContainer(divRenderer);
-        this.pvView.setInteractiveRatio(0.7); // the scaled image compared to the client's view resolution
-        this.pvView.setInteractiveQuality(50); // jpeg quality
-
-        window.addEventListener('resize', this.pvView.resize);
-
         const clientToConnect = vtkWSLinkClient.newInstance();
+        const divRenderer = this.pvContent.nativeElement;
 
         // Error
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
@@ -47,27 +38,41 @@ export class VisualizerComponent implements AfterViewInit {
             console.log(httpReq);
         });
 
+        clientToConnect.onConnectionReady((validClient) => {
+            console.log('connection ready');
+            const session = validClient.getConnection().getSession();
+
+            const viewStream = validClient.getImageStream().createViewStream(-1);
+            const remoteView = vtkRemoteView.newInstance({ session, viewStream });
+
+            this.pvView = remoteView;
+            this.pvView.setContainer(divRenderer);
+            this.pvView.setInteractiveRatio(0.7); // the scaled image compared to the client's view resolution
+            this.pvView.setInteractiveQuality(50); // jpeg quality
+
+            window.addEventListener('resize', this.pvView.resize);
+
+            console.log(validClient);
+            console.log(session);
+            // connectImageStream(session);
+            // this.pvView.setSession(session);
+            // this.pvView.setViewId(-1);
+            this.pvView.render();
+        });
+
         // hint: if you use the launcher.py and ws-proxy just leave out sessionURL
         // (it will be provided by the launcher)
         const config = {
-            application: 'cone',
-            sessionURL: 'ws://localhost:1234/ws'
+            application: 'visualizer'
+            // sessionManagerURL: 'http://localhost:9000/paraview'
+            // sessionURL: 'ws://localhost:1234/ws'
         };
 
-        // Connect
-        clientToConnect
-            .connect(config)
-            .then((validClient: { getConnection: () => { (): any; new(): any; getSession: { (): any; new(): any; }; }; }) => {
-                connectImageStream(validClient.getConnection().getSession());
+        console.log(config);
+        console.log(clientToConnect);
 
-                const session = validClient.getConnection().getSession();
-                this.pvView.setSession(session);
-                this.pvView.setViewId(-1);
-                this.pvView.render();
-            })
-            .catch((error: any) => {
-                console.error(error);
-            });
+        // Connect
+        clientToConnect.connect(config);
     }
 
     toggleZoom() {
