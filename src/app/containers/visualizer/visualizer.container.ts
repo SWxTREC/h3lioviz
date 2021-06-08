@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { debounceTime } from 'rxjs/operators';
+import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
     connectImageStream
@@ -18,7 +19,6 @@ export class VisualizerComponent implements AfterViewInit {
     controlPanel = new FormGroup({
         bvec: new FormControl(false),
         cme: new FormControl(false),
-        data: new FormControl(false),
         latSlice: new FormControl(true),
         lonArrows: new FormControl(false),
         lonSlice: new FormControl(false),
@@ -35,17 +35,8 @@ export class VisualizerComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
         vtkWSLinkClient.setSmartConnectClass(SmartConnect);
-
-        const divRenderer = this.pvContent.nativeElement;
-
-        this.pvView = vtkRemoteView.newInstance();
-        this.pvView.setContainer(divRenderer);
-        this.pvView.setInteractiveRatio(0.7); // the scaled image compared to the client's view resolution
-        this.pvView.setInteractiveQuality(50); // jpeg quality
-
-        window.addEventListener('resize', this.pvView.resize);
-
         const clientToConnect = vtkWSLinkClient.newInstance();
+        const divRenderer = this.pvContent.nativeElement;
 
         // Error
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
@@ -65,30 +56,30 @@ export class VisualizerComponent implements AfterViewInit {
             console.log(httpReq);
         });
 
-        // hint: if you use the launcher.py and ws-proxy just leave out sessionURL
-        // (it will be provided by the launcher)
-        const config = {
-            application: 'enlil',
-            sessionURL: 'ws://localhost:1234/ws'
-        };
+        clientToConnect.onConnectionReady((validClient) => {
+            const session = validClient.getConnection().getSession();
+
+            const viewStream = validClient.getImageStream().createViewStream(-1);
+            const remoteView = vtkRemoteView.newInstance({ session, viewStream });
+
+            this.pvView = remoteView;
+            this.pvView.setContainer(divRenderer);
+            this.pvView.setInteractiveRatio(0.7); // the scaled image compared to the client's view resolution
+            this.pvView.setInteractiveQuality(50); // jpeg quality
+
+            window.addEventListener('resize', this.pvView.resize);
+
+            if ( this.zoomState === 'on' ) {
+                this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
+            }
+            this.updateControls( this.controlPanel.value );
+        });
+
+        // only need sessionURL in development environment
+        const config = environmentConfig;
 
         // Connect
-        clientToConnect
-            .connect(config)
-            .then((validClient: { getConnection: () => { (): any; new(): any; getSession: { (): any; new(): any; }; }; }) => {
-                connectImageStream(validClient.getConnection().getSession());
-
-                const session = validClient.getConnection().getSession();
-                this.pvView.setSession(session);
-                this.pvView.setViewId(-1);
-                if ( this.zoomState === 'on' ) {
-                    this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
-                }
-                this.updateControls( this.controlPanel.value );
-            })
-            .catch((error: any) => {
-                console.error(error);
-            });
+        clientToConnect.connect(config);
 
         this.controlPanel.valueChanges.pipe( debounceTime(300) ).subscribe( newFormValues => {
             this.updateControls( newFormValues );
