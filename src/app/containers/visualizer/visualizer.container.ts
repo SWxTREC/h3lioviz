@@ -29,7 +29,7 @@ export class VisualizerComponent implements AfterViewInit {
             z: new FormControl({ value: false, disabled: true })
         })
     });
-    colorVariables: string[] = [ 'velocity', 'density', 'temperature', 'B', 'Bx', 'By', 'Bz' ];
+    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
     isIndeterminate: { [parameter: string]: boolean } = {};
     pvView: any;
     zoomState: 'on' | 'off' = 'on';
