@@ -4,7 +4,7 @@
         Mouse zoom {{ zoomState }}
         <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
     </div>
-    <button mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
+    <button mat-raised-button color="accent" (click)="resetZoom()">reset zoom</button>
     <mat-divider class="control-panel__spacer"></mat-divider>
     <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
@@ -21,6 +21,15 @@
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
     </form>
+    <mat-divider class="control-panel__spacer"></mat-divider>
+    <mat-form-field>
+        <mat-label>Color variable</mat-label>
+        <mat-select value="Bz" (selectionChange)="updateColorAxis($event.value)">
+            <mat-option *ngFor="let variable of colorVariables" [value]="variable">
+                {{variable}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
 </mat-card>
 <div class="pv__container">
     <div #pvContent class="pv__content"></div>
