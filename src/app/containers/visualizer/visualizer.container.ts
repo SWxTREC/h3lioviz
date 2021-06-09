@@ -127,6 +127,10 @@ export class VisualizerComponent implements AfterViewInit {
         }
     }
 
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
+    }
+
     updateControls( controlStates: { [parameter: string]: any; } ) {
         const session = this.pvView.get().session;
         Object.keys(controlStates).forEach( control => {
