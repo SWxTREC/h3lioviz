@@ -16,7 +16,7 @@ import SmartConnect from 'wslink/src/SmartConnect';
 })
 export class VisualizerComponent implements AfterViewInit {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
-    controlPanel = new FormGroup({
+    controlPanel: FormGroup = new FormGroup({
         bvec: new FormControl(false),
         cme: new FormControl(false),
         latSlice: new FormControl(true),
@@ -29,6 +29,7 @@ export class VisualizerComponent implements AfterViewInit {
             z: new FormControl({ value: false, disabled: true })
         })
     });
+    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
     isIndeterminate: { [parameter: string]: boolean } = {};
     pvView: any;
     zoomState: 'on' | 'off' = 'on';
@@ -73,6 +74,7 @@ export class VisualizerComponent implements AfterViewInit {
                 this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
             }
             this.updateControls( this.controlPanel.value );
+            this.updateColorAxis('Bz');
         });
 
         // only need sessionURL in development environment
@@ -127,6 +129,10 @@ export class VisualizerComponent implements AfterViewInit {
         }
     }
 
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
+    }
+
     updateControls( controlStates: { [parameter: string]: any; } ) {
         const session = this.pvView.get().session;
         Object.keys(controlStates).forEach( control => {
@@ -136,6 +142,12 @@ export class VisualizerComponent implements AfterViewInit {
                 session.call('pv.enlil.visibility', [ name, state ]);
             }
         });
+        this.pvView.render();
+    }
+
+    updateColorAxis( variable: string ) {
+        const serverVariable = variable.toLowerCase();
+        this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
         this.pvView.render();
     }
 }
