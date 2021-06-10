@@ -148,5 +148,6 @@ export class VisualizerComponent implements AfterViewInit {
     updateColorAxis( variable: string ) {
         const serverVariable = variable.toLowerCase();
         this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
+        this.pvView.render();
     }
 }
