@@ -18,6 +18,7 @@ export class VisualizerComponent implements AfterViewInit {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
     controlPanel: FormGroup = new FormGroup({
         bvec: new FormControl(false),
+        colorVariable: new FormControl('Bz'),
         cme: new FormControl(false),
         latSlice: new FormControl(true),
         lonArrows: new FormControl(false),
@@ -27,7 +28,8 @@ export class VisualizerComponent implements AfterViewInit {
             x: new FormControl({ value: false, disabled: true }),
             y: new FormControl({ value: false, disabled: true }),
             z: new FormControl({ value: false, disabled: true })
-        })
+        }),
+        opacity: new FormControl( 90 )
     });
     colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
     isIndeterminate: { [parameter: string]: boolean } = {};
@@ -57,7 +59,7 @@ export class VisualizerComponent implements AfterViewInit {
             console.log(httpReq);
         });
 
-        clientToConnect.onConnectionReady((validClient) => {
+        clientToConnect.onConnectionReady( validClient => {
             const session = validClient.getConnection().getSession();
 
             const viewStream = validClient.getImageStream().createViewStream(-1);
@@ -74,7 +76,6 @@ export class VisualizerComponent implements AfterViewInit {
                 this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
             }
             this.updateControls( this.controlPanel.value );
-            this.updateColorAxis('Bz');
         });
 
         // only need sessionURL in development environment
@@ -86,35 +87,6 @@ export class VisualizerComponent implements AfterViewInit {
         this.controlPanel.valueChanges.pipe( debounceTime(300) ).subscribe( newFormValues => {
             this.updateControls( newFormValues );
         });
-    }
-
-    determineChildStatus( parentControlName: string, childGroup: string ) {
-        const group = this.controlPanel.controls[childGroup] as FormGroup;
-        // give the checkbox a beat to change its status
-        setTimeout(() => {
-            const newValue: boolean = this.controlPanel.value[parentControlName];
-            // if parent is toggled, children should match its state
-            Object.keys( group.controls ).forEach( control => {
-                group.controls[control].setValue(newValue);
-            });
-        }, 0);
-    }
-
-    determineParentStatus( parentControlName: string, childGroup: string ) {
-        const group = this.controlPanel.controls[childGroup] as FormGroup;
-        // give the checkbox a beat to change its status
-        setTimeout(() => {
-            // check if all, none, or some of the parent control's child group are checked
-            if (Object.values(group.controls).every(control => control.value === true)) {
-                this.isIndeterminate[parentControlName] = false;
-                this.controlPanel.controls.bvec.setValue(true);
-            } else if (Object.values(group.controls).every(control => !control.value )) {
-                this.isIndeterminate[parentControlName] = false;
-                this.controlPanel.controls.bvec.setValue(false);
-            } else {
-                this.isIndeterminate[parentControlName] = true;
-            }
-        }, 0);
     }
 
     toggleZoom() {
@@ -135,19 +107,28 @@ export class VisualizerComponent implements AfterViewInit {
 
     updateControls( controlStates: { [parameter: string]: any; } ) {
         const session = this.pvView.get().session;
-        Object.keys(controlStates).forEach( control => {
-            const state = controlStates[control] === true ? 'on' : 'off';
-            const name = snakeCase(control);
-            if ( typeof controlStates[control] === 'boolean') {
-                session.call('pv.enlil.visibility', [ name, state ]);
+        Object.keys(controlStates).forEach( controlName => {
+            if ( typeof controlStates[controlName] === 'boolean') {
+                const name = snakeCase(controlName);
+                const state = controlStates[controlName] === true ? 'on' : 'off';
+                if ( typeof controlStates[controlName] === 'boolean') {
+                    session.call('pv.enlil.visibility', [ name, state ]);
+                }
+            } else if ( controlName === 'opacity') {
+                const name = this.controlPanel.value.colorVariable.toLowerCase();
+                const opacity = this.controlPanel.value.opacity / 100;
+                if ( name[0] === 'b' ) {
+
+                    session.call('pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ]);
+
+                } else {
+                    session.call('pv.enlil.set_opacity', [ name, [ opacity, opacity ] ]);
+                }
+            } else if ( controlName === 'colorVariable') {
+                const serverVariable = this.controlPanel.value.colorVariable.toLowerCase();
+                this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
             }
         });
-        this.pvView.render();
-    }
-
-    updateColorAxis( variable: string ) {
-        const serverVariable = variable.toLowerCase();
-        this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
         this.pvView.render();
     }
 }
