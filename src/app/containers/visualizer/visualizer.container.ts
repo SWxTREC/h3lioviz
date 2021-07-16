@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { snakeCase } from 'lodash';
-import { debounceTime } from 'rxjs/operators';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
@@ -32,103 +30,53 @@ export class VisualizerComponent implements AfterViewInit {
         opacity: new FormControl( 90 )
     });
     colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
-    isIndeterminate: { [parameter: string]: boolean } = {};
     pvView: any;
     zoomState: 'on' | 'off' = 'on';
 
     ngAfterViewInit(): void {
+        // set up websocket
         vtkWSLinkClient.setSmartConnectClass(SmartConnect);
         const clientToConnect = vtkWSLinkClient.newInstance();
         const divRenderer = this.pvContent.nativeElement;
 
         // Error
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
-            const message =
-                (httpReq && httpReq.response && httpReq.response.error) ||
-                `Connection error`;
-            console.error(message);
-            console.log(httpReq);
+            const message = ( httpReq && httpReq.response && httpReq.response.error ) || `Connection error`;
+            console.error( message );
+            console.log( httpReq );
         });
 
         // Close
-        clientToConnect.onConnectionClose((httpReq: { response: { error: any; }; }) => {
+        clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
             const message =
                 (httpReq && httpReq.response && httpReq.response.error) ||
                 `Connection close`;
-            console.error(message);
-            console.log(httpReq);
+            console.error( message );
+            console.log( httpReq );
         });
 
         clientToConnect.onConnectionReady( validClient => {
             const session = validClient.getConnection().getSession();
 
-            const viewStream = validClient.getImageStream().createViewStream(-1);
+            const viewStream = validClient.getImageStream().createViewStream( -1 );
             const remoteView = vtkRemoteView.newInstance({ session, viewStream });
 
             this.pvView = remoteView;
-            this.pvView.setContainer(divRenderer);
-            this.pvView.setInteractiveRatio(0.7); // the scaled image compared to the client's view resolution
-            this.pvView.setInteractiveQuality(50); // jpeg quality
+            this.pvView.setContainer( divRenderer );
+            this.pvView.setInteractiveRatio( 0.7 ); // the scaled image compared to the client's view resolution
+            this.pvView.setInteractiveQuality( 50 ); // jpeg quality
 
-            window.addEventListener('resize', this.pvView.resize);
+            window.addEventListener( 'resize', this.pvView.resize );
 
             if ( this.zoomState === 'on' ) {
-                this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
+                this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
             }
-            this.updateControls( this.controlPanel.value );
         });
 
         // only need sessionURL in development environment
         const config = environmentConfig;
 
         // Connect
-        clientToConnect.connect(config);
-
-        this.controlPanel.valueChanges.pipe( debounceTime(300) ).subscribe( newFormValues => {
-            this.updateControls( newFormValues );
-        });
-    }
-
-    toggleZoom() {
-        const getZoom = this.pvView.get().rpcWheelEvent;
-        // if zoom is on, turn it off and vice versa
-        if ( getZoom ) {
-            this.zoomState = 'off';
-            this.pvView.setRpcWheelEvent(undefined);
-        } else {
-            this.zoomState = 'on';
-            this.pvView.setRpcWheelEvent('viewport.mouse.zoom.wheel');
-        }
-    }
-
-    resetZoom() {
-        this.pvView.get().viewStream.resetCamera();
-    }
-
-    updateControls( controlStates: { [parameter: string]: any; } ) {
-        const session = this.pvView.get().session;
-        Object.keys(controlStates).forEach( controlName => {
-            if ( typeof controlStates[controlName] === 'boolean') {
-                const name = snakeCase(controlName);
-                const state = controlStates[controlName] === true ? 'on' : 'off';
-                if ( typeof controlStates[controlName] === 'boolean') {
-                    session.call('pv.enlil.visibility', [ name, state ]);
-                }
-            } else if ( controlName === 'opacity') {
-                const name = this.controlPanel.value.colorVariable.toLowerCase();
-                const opacity = this.controlPanel.value.opacity / 100;
-                if ( name[0] === 'b' ) {
-
-                    session.call('pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ]);
-
-                } else {
-                    session.call('pv.enlil.set_opacity', [ name, [ opacity, opacity ] ]);
-                }
-            } else if ( controlName === 'colorVariable') {
-                const serverVariable = this.controlPanel.value.colorVariable.toLowerCase();
-                this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
-            }
-        });
-        this.pvView.render();
+        clientToConnect.connect( config );
     }
 }

@@ -1,0 +1,23 @@
+.control-panel {
+    position: fixed;
+    margin: 1rem;
+    z-index: 2;
+    cursor: grab;
+    &:active {
+        cursor: grabbing;
+    }
+    &__controls{
+        display: flex;
+        justify-content: space-between;
+        &--child {
+            margin-left: 2rem;
+        }
+        &--column {
+            flex-direction: column;
+        }
+    }
+    &__spacer {
+        position: relative !important;
+        margin: 1rem 0;
+    }
+}

@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { MaterialModule } from '../../modules';
 
+import { ControlPanelComponent } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -15,6 +16,9 @@ import { VisualizerComponent } from './visualizer.container';
         VisualizerRoutingModule,
         ReactiveFormsModule
     ],
-    declarations: [ VisualizerComponent ]
+    declarations: [
+        VisualizerComponent,
+        ControlPanelComponent
+    ]
 })
 export class VisualizerModule { }

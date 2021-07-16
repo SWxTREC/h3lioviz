@@ -1,0 +1,78 @@
+import { Component, Input } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { snakeCase } from 'lodash';
+import { debounceTime } from 'rxjs/operators';
+
+@Component({
+    selector: 'swt-control-panel',
+    templateUrl: './control-panel.component.html',
+    styleUrls: [ './control-panel.component.scss' ]
+})
+export class ControlPanelComponent {
+    @Input() pvView: any;
+
+    controlPanel: FormGroup = new FormGroup({
+        bvec: new FormControl( false ),
+        colorVariable: new FormControl( 'Bz'),
+        cme: new FormControl( false ),
+        latSlice: new FormControl( true ),
+        lonArrows: new FormControl( false ),
+        lonSlice: new FormControl( false ),
+        lonStreamlines: new FormControl( true ),
+        magneticFields: new FormGroup({
+            x: new FormControl({ value: false, disabled: true }),
+            y: new FormControl({ value: false, disabled: true }),
+            z: new FormControl({ value: false, disabled: true })
+        }),
+        opacity: new FormControl(90)
+    });
+    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
+    zoomState: 'on' | 'off' = 'on';
+
+    constructor() {
+        this.controlPanel.valueChanges.pipe(debounceTime( 300 )).subscribe( newFormValues => {
+            this.updateControls( newFormValues );
+        });
+    }
+
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
+    }
+
+    toggleZoom() {
+        const getZoom = this.pvView.get().rpcWheelEvent;
+        // if zoom is on, turn it off and vice versa
+        if (getZoom) {
+            this.zoomState = 'off';
+            this.pvView.setRpcWheelEvent( undefined );
+        } else {
+            this.zoomState = 'on';
+            this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
+        }
+    }
+
+    updateControls(controlStates: { [parameter: string]: any; }) {
+        const session = this.pvView.get().session;
+        Object.keys( controlStates ).forEach( controlName => {
+            if (typeof controlStates[ controlName ] === 'boolean') {
+                const name = snakeCase( controlName );
+                const state = controlStates[ controlName ] === true ? 'on' : 'off';
+                if ( typeof controlStates[ controlName ] === 'boolean' ) {
+                    session.call( 'pv.enlil.visibility', [ name, state ] );
+                }
+            } else if ( controlName === 'opacity' ) {
+                const name = this.controlPanel.value.colorVariable.toLowerCase();
+                const opacity = this.controlPanel.value.opacity / 100;
+                if ( name[ 0 ] === 'b' ) {
+                    session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
+                } else {
+                    session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
+                }
+            } else if ( controlName === 'colorVariable' ) {
+                const serverVariable = this.controlPanel.value.colorVariable.toLowerCase();
+                this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
+            }
+        });
+        this.pvView.render();
+    }
+}

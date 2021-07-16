@@ -1,26 +1,6 @@
 @use '~lasp-base-app-snippets/styles/misc';
 @include misc.ignore-max-page-width;
 
-.control-panel {
-    position: fixed;
-    margin: 1rem;
-    z-index: 2;
-    &__controls{
-        display: flex;
-        justify-content: space-between;
-        &--child {
-            margin-left: 2rem;
-        }
-        &--column {
-            flex-direction: column;
-        }
-    }
-    &__spacer {
-        position: relative !important;
-        margin: 1rem 0;
-    }
-}
-
 .pv {
     &__container {
         display: flex;
