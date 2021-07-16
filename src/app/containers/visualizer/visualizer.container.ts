@@ -51,9 +51,7 @@ export class VisualizerComponent implements AfterViewInit {
 
             window.addEventListener( 'resize', this.pvView.resize );
 
-            if ( this.zoomState === 'on' ) {
-                this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
-            }
+            this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
         });
 
         // only need sessionURL in development environment
