@@ -14,24 +14,7 @@ import SmartConnect from 'wslink/src/SmartConnect';
 })
 export class VisualizerComponent implements AfterViewInit {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
-    controlPanel: FormGroup = new FormGroup({
-        bvec: new FormControl(false),
-        colorVariable: new FormControl('Bz'),
-        cme: new FormControl(false),
-        latSlice: new FormControl(true),
-        lonArrows: new FormControl(false),
-        lonSlice: new FormControl(false),
-        lonStreamlines: new FormControl(true),
-        magneticFields: new FormGroup({
-            x: new FormControl({ value: false, disabled: true }),
-            y: new FormControl({ value: false, disabled: true }),
-            z: new FormControl({ value: false, disabled: true })
-        }),
-        opacity: new FormControl( 90 )
-    });
-    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
     pvView: any;
-    zoomState: 'on' | 'off' = 'on';
 
     ngAfterViewInit(): void {
         // set up websocket
