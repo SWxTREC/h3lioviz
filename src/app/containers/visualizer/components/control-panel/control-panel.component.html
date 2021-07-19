@@ -1,0 +1,37 @@
+<mat-card cdkDrag class="control-panel">
+    <mat-card-title>Control Panel</mat-card-title>
+    <div class="control-panel__controls">
+        Mouse zoom {{ zoomState }}
+        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+    </div>
+    <button mat-raised-button color="accent" (click)="resetZoom()">reset zoom</button>
+    <mat-divider class="control-panel__spacer"></mat-divider>
+    <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
+        <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic plane</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="latSlice">Meridional section</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
+    <mat-divider class="control-panel__spacer"></mat-divider>
+    <mat-form-field>
+        <mat-label>Color variable</mat-label>
+        <mat-select formControlName="colorVariable">
+            <mat-option *ngFor="let variable of colorVariables" [value]="variable">
+                {{variable}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div>
+        Opacity <small>{{ controlPanel.value.opacity }}% </small>
+        <mat-slider
+            formControlName="opacity"
+            min="0"
+            max="100"
+            step="10"
+            [value]="controlPanel.value.opacity"
+            tickInterval="10"
+            aria-label="opacity"
+        ></mat-slider>
+    </div>
+    </form>
+</mat-card>
