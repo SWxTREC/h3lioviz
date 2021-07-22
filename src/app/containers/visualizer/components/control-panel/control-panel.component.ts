@@ -17,11 +17,11 @@ export class ControlPanelComponent {
     controlPanel: FormGroup = new FormGroup({
         bvec: new FormControl( false ),
         colorVariable: new FormControl( 'Bz'),
-        cme: new FormControl( false ),
+        cme: new FormControl( true ),
         latSlice: new FormControl( true ),
         lonArrows: new FormControl( false ),
         lonSlice: new FormControl( false ),
-        lonStreamlines: new FormControl( true ),
+        lonStreamlines: new FormControl( false ),
         magneticFields: new FormGroup({
             x: new FormControl({ value: false, disabled: true }),
             y: new FormControl({ value: false, disabled: true }),
