@@ -1,5 +1,10 @@
 <mat-card cdkDrag class="control-panel">
-    <mat-card-title>Control Panel</mat-card-title>
+    <div class="control-panel__drag-handle" cdkDragHandle>
+        <mat-icon>drag_indicator</mat-icon>
+    </div>
+    <mat-card-title>
+        Control Panel
+    </mat-card-title>
     <div class="control-panel__controls">
         Mouse zoom {{ zoomState }}
         <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
@@ -22,8 +27,11 @@
         </mat-select>
     </mat-form-field>
     <div>
-        Opacity <small>{{ controlPanel.value.opacity }}% </small>
+        <div>
+            Opacity: {{ controlPanel.value.opacity }}%
+        </div>
         <mat-slider
+            class="control-panel__full-width-slider"
             formControlName="opacity"
             min="0"
             max="100"
@@ -53,5 +61,8 @@
         <div>
             {{ timeTicks[timeTicks.length - 1] }}
         </div>
+    </div>
+    <div class="control-panel__drag-handle" cdkDragHandle>
+        <mat-icon>drag_indicator</mat-icon>
     </div>
 </mat-card>

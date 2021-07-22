@@ -4,9 +4,19 @@
     margin: 1rem;
     position: fixed;
     z-index: 2;
-    cursor: grab;
-    &:active {
-        cursor: grabbing;
+    &__drag-handle {
+        align-items: center;
+        cursor: grab;
+        display: flex;
+        height: 35px;
+        justify-content: center;
+        width: 100%;
+        &:active {
+            cursor: grabbing;
+        }
+        &:hover {
+            color: $color-accent;
+        }
     }
     &__controls{
         display: flex;
