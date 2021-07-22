@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { debounceTime } from 'rxjs/operators';
@@ -10,7 +10,10 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class ControlPanelComponent {
     @Input() pvView: any;
+    @Input() timeTicks: number[];
+    @Output() updateTime = new EventEmitter();
 
+    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
     controlPanel: FormGroup = new FormGroup({
         bvec: new FormControl( false ),
         colorVariable: new FormControl( 'Bz'),
@@ -26,7 +29,10 @@ export class ControlPanelComponent {
         }),
         opacity: new FormControl(90)
     });
-    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
+    displayedTime: number;
+    endTime: number;
+    startTime: number;
+    timeIndex = 0;
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
@@ -37,6 +43,10 @@ export class ControlPanelComponent {
 
     resetZoom() {
         this.pvView.get().viewStream.resetCamera();
+    }
+
+    getTime(index: { value: number; }) {
+        this.updateTime.emit( index.value );
     }
 
     toggleZoom() {
@@ -69,8 +79,8 @@ export class ControlPanelComponent {
                     session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
                 }
             } else if ( controlName === 'colorVariable' ) {
-                const serverVariable = this.controlPanel.value.colorVariable.toLowerCase();
-                this.pvView.get().session.call('pv.enlil.colorby', [ serverVariable ]);
+                const serverVariableName = this.controlPanel.value.colorVariable.toLowerCase();
+                session.call('pv.enlil.colorby', [ serverVariableName ]);
             }
         });
         this.pvView.render();

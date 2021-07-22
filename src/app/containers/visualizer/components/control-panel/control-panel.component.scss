@@ -1,6 +1,8 @@
+@import 'src/theme/theme-colors.scss';
+
 .control-panel {
-    position: fixed;
     margin: 1rem;
+    position: fixed;
     z-index: 2;
     cursor: grab;
     &:active {
@@ -16,8 +18,20 @@
             flex-direction: column;
         }
     }
+    &__full-width-slider {
+        width: 100%;
+    }
+    &__slider-labels {
+        color: transparentize(black, 0.3);
+        display: flex;
+        font-size: 0.66rem;
+        justify-content: space-between;
+        position: relative;
+        top: -1rem;
+        width: 100%;
+    }
     &__spacer {
-        position: relative !important;
         margin: 1rem 0;
+        position: relative !important;
     }
 }

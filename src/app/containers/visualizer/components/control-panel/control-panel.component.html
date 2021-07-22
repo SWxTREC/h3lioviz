@@ -34,4 +34,24 @@
         ></mat-slider>
     </div>
     </form>
+    <mat-divider class="control-panel__spacer"></mat-divider>
+    <div>
+        Time: {{ timeTicks[timeIndex] }}
+    </div>
+    <mat-slider
+        class="control-panel__full-width-slider"
+        [min]="0"
+        [max]="timeTicks.length - 1"
+        [(value)]= "timeIndex"
+        aria-label="time-selector"
+        (change)="getTime($event)"
+    ></mat-slider>
+    <div class="control-panel__slider-labels">
+        <div>
+            {{ timeTicks[0] }}
+        </div>
+        <div>
+            {{ timeTicks[timeTicks.length - 1] }}
+        </div>
+    </div>
 </mat-card>

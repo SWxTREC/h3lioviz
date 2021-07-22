@@ -1,4 +1,7 @@
-<swt-control-panel [pvView]="pvView"></swt-control-panel>
+<swt-control-panel [pvView]="pvView" [timeTicks]="timeTicks" (updateTime)="getTimeStep($event)"></swt-control-panel>
 <div class="pv__container">
     <div #pvContent class="pv__content"></div>
+    <div *ngIf="loading" class="pv__loading">
+        <mat-spinner color="accent" diameter="40"></mat-spinner>
+    </div>
 </div>

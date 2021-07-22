@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
@@ -14,7 +13,9 @@ import SmartConnect from 'wslink/src/SmartConnect';
 })
 export class VisualizerComponent implements AfterViewInit {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
+    loading = true;
     pvView: any;
+    timeTicks: number[] = [];
 
     ngAfterViewInit(): void {
         // set up websocket
@@ -46,12 +47,18 @@ export class VisualizerComponent implements AfterViewInit {
 
             this.pvView = remoteView;
             this.pvView.setContainer( divRenderer );
-            this.pvView.setInteractiveRatio( 0.7 ); // the scaled image compared to the client's view resolution
-            this.pvView.setInteractiveQuality( 50 ); // jpeg quality
+            this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
+            this.pvView.setInteractiveQuality( 100 ); // jpeg quality
 
             window.addEventListener( 'resize', this.pvView.resize );
 
             this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
+
+            this.pvView.get().session.call('pv.time.value.set', [ 0 ]);
+            this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
+                this.timeTicks = timeValues;
+                this.loading = false;
+            });
         });
 
         // only need sessionURL in development environment
@@ -59,5 +66,12 @@ export class VisualizerComponent implements AfterViewInit {
 
         // Connect
         clientToConnect.connect( config );
+    }
+
+    getTimeStep( timeIndex: number ) {
+        this.loading = true;
+        const session = this.pvView.get().session;
+        session.call('pv.time.index.set', [timeIndex]);
+        session.call('pv.time.index.get', []).then( () => this.loading = false);
     }
 }
