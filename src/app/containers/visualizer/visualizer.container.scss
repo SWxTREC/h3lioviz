@@ -4,6 +4,7 @@
 
 .pv {
     &__container {
+        height: 100vh;
         background-color: transparentize(black, 0.1);
         display: flex;
         justify-content: center;

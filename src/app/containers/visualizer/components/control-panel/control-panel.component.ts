@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
+import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
@@ -30,14 +31,27 @@ export class ControlPanelComponent {
         opacity: new FormControl(90)
     });
     displayedTime: number;
-    endTime: number;
-    startTime: number;
+    numberDebouncer: Subject<number> = new Subject<number>();
+    playing = false;
     timeIndex = 0;
     zoomState: 'on' | 'off' = 'on';
+    playingDebouncer: Subject<boolean> = new Subject<boolean>();
 
     constructor() {
         this.controlPanel.valueChanges.pipe(debounceTime( 300 )).subscribe( newFormValues => {
             this.updateControls( newFormValues );
+        });
+        this.updateTime.emit(0);
+        this.numberDebouncer.pipe(
+            debounceTime(300)
+        ).subscribe((value) => this.updateTime.emit(value));
+        this.playingDebouncer.pipe(
+            debounceTime(300)
+        ).subscribe(() => {
+            const session = this.pvView.get().session;
+            if ( this.playing ) {
+                session.call( 'pv.time.index.get', [] ).then(( index: number ) => this.playTimeSteps( session, index ));
+            }
         });
     }
 
@@ -46,7 +60,30 @@ export class ControlPanelComponent {
     }
 
     getTime(index: { value: number; }) {
-        this.updateTime.emit( index.value );
+        this.numberDebouncer.next( index.value );
+    }
+
+    playTimeSteps( session: { call: (arg0: string, arg1: number[]) => Promise<any>; }, index: number ) {
+        if (this.playing) {
+            const incremented = index + 1;
+            session.call('pv.time.index.set', [ incremented ]).then( () => {
+                this.timeIndex = incremented;
+                if ( this.timeIndex < this.timeTicks.length - 1 ) {
+                    this.playTimeSteps(session, this.timeIndex );
+                } else {
+                    // stop when last time step is reached
+                    this.playing = false;
+                }
+            });
+        } else {
+            // stop when the pause button is pressed
+            session.call( 'pv.time.index.set', [ index ] );
+        }
+    }
+
+    togglePlay() {
+        this.playing = !this.playing;
+        this.playingDebouncer.next( this.playing );
     }
 
     toggleZoom() {

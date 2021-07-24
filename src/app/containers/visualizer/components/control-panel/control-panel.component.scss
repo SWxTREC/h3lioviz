@@ -44,4 +44,9 @@
         margin: 1rem 0;
         position: relative !important;
     }
+    &__time-player {
+        position: relative;
+        text-align: center;
+        top: -2rem;
+    }
 }

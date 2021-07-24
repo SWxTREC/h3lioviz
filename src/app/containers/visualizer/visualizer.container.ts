@@ -58,6 +58,7 @@ export class VisualizerComponent implements AfterViewInit {
             this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
                 this.timeTicks = timeValues;
                 this.loading = false;
+                session.call('pv.vcr.action', [ 'first' ]);
             });
         });
 
@@ -71,7 +72,6 @@ export class VisualizerComponent implements AfterViewInit {
     getTimeStep( timeIndex: number ) {
         this.loading = true;
         const session = this.pvView.get().session;
-        session.call('pv.time.index.set', [timeIndex]);
-        session.call('pv.time.index.get', []).then( () => this.loading = false);
+        session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 }

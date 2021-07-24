@@ -46,6 +46,9 @@
     <div>
         Time: {{ timeTicks[timeIndex] }}
     </div>
+    <div>
+        <small>(Index: {{ timeIndex }})</small>
+    </div>
     <mat-slider
         class="control-panel__full-width-slider"
         [min]="0"
@@ -61,6 +64,10 @@
         <div>
             {{ timeTicks[timeTicks.length - 1] }}
         </div>
+    </div>
+    <div class="control-panel__time-player" (click)="togglePlay()">
+        <mat-icon *ngIf="!playing">play_arrow</mat-icon>
+        <mat-icon *ngIf="playing">pause</mat-icon>
     </div>
     <div class="control-panel__drag-handle" cdkDragHandle>
         <mat-icon>drag_indicator</mat-icon>
