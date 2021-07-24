@@ -1,4 +1,8 @@
 @import 'src/theme/theme-colors.scss';
+@keyframes fade {
+  0%,100% { opacity: 0.3 }
+  50% { opacity: 1 }
+}
 
 .control-panel {
     margin: 1rem;
@@ -30,6 +34,14 @@
     }
     &__full-width-slider {
         width: 100%;
+        &--pulsing {
+            ::ng-deep {
+                .mat-slider-track-fill {
+                    opacity: 1;
+                    animation: fade 2s linear infinite;
+                }
+            }
+        }
     }
     &__slider-labels {
         color: transparentize(black, 0.3);

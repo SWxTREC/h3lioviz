@@ -32,6 +32,7 @@
         </div>
         <mat-slider
             class="control-panel__full-width-slider"
+            color="primary"
             formControlName="opacity"
             min="0"
             max="100"
@@ -51,6 +52,8 @@
     </div>
     <mat-slider
         class="control-panel__full-width-slider"
+        [class.control-panel__full-width-slider--pulsing]="playing"
+        color="primary"
         [min]="0"
         [max]="timeTicks.length - 1"
         [(value)]= "timeIndex"
