@@ -1,16 +1,26 @@
 @use '~lasp-base-app-snippets/styles/misc';
 @include misc.ignore-max-page-width;
+@import 'src/theme/theme-colors.scss';
 
 .pv {
     &__container {
+        height: 100vh;
+        background-color: transparentize(black, 0.1);
         display: flex;
         justify-content: center;
-        background-color: transparentize(black, 0.1);
     }
     &__content {
+        align-items: center;
         position: relative;
         width: 100vh;
-        align-items: center;
         z-index: 1
+    }
+    &__loading {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 50%;
+        z-index: 1;
     }
 }

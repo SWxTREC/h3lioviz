@@ -1,10 +1,26 @@
+@import 'src/theme/theme-colors.scss';
+@keyframes fade {
+  0%,100% { opacity: 0.3 }
+  50% { opacity: 1 }
+}
+
 .control-panel {
-    position: fixed;
     margin: 1rem;
+    position: fixed;
     z-index: 2;
-    cursor: grab;
-    &:active {
-        cursor: grabbing;
+    &__drag-handle {
+        align-items: center;
+        cursor: grab;
+        display: flex;
+        height: 35px;
+        justify-content: center;
+        width: 100%;
+        &:active {
+            cursor: grabbing;
+        }
+        &:hover {
+            color: $color-accent;
+        }
     }
     &__controls{
         display: flex;
@@ -16,8 +32,33 @@
             flex-direction: column;
         }
     }
+    &__full-width-slider {
+        width: 100%;
+        &--pulsing {
+            ::ng-deep {
+                .mat-slider-track-fill {
+                    opacity: 1;
+                    animation: fade 2s linear infinite;
+                }
+            }
+        }
+    }
+    &__slider-labels {
+        color: transparentize(black, 0.3);
+        display: flex;
+        font-size: 0.66rem;
+        justify-content: space-between;
+        position: relative;
+        top: -1rem;
+        width: 100%;
+    }
     &__spacer {
-        position: relative !important;
         margin: 1rem 0;
+        position: relative !important;
+    }
+    &__time-player {
+        position: relative;
+        text-align: center;
+        top: -2rem;
     }
 }
