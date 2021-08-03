@@ -69,7 +69,7 @@ export class VisualizerComponent implements AfterViewInit {
         clientToConnect.connect( config );
     }
 
-    getTimeStep( timeIndex: number ) {
+    getTimestep( timeIndex: number ) {
         this.loading = true;
         const session = this.pvView.get().session;
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );

@@ -17,7 +17,9 @@
         <mat-checkbox color="primary" formControlName="latSlice">Meridional section</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
-    <mat-divider class="control-panel__spacer"></mat-divider>
+    <div class="control-panel__drag-handle" cdkDragHandle>
+        <mat-icon>drag_indicator</mat-icon>
+    </div>
     <mat-form-field>
         <mat-label>Color variable</mat-label>
         <mat-select formControlName="colorVariable">
@@ -27,8 +29,11 @@
         </mat-select>
     </mat-form-field>
     <div>
-        <div>
-            Opacity: {{ controlPanel.value.opacity }}%
+        <div class="control-panel__header">
+            <div>
+                <strong>Opacity</strong>
+            </div>
+            {{ controlPanel.value.opacity }}%
         </div>
         <mat-slider
             class="control-panel__full-width-slider"
@@ -43,14 +48,18 @@
         ></mat-slider>
     </div>
     </form>
-    <mat-divider class="control-panel__spacer"></mat-divider>
-    <div>
-        Time: {{ timeTicks[timeIndex] }}
-    </div>
-    <div>
-        <small>(Index: {{ timeIndex }})</small>
-    </div>
-    <mat-slider
+    <ng-container *ngIf="startTime">
+        <div class="control-panel__drag-handle" cdkDragHandle>
+            <mat-icon>drag_indicator</mat-icon>
+        </div>
+        <div class="control-panel__header">
+            <div>
+                <strong>Datetime</strong>
+            </div>
+            <strong>{{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD'}}  </strong>
+            <small>{{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'HH:mm:ss.SSSSSS'}}</small>
+        </div>
+        <mat-slider
         class="control-panel__full-width-slider"
         [class.control-panel__full-width-slider--pulsing]="playing"
         color="primary"
@@ -58,20 +67,21 @@
         [max]="timeTicks.length - 1"
         [(value)]= "timeIndex"
         aria-label="time-selector"
-        (change)="getTime($event)"
-    ></mat-slider>
-    <div class="control-panel__slider-labels">
-        <div>
-            {{ timeTicks[0] }}
+        (change)="newTimestep($event)"
+        ></mat-slider>
+        <div class="control-panel__slider-labels">
+            <div class="control-panel__slider-label">
+                {{ startTime | amAdd: timeTicks[0] : 's' |  amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+            </div>
+            <div class="control-panel__slider-label control-panel__slider-label--right">
+                {{ startTime | amAdd: timeTicks[timeTicks.length - 1] : 's' |  amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+            </div>
         </div>
-        <div>
-            {{ timeTicks[timeTicks.length - 1] }}
+        <div class="control-panel__time-player" (click)="togglePlay()">
+            <mat-icon *ngIf="!playing">play_arrow</mat-icon>
+            <mat-icon *ngIf="playing">pause</mat-icon>
         </div>
-    </div>
-    <div class="control-panel__time-player" (click)="togglePlay()">
-        <mat-icon *ngIf="!playing">play_arrow</mat-icon>
-        <mat-icon *ngIf="playing">pause</mat-icon>
-    </div>
+    </ng-container>
     <div class="control-panel__drag-handle" cdkDragHandle>
         <mat-icon>drag_indicator</mat-icon>
     </div>

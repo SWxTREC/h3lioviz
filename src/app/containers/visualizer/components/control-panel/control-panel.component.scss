@@ -1,6 +1,6 @@
 @import 'src/theme/theme-colors.scss';
 @keyframes fade {
-  0%,100% { opacity: 0.3 }
+  0%,100% { opacity: 0.1 }
   50% { opacity: 1 }
 }
 
@@ -36,11 +36,20 @@
         width: 100%;
         &--pulsing {
             ::ng-deep {
-                .mat-slider-track-fill {
+                .mat-slider-track-wrapper {
                     opacity: 1;
                     animation: fade 2s linear infinite;
                 }
             }
+        }
+    }
+    &__header {
+        text-align: center;
+    }
+    &__slider-label {
+        width: 5rem;
+        &--right {
+            text-align: right;
         }
     }
     &__slider-labels {

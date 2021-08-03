@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { Subject } from 'rxjs';
@@ -9,7 +9,7 @@ import { debounceTime } from 'rxjs/operators';
     templateUrl: './control-panel.component.html',
     styleUrls: [ './control-panel.component.scss' ]
 })
-export class ControlPanelComponent {
+export class ControlPanelComponent implements OnChanges {
     @Input() pvView: any;
     @Input() timeTicks: number[];
     @Output() updateTime = new EventEmitter();
@@ -33,9 +33,11 @@ export class ControlPanelComponent {
     displayedTime: number;
     numberDebouncer: Subject<number> = new Subject<number>();
     playing = false;
+    playingDebouncer: Subject<boolean> = new Subject<boolean>();
+    session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
+    startTime: string;
     timeIndex = 0;
     zoomState: 'on' | 'off' = 'on';
-    playingDebouncer: Subject<boolean> = new Subject<boolean>();
 
     constructor() {
         this.controlPanel.valueChanges.pipe(debounceTime( 300 )).subscribe( newFormValues => {
@@ -43,42 +45,62 @@ export class ControlPanelComponent {
         });
         this.updateTime.emit(0);
         this.numberDebouncer.pipe(
-            debounceTime(300)
+            debounceTime(250)
         ).subscribe((value) => this.updateTime.emit(value));
         this.playingDebouncer.pipe(
             debounceTime(300)
-        ).subscribe(() => {
-            const session = this.pvView.get().session;
-            if ( this.playing ) {
-                session.call( 'pv.time.index.get', [] ).then(( index: number ) => this.playTimeSteps( session, index ));
+        ).subscribe( (playing: boolean) => {
+            if ( playing ) {
+                // play when play button is pressed
+                this.playTimesteps( this.timeIndex );
+            } else {
+                // stop when the pause button is pressed
+                this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
             }
         });
     }
 
-    resetZoom() {
-        this.pvView.get().viewStream.resetCamera();
+    ngOnChanges() {
+        // get session once, when pvView is defined
+        if ( this.pvView && !this.session ) {
+            this.session = this.pvView.get().session;
+            this.session.call('pv.enlil.get_start_time', []).then( (timeString: string) => {
+                this.startTime = timeString[0].split(' ').slice(-2).join('T');
+            });
+            // initialize server to state of form
+            this.updateControls( this.controlPanel.value );
+        }
     }
 
-    getTime(index: { value: number; }) {
+    newTimestep(index: { value: number; }) {
+        // if playing, immediately stop on click on timeline
+        if ( this.playing ) {
+            this.playing = false;
+        }
         this.numberDebouncer.next( index.value );
     }
 
-    playTimeSteps( session: { call: (arg0: string, arg1: number[]) => Promise<any>; }, index: number ) {
-        if (this.playing) {
-            const incremented = index + 1;
-            session.call('pv.time.index.set', [ incremented ]).then( () => {
-                this.timeIndex = incremented;
-                if ( this.timeIndex < this.timeTicks.length - 1 ) {
-                    this.playTimeSteps(session, this.timeIndex );
+    playTimesteps( index: number ) {
+        const nextIndex = index + 1;
+        if ( nextIndex < this.timeTicks.length ) {
+            this.session.call( 'pv.time.index.set', [ nextIndex ]).then( () => {
+                if (this.playing) {
+                    // increment timeIndex here, once graphics are loaded
+                    this.timeIndex = index;
+                    this.playTimesteps( nextIndex );
                 } else {
-                    // stop when last time step is reached
-                    this.playing = false;
+                    this.session.call('pv.time.index.set', [ this.timeIndex ]);
                 }
             });
         } else {
-            // stop when the pause button is pressed
-            session.call( 'pv.time.index.set', [ index ] );
+            // stop when last time step is reached
+            this.playing = false;
+            this.session.call('pv.time.index.set', [ this.timeIndex ]);
         }
+    }
+
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
     }
 
     togglePlay() {
@@ -99,25 +121,24 @@ export class ControlPanelComponent {
     }
 
     updateControls(controlStates: { [parameter: string]: any; }) {
-        const session = this.pvView.get().session;
         Object.keys( controlStates ).forEach( controlName => {
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 if ( typeof controlStates[ controlName ] === 'boolean' ) {
-                    session.call( 'pv.enlil.visibility', [ name, state ] );
+                    this.session.call( 'pv.enlil.visibility', [ name, state ] );
                 }
             } else if ( controlName === 'opacity' ) {
                 const name = this.controlPanel.value.colorVariable.toLowerCase();
                 const opacity = this.controlPanel.value.opacity / 100;
                 if ( name[ 0 ] === 'b' ) {
-                    session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
                 } else {
-                    session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
                 }
             } else if ( controlName === 'colorVariable' ) {
                 const serverVariableName = this.controlPanel.value.colorVariable.toLowerCase();
-                session.call('pv.enlil.colorby', [ serverVariableName ]);
+                this.session.call('pv.enlil.colorby', [ serverVariableName ]);
             }
         });
         this.pvView.render();
