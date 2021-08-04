@@ -54,10 +54,9 @@
         </div>
         <div class="control-panel__header">
             <div>
-                <strong>Datetime</strong>
+                <strong>Date</strong>
             </div>
-            <strong>{{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD'}}  </strong>
-            <small>{{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'HH:mm:ss.SSSSSS'}}</small>
+            {{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD HH:00 UTC'}}
         </div>
         <mat-slider
         class="control-panel__full-width-slider"
@@ -71,10 +70,10 @@
         ></mat-slider>
         <div class="control-panel__slider-labels">
             <div class="control-panel__slider-label">
-                {{ startTime | amAdd: timeTicks[0] : 's' |  amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+                {{ startTime | amAdd: timeTicks[0] : 's' |  amDateFormat: 'YYYY-MM-DD HH:00'}}
             </div>
             <div class="control-panel__slider-label control-panel__slider-label--right">
-                {{ startTime | amAdd: timeTicks[timeTicks.length - 1] : 's' |  amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+                {{ startTime | amAdd: timeTicks[timeTicks.length - 1] : 's' |  amDateFormat: 'YYYY-MM-DD HH:00'}}
             </div>
         </div>
         <div class="control-panel__time-player" (click)="togglePlay()">
