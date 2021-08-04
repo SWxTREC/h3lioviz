@@ -95,6 +95,7 @@ export class ControlPanelComponent implements OnChanges {
         } else {
             // stop when last time step is reached
             this.playing = false;
+            this.timeIndex = this.timeTicks.length - 1;
             this.session.call('pv.time.index.set', [ this.timeIndex ]);
         }
     }
