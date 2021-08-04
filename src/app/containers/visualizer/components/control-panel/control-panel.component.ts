@@ -45,7 +45,7 @@ export class ControlPanelComponent implements OnChanges {
         });
         this.updateTime.emit(0);
         this.numberDebouncer.pipe(
-            debounceTime(250)
+            debounceTime(300)
         ).subscribe((value) => this.updateTime.emit(value));
         this.playingDebouncer.pipe(
             debounceTime(300)
@@ -73,7 +73,7 @@ export class ControlPanelComponent implements OnChanges {
     }
 
     newTimestep(index: { value: number; }) {
-        // if playing, immediately stop on click on timeline
+        // if playing, immediately stop when there is a click on the timeline
         if ( this.playing ) {
             this.playing = false;
         }
