@@ -15,6 +15,12 @@
         width: 100vh;
         z-index: 1
     }
+    &__error {
+        color: $color-warn;
+    }
+    &__fade {
+        opacity: 20%;
+    }
     &__loading {
         align-items: center;
         display: flex;
@@ -22,5 +28,10 @@
         position: absolute;
         top: 50%;
         z-index: 1;
+        &--disconnect {
+            color: transparentize(black, 0.3);
+            height: 100%;
+            width: 100%;
+        }
     }
 }
