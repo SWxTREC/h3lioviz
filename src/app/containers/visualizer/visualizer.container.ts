@@ -16,6 +16,7 @@ export class VisualizerComponent implements AfterViewInit {
     loading = true;
     pvView: any;
     timeTicks: number[] = [];
+    errorMessage: string;
 
     ngAfterViewInit(): void {
         // set up websocket
@@ -25,21 +26,22 @@ export class VisualizerComponent implements AfterViewInit {
 
         // Error
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
-            const message = ( httpReq && httpReq.response && httpReq.response.error ) || `Connection error`;
+            const message = ( httpReq?.response?.error ) || `Connection error`;
             console.error( message );
             console.log( httpReq );
+            this.errorMessage = 'cannot connect to Enlil-3D server';
         });
 
         // Close
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
-            const message =
-                (httpReq && httpReq.response && httpReq.response.error) ||
-                `Connection close`;
+            const message = (httpReq?.response?.error) || `Connection close`;
             console.error( message );
             console.log( httpReq );
+            this.errorMessage = 'Enlil-3D server is not responding';
         });
 
         clientToConnect.onConnectionReady( validClient => {
+            this.errorMessage = undefined;
             const session = validClient.getConnection().getSession();
 
             const viewStream = validClient.getImageStream().createViewStream( -1 );
