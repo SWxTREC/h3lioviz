@@ -56,7 +56,7 @@ export class VisualizerComponent implements AfterViewInit {
 
             this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
 
-            this.pvView.get().session.call('pv.time.value.set', [ 0 ]);
+            this.pvView.get().session.call('pv.time.index.set', [ 0 ]);
             this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
                 this.timeTicks = timeValues;
                 this.loading = false;
