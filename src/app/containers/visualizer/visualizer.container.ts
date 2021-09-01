@@ -66,6 +66,7 @@ export class VisualizerComponent implements AfterViewInit {
 
         // only need sessionURL in development environment
         const config = environmentConfig;
+        // after login, access clientId and client credentials to this config: config.
 
         // Connect
         clientToConnect.connect( config );
