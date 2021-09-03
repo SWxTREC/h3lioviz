@@ -32,7 +32,6 @@
     "@angular/platform-browser": "^11.2.8",
     "@angular/platform-browser-dynamic": "^11.2.8",
     "@angular/router": "^11.2.8",
-    "aws-api-gateway-client": "^0.3.7",
     "aws-sdk": "^2.976.0",
     "core-js": "^3.10.0",
     "lasp-base-app-snippets": "^2.2.2",

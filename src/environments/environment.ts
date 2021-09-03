@@ -22,7 +22,7 @@ if ( siteRootUrl.substr(-1) !== '/' ) {
 export const environment = {
     aws: {
         cognito: {
-            appClientId: 'vha7hq4ant83mhvt47pffkk5k',
+            appClientId: '5itqpae8gseickjbemm5tprpef',
             region: 'us-east-1',
             userPoolId: 'Dgc4otkxZ',
             loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
@@ -37,6 +37,4 @@ export const environment = {
 export const environmentConfig = {
     application: 'visualizer',
     sessionURL: 'ws://localhost:1234/ws'
-    // user: 'test',
-    // cognitoId: 'test123'
 };
