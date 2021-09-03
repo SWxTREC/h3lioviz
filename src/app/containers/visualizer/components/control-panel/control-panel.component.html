@@ -48,7 +48,7 @@
         ></mat-slider>
     </div>
     </form>
-    <ng-container *ngIf="startTime">
+    <ng-container *ngIf="timeTicks[0]">
         <div class="control-panel__drag-handle" cdkDragHandle>
             <mat-icon>drag_indicator</mat-icon>
         </div>
@@ -56,7 +56,7 @@
             <div>
                 <strong>Date</strong>
             </div>
-            {{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD HH:00 UTC'}}
+            {{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}
         </div>
         <mat-slider
         class="control-panel__full-width-slider"
