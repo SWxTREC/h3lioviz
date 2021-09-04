@@ -21,7 +21,3 @@ export interface ICognitoTokens {
     refresh_token: string;
     token_type: string;
 }
-
-// export enum CustomCognitoScopes {
-//     fileListRead = 'ae.emm.sdc/filelist.read'
-// }
