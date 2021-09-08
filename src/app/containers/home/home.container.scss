@@ -1,0 +1,24 @@
+@use '~lasp-base-app-snippets/styles/misc';
+@include misc.ignore-max-page-width;
+
+:host {
+    text-align: center;
+    color: white;
+    background-color: transparentize(black, 0.1);
+}
+
+.home {
+    height: 80vh;
+    padding: 50px;
+    &__message {
+        font-size: large;
+    }
+    &__videos {
+        background-color: black;
+        padding: 20px;
+    }
+    &__video {
+        height: 300px;
+        border: 5px solid black;
+    }
+}

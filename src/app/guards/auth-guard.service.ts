@@ -15,7 +15,6 @@ export class AuthGuard implements CanActivate {
 
         // if the user is logged in, then session tokens will be present
         const isLoggedIn = !!this._profileNavService.getStoredTokens();
-        console.log({ isLoggedIn });
 
         if ( !isLoggedIn ) {
             // execute the handler for clicking the 'sign in' button,
