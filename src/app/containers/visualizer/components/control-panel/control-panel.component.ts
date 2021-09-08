@@ -64,8 +64,6 @@ export class ControlPanelComponent implements OnChanges {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // Time within the app is always in seconds from this epoch UTC
-            this.startTime = '1970-01-01T00:00';
             // initialize server to state of form
             this.updateControls( this.controlPanel.value );
         }

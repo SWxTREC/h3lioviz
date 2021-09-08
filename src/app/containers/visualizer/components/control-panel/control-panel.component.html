@@ -48,7 +48,7 @@
         ></mat-slider>
     </div>
     </form>
-    <ng-container *ngIf="startTime">
+    <ng-container *ngIf="timeTicks[0]">
         <div class="control-panel__drag-handle" cdkDragHandle>
             <mat-icon>drag_indicator</mat-icon>
         </div>
@@ -56,7 +56,7 @@
             <div>
                 <strong>Date</strong>
             </div>
-            {{ startTime | amAdd: timeTicks[timeIndex] : 's' | amDateFormat: 'YYYY-MM-DD HH:00 UTC'}}
+            {{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}
         </div>
         <mat-slider
         class="control-panel__full-width-slider"
@@ -70,10 +70,10 @@
         ></mat-slider>
         <div class="control-panel__slider-labels">
             <div class="control-panel__slider-label">
-                {{ startTime | amAdd: timeTicks[0] : 's' |  amDateFormat: 'YYYY-MM-DD HH:00'}}
+                {{  timeTicks[0] | amFromUnix | amUtc |  amDateFormat: 'YYYY-MM-DD HH:00'}}
             </div>
             <div class="control-panel__slider-label control-panel__slider-label--right">
-                {{ startTime | amAdd: timeTicks[timeTicks.length - 1] : 's' |  amDateFormat: 'YYYY-MM-DD HH:00'}}
+                {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
             </div>
         </div>
         <div class="control-panel__time-player" (click)="togglePlay()">

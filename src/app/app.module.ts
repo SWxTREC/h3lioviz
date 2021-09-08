@@ -11,8 +11,10 @@ import { LaspNavModule, LaspNavService } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { AppComponent } from './app.component';
+import { AuthGuard } from './guards/auth-guard.service';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
+import { ProfileNavService } from './services/profile-nav.service';
 
 @NgModule({
     declarations: [
@@ -31,11 +33,17 @@ import { routes } from './routes';
         RouterModule.forRoot( routes, { scrollPositionRestoration: 'enabled', relativeLinkResolution: 'legacy' } )
     ],
     providers: [
+        AuthGuard,
+        ProfileNavService,
+        LaspNavService,
+        {
+            provide: LaspNavService,
+            useExisting: ProfileNavService
+        },
         {
             provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: { appearance: 'outline' }
-        },
-        LaspNavService
+        }
     ],
     bootstrap: [ AppComponent ]
 })

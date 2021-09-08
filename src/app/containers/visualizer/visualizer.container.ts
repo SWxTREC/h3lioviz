@@ -58,7 +58,7 @@ export class VisualizerComponent implements AfterViewInit {
 
             this.pvView.get().session.call('pv.time.index.set', [ 0 ]);
             this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
-                this.timeTicks = timeValues;
+                this.timeTicks = timeValues.map( value => Math.round(value));
                 this.loading = false;
                 session.call('pv.vcr.action', [ 'first' ]);
             });
@@ -66,6 +66,7 @@ export class VisualizerComponent implements AfterViewInit {
 
         // only need sessionURL in development environment
         const config = environmentConfig;
+        // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
         clientToConnect.connect( config );
