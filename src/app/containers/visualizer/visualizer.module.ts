@@ -1,3 +1,4 @@
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import { VisualizerComponent } from './visualizer.container';
         CommonModule,
         MaterialModule,
         MomentModule,
+        NgxSliderModule,
         VisualizerRoutingModule,
         ReactiveFormsModule
     ],

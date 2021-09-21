@@ -6,22 +6,8 @@
 
 .control-panel {
     margin: 1rem;
-    position: fixed;
+    position: absolute;
     z-index: 2;
-    &__drag-handle {
-        align-items: center;
-        cursor: grab;
-        display: flex;
-        height: 35px;
-        justify-content: center;
-        width: 100%;
-        &:active {
-            cursor: grabbing;
-        }
-        &:hover {
-            color: $color-accent;
-        }
-    }
     &__controls{
         display: flex;
         justify-content: space-between;

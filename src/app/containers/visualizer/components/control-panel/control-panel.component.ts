@@ -1,3 +1,4 @@
+import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
