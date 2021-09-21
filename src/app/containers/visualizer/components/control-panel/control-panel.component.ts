@@ -1,8 +1,8 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
@@ -10,64 +10,139 @@ import { debounceTime } from 'rxjs/operators';
     templateUrl: './control-panel.component.html',
     styleUrls: [ './control-panel.component.scss' ]
 })
-export class ControlPanelComponent implements OnChanges {
+export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
     @Input() timeTicks: number[];
     @Output() updateTime = new EventEmitter();
 
+    // TODO: set these in the server on load, possibly create a constant for all load configurations
+    LUT_RANGE: { [param: string]: [number, number] } = {
+        Velocity: [ 300, 900 ],
+        Density: [ 0, 30 ],
+        Temperature: [ 1e4, 1e6 ],
+        Br: [ -10, 10 ],
+        Bx: [ -10, 10 ],
+        By: [ -10, 10 ],
+        Bz: [ -10, 10 ]
+    };
+    // TODO: variables list of objects with serverName, name, units, range
+
     colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
+    defaultColorVariable = this.colorVariables[ 6 ];
+    colorOptions: Options = {
+        floor: this.LUT_RANGE[ this.defaultColorVariable ][0],
+        ceil: this.LUT_RANGE[ this.defaultColorVariable ][1],
+        step: 5
+    };
+    defaultThresholdVariable = this.defaultColorVariable;
     controlPanel: FormGroup = new FormGroup({
-        bvec: new FormControl( false ),
-        colorVariable: new FormControl( 'Bz'),
+        colorRange: new FormControl( this.LUT_RANGE[ this.defaultColorVariable ] ),
+        colorVariable: new FormControl( this.defaultColorVariable ),
         cme: new FormControl( true ),
         latSlice: new FormControl( true ),
         lonArrows: new FormControl( false ),
         lonSlice: new FormControl( false ),
         lonStreamlines: new FormControl( false ),
-        magneticFields: new FormGroup({
-            x: new FormControl({ value: false, disabled: true }),
-            y: new FormControl({ value: false, disabled: true }),
-            z: new FormControl({ value: false, disabled: true })
-        }),
-        opacity: new FormControl(90)
+        opacity: new FormControl(90),
+        threshold: new FormControl( false ),
+        thresholdVariable: new FormControl( this.defaultThresholdVariable )
     });
     displayedTime: number;
-    numberDebouncer: Subject<number> = new Subject<number>();
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
+    renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
     startTime: string;
+    subscriptions: Subscription[] = [];
+    timestepDebouncer: Subject<number> = new Subject<number>();
+    thresholdOptions: Options = {
+        floor: this.LUT_RANGE[ this.defaultThresholdVariable ][0],
+        ceil: this.LUT_RANGE[ this.defaultThresholdVariable ][1],
+        step: 5
+    };
+    thresholdRange: [number, number] = ( this.LUT_RANGE[ this.defaultThresholdVariable ]);
     timeIndex = 0;
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
-        this.controlPanel.valueChanges.pipe(debounceTime( 300 )).subscribe( newFormValues => {
-            this.updateControls( newFormValues );
-        });
+        this.subscriptions.push( this.controlPanel.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
+                this.updateVisibilityControls( newFormValues );
+                // this will render everytime any part of the form is updated
+                this.renderDebouncer.next('visibility');
+            }));
+        this.subscriptions.push( this.controlPanel.controls.colorRange.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newColorRange => {
+                const colorVariableName = this.controlPanel.value.colorVariable.toLowerCase();
+                this.session.call('pv.enlil.set_range', [ colorVariableName, newColorRange ]);
+            }));
+        this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
+                const colorVariableName = newColorVariable.toLowerCase();
+                const twentySteps = (this.LUT_RANGE[ newColorVariable ][1] - this.LUT_RANGE[ newColorVariable ][0]) / 20;
+
+                this.session.call('pv.enlil.colorby', [ colorVariableName ]);
+                this.colorOptions = {
+                    floor: this.LUT_RANGE[ newColorVariable ][0],
+                    ceil: this.LUT_RANGE[ newColorVariable ][1],
+                    step: twentySteps
+                };
+
+            }));
+        this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
+                const thresholdVariableName = newThresholdVariable.toLowerCase();
+                const twentySteps = (this.LUT_RANGE[ newThresholdVariable ][1] - this.LUT_RANGE[ newThresholdVariable ][0]) / 20;
+                this.thresholdOptions = {
+                    floor: this.LUT_RANGE[ newThresholdVariable ][0],
+                    ceil: this.LUT_RANGE[ newThresholdVariable ][1],
+                    step: twentySteps
+                };
+                const quarter = 5 * this.thresholdOptions.step;
+                const defaultThresholdRange: [number, number] =
+                [ this.thresholdOptions.floor + quarter, this.thresholdOptions.ceil - quarter ];
+                this.thresholdRange = defaultThresholdRange;
+                this.session.call('pv.enlil.set_threshold', [ thresholdVariableName, defaultThresholdRange ]);
+            }));
+        // initialize
         this.updateTime.emit(0);
-        this.numberDebouncer.pipe(
-            debounceTime(300)
-        ).subscribe((value) => this.updateTime.emit(value));
-        this.playingDebouncer.pipe(
-            debounceTime(300)
-        ).subscribe( (playing: boolean) => {
-            if ( playing ) {
-                // play when play button is pressed
-                this.playTimesteps( this.timeIndex );
-            } else {
-                // stop when the pause button is pressed
-                this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
+        this.subscriptions.push(
+            this.timestepDebouncer.pipe(
+                debounceTime(300)
+            ).subscribe((value) => this.updateTime.emit(value)));
+        this.subscriptions.push(
+            this.playingDebouncer.pipe(
+                debounceTime(300)
+            ).subscribe( (playing: boolean) => {
+                if ( playing ) {
+                    // play when play button is pressed
+                    this.playTimesteps( this.timeIndex );
+                } else {
+                    // stop when the pause button is pressed
+                    this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
+                }
             }
-        });
+        ));
+        this.subscriptions.push(
+            this.renderDebouncer.pipe(
+                debounceTime( 300 )
+            ).subscribe((str) => {
+                this.pvView.render();
+            }
+        ));
     }
 
-    ngOnChanges() {
+    ngOnChanges(): void {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // initialize server to state of form
-            this.updateControls( this.controlPanel.value );
+            // initialize server to default visibility selections
+            this.updateVisibilityControls( this.controlPanel.value );
         }
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
     newTimestep(index: { value: number; }) {
@@ -75,7 +150,7 @@ export class ControlPanelComponent implements OnChanges {
         if ( this.playing ) {
             this.playing = false;
         }
-        this.numberDebouncer.next( index.value );
+        this.timestepDebouncer.next( index.value );
     }
 
     playTimesteps( index: number ) {
@@ -119,27 +194,20 @@ export class ControlPanelComponent implements OnChanges {
         }
     }
 
-    updateControls(controlStates: { [parameter: string]: any; }) {
+    updateVisibilityControls(controlStates: { [parameter: string]: any; }) {
         Object.keys( controlStates ).forEach( controlName => {
+            // const colorVariableName = this.controlPanel.value.colorVariable.toLowerCase();
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                if ( typeof controlStates[ controlName ] === 'boolean' ) {
-                    this.session.call( 'pv.enlil.visibility', [ name, state ] );
-                }
-            } else if ( controlName === 'opacity' ) {
-                const name = this.controlPanel.value.colorVariable.toLowerCase();
-                const opacity = this.controlPanel.value.opacity / 100;
-                if ( name[ 0 ] === 'b' ) {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
-                } else {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
-                }
-            } else if ( controlName === 'colorVariable' ) {
-                const serverVariableName = this.controlPanel.value.colorVariable.toLowerCase();
-                this.session.call('pv.enlil.colorby', [ serverVariableName ]);
+                this.session.call( 'pv.enlil.visibility', [ name, state ] );
             }
         });
-        this.pvView.render();
+    }
+
+    updateThresholdRange( event: ChangeContext ) {
+        const newThresholdRange: [ number, number ] = [ event.value, event.highValue ];
+        this.thresholdRange = newThresholdRange;
+        this.session.call('pv.enlil.set_threshold', [ this.controlPanel.value.thresholdVariable.toLowerCase(), this.thresholdRange ] );
     }
 }
