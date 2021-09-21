@@ -56,4 +56,27 @@
         text-align: center;
         top: -2rem;
     }
+    // slider styles
+    ::ng-deep {
+        .ngx-slider .ngx-slider-selection {
+            background: $color-primary;
+        }
+
+        .ngx-slider-pointer {
+            width: 20px;
+            height: 20px;
+            background-color: $color-primary;
+            top: -8px;
+        }
+
+        .ngx-slider .ngx-slider-pointer:after {
+            display: none;
+        }
+
+        .ngx-slider-active {
+            outline: none;
+            border: 2px solid #5E9ED6;
+        }
+    }
+
 }
