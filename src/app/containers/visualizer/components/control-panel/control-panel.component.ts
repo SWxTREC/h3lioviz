@@ -121,8 +121,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
                 }
             }));
-        // initialize
-        this.updateTime.emit(0);
         this.subscriptions.push(
             this.timestepDebouncer.pipe(
                 debounceTime(300)
@@ -154,6 +152,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
             // initialize server to default selections
+            this.updateTime.emit(0);
             this.controlPanel.setValue( this.initialControlPanelValues );
         }
     }

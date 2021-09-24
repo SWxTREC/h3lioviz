@@ -26,9 +26,8 @@
             </mat-form-field>
             <div class="control-panel__header">
                 <div>
-                    <strong>{{ controlPanel.value.thresholdVariable }} range</strong>
+                    <strong>{{ controlPanel.value.thresholdVariable }} range (units)</strong>
                 </div>
-                {{ this.thresholdRange[0] }}&ndash;{{ this.thresholdRange[1] }} units for threshold variable?
             </div>
             <ngx-slider [options]="thresholdOptions" [value]="thresholdRange[0]" [highValue]="thresholdRange[1]" (userChange)="updateThresholdRange($event)"></ngx-slider>
         </ng-container>
@@ -62,9 +61,8 @@
             ></mat-slider>
             <div class="control-panel__header">
                 <div>
-                    <strong>Color range</strong>
+                    <strong>Color range (units)</strong>
                 </div>
-                {{ colorRange[0] }}&ndash;{{ colorRange[1] }} units for variable?
             </div>
             <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
         </div>
