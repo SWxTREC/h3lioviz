@@ -35,8 +35,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         step: 5
     };
     defaultThresholdVariable = this.defaultColorVariable;
+    colorRange: [number, number] = ( this.LUT_RANGE[ this.defaultColorVariable ] );
     controlPanel: FormGroup = new FormGroup({
-        colorRange: new FormControl( this.LUT_RANGE[ this.defaultColorVariable ] ),
         colorVariable: new FormControl( this.defaultColorVariable ),
         cme: new FormControl( true ),
         latSlice: new FormControl( true ),
@@ -48,6 +48,17 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         thresholdVariable: new FormControl( this.defaultThresholdVariable )
     });
     displayedTime: number;
+    initialControlPanelValues = {
+        colorVariable: this.defaultColorVariable,
+        cme: true,
+        latSlice: true,
+        lonArrows: false,
+        lonSlice: false,
+        lonStreamlines: false,
+        opacity: 90,
+        threshold: false,
+        thresholdVariable: this.defaultThresholdVariable
+    };
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
     renderDebouncer: Subject<string> = new Subject<string>();
@@ -70,28 +81,24 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.updateVisibilityControls( newFormValues );
                 // this will render everytime any part of the form is updated
                 this.renderDebouncer.next('visibility');
-            }));
-        this.subscriptions.push( this.controlPanel.controls.colorRange.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newColorRange => {
-                const colorVariableName = this.controlPanel.value.colorVariable.toLowerCase();
-                this.session.call('pv.enlil.set_range', [ colorVariableName, newColorRange ]);
+
             }));
         this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
                 const colorVariableName = newColorVariable.toLowerCase();
                 const twentySteps = (this.LUT_RANGE[ newColorVariable ][1] - this.LUT_RANGE[ newColorVariable ][0]) / 20;
-
                 this.session.call('pv.enlil.colorby', [ colorVariableName ]);
                 this.colorOptions = {
                     floor: this.LUT_RANGE[ newColorVariable ][0],
                     ceil: this.LUT_RANGE[ newColorVariable ][1],
                     step: twentySteps
                 };
-
+                this.session.call('pv.enlil.set_range', [ colorVariableName, this.colorRange ]);
             }));
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
                 const thresholdVariableName = newThresholdVariable.toLowerCase();
+                // TODO: make this a function that takes the number of steps as a parameter
                 const twentySteps = (this.LUT_RANGE[ newThresholdVariable ][1] - this.LUT_RANGE[ newThresholdVariable ][0]) / 20;
                 this.thresholdOptions = {
                     floor: this.LUT_RANGE[ newThresholdVariable ][0],
@@ -100,9 +107,19 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 };
                 const quarter = 5 * this.thresholdOptions.step;
                 const defaultThresholdRange: [number, number] =
-                [ this.thresholdOptions.floor + quarter, this.thresholdOptions.ceil - quarter ];
+                    [ this.thresholdOptions.floor + quarter, this.thresholdOptions.ceil - quarter ];
                 this.thresholdRange = defaultThresholdRange;
                 this.session.call('pv.enlil.set_threshold', [ thresholdVariableName, defaultThresholdRange ]);
+            }));
+        this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newOpacity => {
+                const name = this.controlPanel.value.colorVariable.toLowerCase();
+                const opacity = this.controlPanel.value.opacity / 100;
+                if ( name[ 0 ] === 'b' ) {
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
+                } else {
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
+                }
             }));
         // initialize
         this.updateTime.emit(0);
@@ -126,7 +143,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push(
             this.renderDebouncer.pipe(
                 debounceTime( 300 )
-            ).subscribe((str) => {
+            ).subscribe(() => {
                 this.pvView.render();
             }
         ));
@@ -136,8 +153,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // initialize server to default visibility selections
-            this.updateVisibilityControls( this.controlPanel.value );
+            // initialize server to default selections
+            this.controlPanel.setValue( this.initialControlPanelValues );
         }
     }
 
@@ -203,6 +220,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.session.call( 'pv.enlil.visibility', [ name, state ] );
             }
         });
+    }
+
+    updateColorRange( event: ChangeContext ) {
+        const newColorRange: [ number, number ] = [ event.value, event.highValue ];
+        this.colorRange = newColorRange;
+        this.session.call('pv.enlil.set_range', [ this.controlPanel.value.colorVariable.toLowerCase(), this.colorRange ] );
     }
 
     updateThresholdRange( event: ChangeContext ) {

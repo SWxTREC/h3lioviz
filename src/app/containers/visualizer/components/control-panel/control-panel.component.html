@@ -64,9 +64,9 @@
                 <div>
                     <strong>Color range</strong>
                 </div>
-                {{ controlPanel.value.colorRange[0] }}&ndash;{{ controlPanel.value.colorRange[1] }} units for variable?
+                {{ colorRange[0] }}&ndash;{{ colorRange[1] }} units for variable?
             </div>
-            <ngx-slider formControlName="colorRange" [options]="colorOptions"></ngx-slider>
+            <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
         </div>
     </form>
     <ng-container *ngIf="timeTicks[0]">
