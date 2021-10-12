@@ -43,7 +43,7 @@ export class AppComponent {
             href: 'https://twitter.com/spaceweathercu'
         }, {
             name: 'github',
-            href: 'https://github.com/SWxTREC/enlil-code'
+            href: 'https://github.com/SWxTREC'
         }, {
             name: 'vimeo',
             href: 'https://vimeo.com/user128770849'

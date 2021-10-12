@@ -41,31 +41,4 @@
             width: 100%;
         }
     }
-    &__slider-label {
-        width: 7rem;
-        &--right {
-            text-align: right;
-        }
-    }
-    &__slider-labels {
-        color: transparentize(black, 0.3);
-        display: flex;
-        font-size: 0.66rem;
-        justify-content: space-between;
-        position: relative;
-        top: -1rem;
-        width: 100%;
-    }
-    &__full-width-slider {
-        width: 80%;
-        &--pulsing {
-            ::ng-deep {
-                .mat-slider-track-wrapper {
-                    opacity: 1;
-                    animation: fade 2s linear infinite;
-                }
-            }
-        }
-    }
-
 }

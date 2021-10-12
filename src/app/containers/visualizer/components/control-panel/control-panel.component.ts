@@ -71,7 +71,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push( this.controlPanel.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
-                // this will render everytime any part of the form is updated
+                // this will render every time any part of the form is updated
                 this.renderDebouncer.next('visibility');
 
             }));
