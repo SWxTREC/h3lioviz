@@ -2,6 +2,7 @@
 @include misc.ignore-max-page-width;
 @import 'src/theme/theme-colors.scss';
 
+// TODO: add narrow and mobile styles (column)
 :host {
     background: $color-accent;
 }

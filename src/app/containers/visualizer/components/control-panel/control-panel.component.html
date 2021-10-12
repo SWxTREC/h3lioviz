@@ -15,22 +15,24 @@
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
         <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
-        <ng-container *ngIf="controlPanel.value.threshold">
-            <mat-form-field>
-                <mat-label>Threshold variable</mat-label>
-                <mat-select formControlName="thresholdVariable">
-                    <mat-option *ngFor="let variable of colorVariables" [value]="variable">
-                        {{variable}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-            <div class="control-panel__header">
-                <div>
-                    <strong>{{ controlPanel.value.thresholdVariable }} range (units)</strong>
+        <div class="control-panel__threshold" [class.control-panel__threshold--expand]="controlPanel.value.threshold">
+            <ng-container *ngIf="controlPanel.value.threshold">
+                <mat-form-field>
+                    <mat-label>Threshold variable</mat-label>
+                    <mat-select formControlName="thresholdVariable">
+                        <mat-option *ngFor="let variable of colorVariables" [value]="variable">
+                            {{variable}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="control-panel__header">
+                    <div>
+                        <strong>{{ controlPanel.value.thresholdVariable }} range (units)</strong>
+                    </div>
                 </div>
-            </div>
-            <ngx-slider [options]="thresholdOptions" [value]="thresholdRange[0]" [highValue]="thresholdRange[1]" (userChange)="updateThresholdRange($event)"></ngx-slider>
-        </ng-container>
+                <ngx-slider [options]="thresholdOptions" [value]="thresholdRange[0]" [highValue]="thresholdRange[1]" (userChange)="updateThresholdRange($event)"></ngx-slider>
+            </ng-container>
+        </div>
         <mat-divider class="control-panel__spacer"></mat-divider>
 
         <mat-form-field>

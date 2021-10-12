@@ -24,6 +24,14 @@
         margin: 1rem 0;
         position: relative !important;
     }
+    &__threshold {
+        opacity: 0;
+        // TODO: use angular animate to animate entire element in, fade and grow
+        &--expand {
+            opacity: 1;
+            transition: opacity 2s;
+        }
+    }
     // ngx-slider styles
     ::ng-deep {
         .ngx-slider .ngx-slider-selection {
