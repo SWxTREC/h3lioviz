@@ -6,7 +6,7 @@ import { MomentModule } from 'ngx-moment';
 
 import { MaterialModule } from '../../modules';
 
-import { ControlPanelComponent } from './components';
+import { ControlPanelComponent, TimePlayerComponent } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -22,7 +22,8 @@ import { VisualizerComponent } from './visualizer.container';
     ],
     declarations: [
         VisualizerComponent,
-        ControlPanelComponent
+        ControlPanelComponent,
+        TimePlayerComponent
     ]
 })
 export class VisualizerModule { }

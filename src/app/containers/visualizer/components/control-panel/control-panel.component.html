@@ -67,34 +67,4 @@
             <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
         </div>
     </form>
-    <ng-container *ngIf="timeTicks[0]">
-        <div class="control-panel__header">
-            <div>
-                <strong>Date</strong>
-            </div>
-            {{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}
-        </div>
-        <mat-slider
-        class="control-panel__full-width-slider"
-        [class.control-panel__full-width-slider--pulsing]="playing"
-        color="primary"
-        [min]="0"
-        [max]="timeTicks.length - 1"
-        [(value)]= "timeIndex"
-        aria-label="time-selector"
-        (change)="newTimestep($event)"
-        ></mat-slider>
-        <div class="control-panel__slider-labels">
-            <div class="control-panel__slider-label">
-                {{  timeTicks[0] | amFromUnix | amUtc |  amDateFormat: 'YYYY-MM-DD HH:00'}}
-            </div>
-            <div class="control-panel__slider-label control-panel__slider-label--right">
-                {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
-            </div>
-        </div>
-        <div class="control-panel__time-player" (click)="togglePlay()">
-            <mat-icon *ngIf="!playing">play_arrow</mat-icon>
-            <mat-icon *ngIf="playing">pause</mat-icon>
-        </div>
-    </ng-container>
 </mat-card>

@@ -3,14 +3,12 @@
     {{ errorMessage }}, please refresh or try again later
 </div>
 <div [class.pv__fade]="errorMessage">
-    <swt-control-panel [pvView]="pvView" [timeTicks]="timeTicks" (updateTime)="getTimestep($event)"></swt-control-panel>
-    <div class="pv__container">
+    <swt-control-panel [pvView]="pvView"></swt-control-panel>
+    <swt-time-player *ngIf="timeTicks[0]" class="pv__container" [pvView]="pvView" [timeTicks]="timeTicks" (updateTime)="getTimestep($event)"></swt-time-player>
+    <div class="pv__container pv__container--viewer">
         <div #pvContent class="pv__content"></div>
         <div *ngIf="loading" class="pv__loading">
             <mat-spinner color="accent" diameter="40"></mat-spinner>
         </div>
     </div>
-</div>
-<div>
-    time player here
 </div>

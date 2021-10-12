@@ -1,5 +1,5 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
@@ -12,8 +12,6 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
-    @Input() timeTicks: number[];
-    @Output() updateTime = new EventEmitter();
 
     // TODO: set these in the server on load, possibly create a constant for all load configurations
     LUT_RANGE: { [param: string]: [number, number] } = {
@@ -47,7 +45,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         threshold: new FormControl( false ),
         thresholdVariable: new FormControl( this.defaultThresholdVariable )
     });
-    displayedTime: number;
     initialControlPanelValues = {
         colorVariable: this.defaultColorVariable,
         cme: true,
@@ -59,20 +56,15 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
-    playing = false;
-    playingDebouncer: Subject<boolean> = new Subject<boolean>();
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
-    startTime: string;
     subscriptions: Subscription[] = [];
-    timestepDebouncer: Subject<number> = new Subject<number>();
     thresholdOptions: Options = {
         floor: this.LUT_RANGE[ this.defaultThresholdVariable ][0],
         ceil: this.LUT_RANGE[ this.defaultThresholdVariable ][1],
         step: 5
     };
     thresholdRange: [number, number] = ( this.LUT_RANGE[ this.defaultThresholdVariable ]);
-    timeIndex = 0;
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
@@ -122,23 +114,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 }
             }));
         this.subscriptions.push(
-            this.timestepDebouncer.pipe(
-                debounceTime(300)
-            ).subscribe((value) => this.updateTime.emit(value)));
-        this.subscriptions.push(
-            this.playingDebouncer.pipe(
-                debounceTime(300)
-            ).subscribe( (playing: boolean) => {
-                if ( playing ) {
-                    // play when play button is pressed
-                    this.playTimesteps( this.timeIndex );
-                } else {
-                    // stop when the pause button is pressed
-                    this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
-                }
-            }
-        ));
-        this.subscriptions.push(
             this.renderDebouncer.pipe(
                 debounceTime( 300 )
             ).subscribe(() => {
@@ -151,8 +126,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // initialize server to default selections
-            this.updateTime.emit(0);
             this.controlPanel.setValue( this.initialControlPanelValues );
         }
     }
@@ -161,41 +134,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    newTimestep(index: { value: number; }) {
-        // if playing, immediately stop when there is a click on the timeline
-        if ( this.playing ) {
-            this.playing = false;
-        }
-        this.timestepDebouncer.next( index.value );
-    }
-
-    playTimesteps( index: number ) {
-        const nextIndex = index + 1;
-        if ( nextIndex < this.timeTicks.length ) {
-            this.session.call( 'pv.time.index.set', [ nextIndex ]).then( () => {
-                if (this.playing) {
-                    // increment timeIndex here, once graphics are loaded
-                    this.timeIndex = index;
-                    this.playTimesteps( nextIndex );
-                } else {
-                    this.session.call('pv.time.index.set', [ this.timeIndex ]);
-                }
-            });
-        } else {
-            // stop when last time step is reached
-            this.playing = false;
-            this.timeIndex = this.timeTicks.length - 1;
-            this.session.call('pv.time.index.set', [ this.timeIndex ]);
-        }
-    }
-
     resetZoom() {
         this.pvView.get().viewStream.resetCamera();
-    }
-
-    togglePlay() {
-        this.playing = !this.playing;
-        this.playingDebouncer.next( this.playing );
     }
 
     toggleZoom() {

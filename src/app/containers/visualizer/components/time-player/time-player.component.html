@@ -1,0 +1,30 @@
+<mat-card class="time-player">
+    <div class="control-panel__header">
+        <div>
+            <strong>Datetime</strong>
+        </div>
+        {{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}
+    </div>
+    <mat-slider
+        class="time-player__slider"
+        [class.time-player__slider--pulsing]="playing"
+        color="primary"
+        [min]="0"
+        [max]="timeTicks.length - 1"
+        [(value)]= "timeIndex"
+        aria-label="time-selector"
+        (change)="newTimestep($event)"
+    ></mat-slider>
+    <div class="time-player__slider-labels">
+        <div class="time-player__slider-label">
+            {{  timeTicks[0] | amFromUnix | amUtc |  amDateFormat: 'YYYY-MM-DD HH:00'}}
+        </div>
+        <div class="pv__slider-label pv__slider-label--right">
+            {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
+        </div>
+    </div>
+    <div (click)="togglePlay()">
+        <mat-icon *ngIf="!playing">play_arrow</mat-icon>
+        <mat-icon *ngIf="playing">pause</mat-icon>
+    </div>
+</mat-card>
