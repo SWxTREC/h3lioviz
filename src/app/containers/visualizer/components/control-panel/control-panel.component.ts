@@ -4,6 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { IVariableInfo } from 'src/app/models';
 
 @Component({
     selector: 'swt-control-panel',
@@ -13,27 +14,75 @@ import { debounceTime } from 'rxjs/operators';
 export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
 
-    // TODO: set these in the server on load, possibly create a constant for all load configurations
-    LUT_RANGE: { [param: string]: [number, number] } = {
-        Velocity: [ 300, 900 ],
-        Density: [ 0, 30 ],
-        Temperature: [ 1e4, 1e6 ],
-        Br: [ -10, 10 ],
-        Bx: [ -10, 10 ],
-        By: [ -10, 10 ],
-        Bz: [ -10, 10 ]
+    // TODO: set these in the server on load
+    VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
+        velocity: {
+            serverName: 'velocity',
+            displayName: 'Velocity',
+            units: 'k/s',
+            range: [ 300, 900 ],
+            defaultRange: [ 600, 900 ],
+            step: 100
+        },
+        density: {
+            serverName: 'density',
+            displayName: 'Density',
+            units: 'g/cm<sup>3</sup>',
+            range: [ 0, 30 ],
+            defaultRange: [ 15, 30 ],
+            step: 1
+        },
+        temperature: {
+            serverName: 'temperature',
+            displayName: 'Temperature',
+            units: 'K',
+            range: [ 10000, 1000000 ],
+            defaultRange: [ 500000, 1000000 ],
+            step: 10000
+        },
+        b: {
+            serverName: 'b',
+            displayName: 'B',
+            units: 'nT',
+            range: [ -10, 10 ],
+            defaultRange: [ -10, 0 ],
+            step: 1
+        },
+        bx: {
+            serverName: 'bx',
+            displayName: 'Bx',
+            units: 'nT',
+            range: [ -10, 10 ],
+            defaultRange: [ -10, 0 ],
+            step: 1
+        },
+        by: {
+            serverName: 'by',
+            displayName: 'By',
+            units: 'nT',
+            range: [ -10, 10 ],
+            defaultRange: [ -10, 0 ],
+            step: 1
+        },
+        bz: {
+            serverName: 'bz',
+            displayName: 'Bz',
+            units: 'nT',
+            range: [ -10, 10 ],
+            defaultRange: [ -10, 0 ],
+            step: 1
+        }
     };
-    // TODO: variables list of objects with serverName, name, units, range
 
-    colorVariables: string[] = [ 'Velocity', 'Density', 'Temperature', 'B', 'Bx', 'By', 'Bz' ];
-    defaultColorVariable = this.colorVariables[ 6 ];
+    variables: string[] = Object.keys(this.VARIABLE_CONFIG);
+    defaultColorVariable = this.variables[ 6 ];
     colorOptions: Options = {
-        floor: this.LUT_RANGE[ this.defaultColorVariable ][0],
-        ceil: this.LUT_RANGE[ this.defaultColorVariable ][1],
-        step: 5
+        floor: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[0],
+        ceil: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[1],
+        step: this.VARIABLE_CONFIG[ this.defaultColorVariable ].step
     };
-    defaultThresholdVariable = this.defaultColorVariable;
-    colorRange: [number, number] = ( this.LUT_RANGE[ this.defaultColorVariable ] );
+    defaultThresholdVariable = this.variables[ 1 ];
+    colorRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultColorVariable ].range );
     controlPanel: FormGroup = new FormGroup({
         colorVariable: new FormControl( this.defaultColorVariable ),
         cme: new FormControl( true ),
@@ -60,52 +109,51 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
-        floor: this.LUT_RANGE[ this.defaultThresholdVariable ][0],
-        ceil: this.LUT_RANGE[ this.defaultThresholdVariable ][1],
-        step: 5
+        floor: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[0],
+        ceil: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[1],
+        step: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].step
     };
-    thresholdRange: [number, number] = ( this.LUT_RANGE[ this.defaultThresholdVariable ]);
+    thresholdRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range);
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
+        // subscribe to any form change
         this.subscriptions.push( this.controlPanel.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
-                // this will render every time any part of the form is updated
-                this.renderDebouncer.next('visibility');
-
+                // this will render every time any named control of the form is updated
+                // the threshold and color ranges are outside of the form and are updated and rendered manually
+                this.renderDebouncer.next();
             }));
+        // subscribe to color variable changes and reset color slider options, color range, and 'set_range' for color
         this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
-                const colorVariableName = newColorVariable.toLowerCase();
-                const twentySteps = (this.LUT_RANGE[ newColorVariable ][1] - this.LUT_RANGE[ newColorVariable ][0]) / 20;
-                this.session.call('pv.enlil.colorby', [ colorVariableName ]);
+                const colorVariableServerName = this.VARIABLE_CONFIG[ newColorVariable ].serverName;
+                this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
                 this.colorOptions = {
-                    floor: this.LUT_RANGE[ newColorVariable ][0],
-                    ceil: this.LUT_RANGE[ newColorVariable ][1],
-                    step: twentySteps
+                    floor: this.VARIABLE_CONFIG[ newColorVariable ].range[0],
+                    ceil: this.VARIABLE_CONFIG[ newColorVariable ].range[1],
+                    step: this.VARIABLE_CONFIG[ newColorVariable ].step
                 };
-                this.session.call('pv.enlil.set_range', [ colorVariableName, this.colorRange ]);
+                this.colorRange = this.VARIABLE_CONFIG[ newColorVariable ].range;
+                this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
             }));
+        // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
-                const thresholdVariableName = newThresholdVariable.toLowerCase();
-                // TODO: make this a function that takes the number of steps as a parameter
-                const twentySteps = (this.LUT_RANGE[ newThresholdVariable ][1] - this.LUT_RANGE[ newThresholdVariable ][0]) / 20;
+                const thresholdVariableServerName = this.VARIABLE_CONFIG[ newThresholdVariable ].serverName;
                 this.thresholdOptions = {
-                    floor: this.LUT_RANGE[ newThresholdVariable ][0],
-                    ceil: this.LUT_RANGE[ newThresholdVariable ][1],
-                    step: twentySteps
+                    floor: this.VARIABLE_CONFIG[ newThresholdVariable ].range[0],
+                    ceil: this.VARIABLE_CONFIG[ newThresholdVariable ].range[1],
+                    step: this.VARIABLE_CONFIG[ newThresholdVariable ].step
                 };
-                const quarter = 5 * this.thresholdOptions.step;
-                const defaultThresholdRange: [number, number] =
-                    [ this.thresholdOptions.floor + quarter, this.thresholdOptions.ceil - quarter ];
-                this.thresholdRange = defaultThresholdRange;
-                this.session.call('pv.enlil.set_threshold', [ thresholdVariableName, defaultThresholdRange ]);
+                this.thresholdRange = this.VARIABLE_CONFIG[ newThresholdVariable ].defaultRange;
+                this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
             }));
+        // subscribe to opacity slider and 'set_opacity'
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newOpacity => {
-                const name = this.controlPanel.value.colorVariable.toLowerCase();
+            .pipe( debounceTime( 300 ) ).subscribe( () => {
+                const name = this.VARIABLE_CONFIG[this.controlPanel.value.colorVariable].serverName;
                 const opacity = this.controlPanel.value.opacity / 100;
                 if ( name[ 0 ] === 'b' ) {
                     this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
@@ -113,6 +161,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
                 }
             }));
+        // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
                 debounceTime( 300 )
@@ -152,7 +201,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any; }) {
         Object.keys( controlStates ).forEach( controlName => {
-            // const colorVariableName = this.controlPanel.value.colorVariable.toLowerCase();
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
@@ -162,14 +210,16 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     updateColorRange( event: ChangeContext ) {
-        const newColorRange: [ number, number ] = [ event.value, event.highValue ];
-        this.colorRange = newColorRange;
-        this.session.call('pv.enlil.set_range', [ this.controlPanel.value.colorVariable.toLowerCase(), this.colorRange ] );
+        const variable: string = this.controlPanel.value.colorVariable;
+        this.colorRange = [ event.value, event.highValue ];
+        this.session.call('pv.enlil.set_range', [ this.VARIABLE_CONFIG[ variable ].serverName, this.colorRange ] );
+        this.renderDebouncer.next();
     }
 
     updateThresholdRange( event: ChangeContext ) {
-        const newThresholdRange: [ number, number ] = [ event.value, event.highValue ];
-        this.thresholdRange = newThresholdRange;
-        this.session.call('pv.enlil.set_threshold', [ this.controlPanel.value.thresholdVariable.toLowerCase(), this.thresholdRange ] );
+        const variable: string = this.controlPanel.value.thresholdVariable;
+        this.thresholdRange = [ event.value, event.highValue ];
+        this.session.call('pv.enlil.set_threshold', [ this.VARIABLE_CONFIG[ variable ].serverName, this.thresholdRange ] );
+        this.renderDebouncer.next();
     }
 }

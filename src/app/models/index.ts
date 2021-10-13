@@ -1,2 +1,2 @@
-export * from './model-parameters';
+export * from './variable-info';
 export * from './auth';

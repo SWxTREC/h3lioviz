@@ -40,15 +40,12 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                 }
             }
         ));
-
     }
 
     ngOnChanges(): void {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // initialize server to default selections
-            this.updateTime.emit(0);
         }
     }
 
