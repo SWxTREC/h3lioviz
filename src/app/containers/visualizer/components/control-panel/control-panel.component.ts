@@ -19,7 +19,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         velocity: {
             serverName: 'velocity',
             displayName: 'Velocity',
-            units: 'k/s',
+            units: 'km/s',
             range: [ 300, 900 ],
             defaultRange: [ 600, 900 ],
             step: 100
@@ -27,7 +27,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         density: {
             serverName: 'density',
             displayName: 'Density',
-            units: 'g/cm<sup>3</sup>',
+            units: 'r<sup>2</sup>N/cm<sup>3</sup>',
             range: [ 0, 30 ],
             defaultRange: [ 15, 30 ],
             step: 1

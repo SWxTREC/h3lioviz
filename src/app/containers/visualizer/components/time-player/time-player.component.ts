@@ -85,6 +85,4 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         this.playing = !this.playing;
         this.playingDebouncer.next( this.playing );
     }
-
-
 }
