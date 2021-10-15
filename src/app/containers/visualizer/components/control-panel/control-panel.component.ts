@@ -90,7 +90,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         lonArrows: new FormControl( false ),
         lonSlice: new FormControl( false ),
         lonStreamlines: new FormControl( false ),
-        opacity: new FormControl(90),
+        opacity: new FormControl([ 0, 90 ]),
         threshold: new FormControl( false ),
         thresholdVariable: new FormControl( this.defaultThresholdVariable )
     });
@@ -101,9 +101,14 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         lonArrows: false,
         lonSlice: false,
         lonStreamlines: false,
-        opacity: 90,
+        opacity: [ 0, 90 ],
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
+    };
+    opacityOptions: Options = {
+        floor: 0,
+        ceil: 100,
+        step: 10
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
@@ -154,11 +159,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( () => {
                 const name = this.VARIABLE_CONFIG[this.controlPanel.value.colorVariable].serverName;
-                const opacity = this.controlPanel.value.opacity / 100;
+                const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
+                const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;
                 if ( name[ 0 ] === 'b' ) {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity, opacity ] ] );
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityHigh, opacityLow, opacityHigh ] ] );
                 } else {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacity, opacity ] ] );
+                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
                 }
             }));
         // debounce render
