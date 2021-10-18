@@ -1,9 +1,6 @@
 @import 'src/theme/theme-colors.scss';
 
 .control-panel {
-    margin: 0 1rem;
-    position: absolute;
-    z-index: 2;
     &__controls{
         display: flex;
         justify-content: space-between;
