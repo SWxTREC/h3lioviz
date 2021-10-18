@@ -30,7 +30,7 @@ export class AppComponent {
         }
     ];
 
-    orgLogos: IImageLink[] = [
+    partnerLogos: IImageLink[] = [
         {
             src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png',
             href: 'http://lasp.colorado.edu'
@@ -39,8 +39,11 @@ export class AppComponent {
 
     socialLinks: ISocialLink[] = [
         {
+            name: 'twitter',
+            href: 'https://twitter.com/spaceweathercu'
+        }, {
             name: 'github',
-            href: 'https://github.com/SWxTREC/enlil-code'
+            href: 'https://github.com/SWxTREC'
         }
     ];
 

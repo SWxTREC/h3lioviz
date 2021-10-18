@@ -9,7 +9,7 @@
     'accent-color': $color-accent,
     'info-color': $color-info,
     'success-color': $color-success,
-    'background-color': black,
+    'background-color': #53576D,
 
     'link-color': mat-color( $primary, 200 ),
     'heading-color': mat-color( $primary, 500 )
@@ -22,16 +22,16 @@
 }
 */
 
-.header__logo--org {
-    height: 60px;
+.lower-footer__partners {
+    a {
+        img {
+            height: 75px !important;
+        }
+    }
 }
 
 .mat-card-title {
     color: $color-primary;
-}
-
-.upper-footer {
-    background-color: darken($color-primary, 5%) !important;
 }
 
 body > * > .page-content > *:not(router-outlet) {

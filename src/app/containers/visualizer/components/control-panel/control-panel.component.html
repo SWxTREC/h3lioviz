@@ -1,7 +1,4 @@
-<mat-card cdkDrag class="control-panel">
-    <div class="control-panel__drag-handle" cdkDragHandle>
-        <mat-icon>drag_indicator</mat-icon>
-    </div>
+<mat-card class="control-panel">
     <mat-card-title>
         Control Panel
     </mat-card-title>
@@ -17,71 +14,51 @@
         <mat-checkbox color="primary" formControlName="latSlice">Meridional section</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
-    <div class="control-panel__drag-handle" cdkDragHandle>
-        <mat-icon>drag_indicator</mat-icon>
-    </div>
-    <mat-form-field>
-        <mat-label>Color variable</mat-label>
-        <mat-select formControlName="colorVariable">
-            <mat-option *ngFor="let variable of colorVariables" [value]="variable">
-                {{variable}}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <div>
-        <div class="control-panel__header">
-            <div>
-                <strong>Opacity</strong>
-            </div>
-            {{ controlPanel.value.opacity }}%
+        <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
+        <div class="control-panel__threshold" [class.control-panel__threshold--expand]="controlPanel.value.threshold">
+            <ng-container *ngIf="controlPanel.value.threshold">
+                <mat-form-field>
+                    <mat-label>Threshold variable</mat-label>
+                    <mat-select formControlName="thresholdVariable">
+                        <mat-option *ngFor="let variable of variables" [value]="variable">
+                            {{ VARIABLE_CONFIG[variable].displayName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="control-panel__header">
+                    <div>
+                        <strong>{{ VARIABLE_CONFIG[controlPanel.value.thresholdVariable].displayName }} range</strong>
+                        <small innerHTML=" ({{VARIABLE_CONFIG[ controlPanel.value.thresholdVariable ].units}})"></small>
+                    </div>
+                </div>
+                <ngx-slider [options]="thresholdOptions" [value]="thresholdRange[0]" [highValue]="thresholdRange[1]" (userChange)="updateThresholdRange($event)"></ngx-slider>
+            </ng-container>
         </div>
-        <mat-slider
-            class="control-panel__full-width-slider"
-            color="primary"
-            formControlName="opacity"
-            min="0"
-            max="100"
-            step="10"
-            [value]="controlPanel.value.opacity"
-            tickInterval="10"
-            aria-label="opacity"
-        ></mat-slider>
-    </div>
+        <mat-divider class="control-panel__spacer"></mat-divider>
+
+        <mat-form-field>
+            <mat-label>Color variable</mat-label>
+            <mat-select formControlName="colorVariable">
+                <mat-option *ngFor="let variable of variables" [value]="variable">
+                    {{ VARIABLE_CONFIG[variable].displayName }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <div>
+            <div class="control-panel__header">
+                <div>
+                    <strong>Opacity</strong>
+                </div>
+                {{ controlPanel.value.opacity[0] }}% to {{ controlPanel.value.opacity[1] }}%
+            </div>
+            <ngx-slider [options]="opacityOptions" [value]="controlPanel.value.opacity[0]" [highValue]="controlPanel.value.opacity[1]" formControlName="opacity"></ngx-slider>
+            <div class="control-panel__header">
+                <div>
+                    <strong>Color range</strong>
+                    <small innerHTML=" ({{ VARIABLE_CONFIG[ controlPanel.value.colorVariable ].units }})"></small>
+                </div>
+            </div>
+            <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
+        </div>
     </form>
-    <ng-container *ngIf="timeTicks[0]">
-        <div class="control-panel__drag-handle" cdkDragHandle>
-            <mat-icon>drag_indicator</mat-icon>
-        </div>
-        <div class="control-panel__header">
-            <div>
-                <strong>Date</strong>
-            </div>
-            {{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}
-        </div>
-        <mat-slider
-        class="control-panel__full-width-slider"
-        [class.control-panel__full-width-slider--pulsing]="playing"
-        color="primary"
-        [min]="0"
-        [max]="timeTicks.length - 1"
-        [(value)]= "timeIndex"
-        aria-label="time-selector"
-        (change)="newTimestep($event)"
-        ></mat-slider>
-        <div class="control-panel__slider-labels">
-            <div class="control-panel__slider-label">
-                {{  timeTicks[0] | amFromUnix | amUtc |  amDateFormat: 'YYYY-MM-DD HH:00'}}
-            </div>
-            <div class="control-panel__slider-label control-panel__slider-label--right">
-                {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
-            </div>
-        </div>
-        <div class="control-panel__time-player" (click)="togglePlay()">
-            <mat-icon *ngIf="!playing">play_arrow</mat-icon>
-            <mat-icon *ngIf="playing">pause</mat-icon>
-        </div>
-    </ng-container>
-    <div class="control-panel__drag-handle" cdkDragHandle>
-        <mat-icon>drag_indicator</mat-icon>
-    </div>
 </mat-card>

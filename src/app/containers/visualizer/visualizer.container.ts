@@ -17,6 +17,7 @@ export class VisualizerComponent implements AfterViewInit {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
+    visualizerSplit: [number, number] = [ 30, 70 ];
 
     ngAfterViewInit(): void {
         // set up websocket
