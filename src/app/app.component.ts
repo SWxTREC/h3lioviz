@@ -44,9 +44,6 @@ export class AppComponent {
         }, {
             name: 'github',
             href: 'https://github.com/SWxTREC'
-        }, {
-            name: 'vimeo',
-            href: 'https://vimeo.com/user128770849'
         }
     ];
 
