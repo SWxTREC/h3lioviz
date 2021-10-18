@@ -79,7 +79,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colorOptions: Options = {
         floor: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[0],
         ceil: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[1],
-        step: this.VARIABLE_CONFIG[ this.defaultColorVariable ].step
+        step: this.VARIABLE_CONFIG[ this.defaultColorVariable ].step,
+        animate: false
     };
     defaultThresholdVariable = this.variables[ 1 ];
     colorRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultColorVariable ].range );
@@ -108,7 +109,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
-        step: 10
+        step: 10,
+        animate: false
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
@@ -116,7 +118,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     thresholdOptions: Options = {
         floor: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[0],
         ceil: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[1],
-        step: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].step
+        step: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].step,
+        animate: false
     };
     thresholdRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range);
     zoomState: 'on' | 'off' = 'on';
@@ -138,7 +141,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.colorOptions = {
                     floor: this.VARIABLE_CONFIG[ newColorVariable ].range[0],
                     ceil: this.VARIABLE_CONFIG[ newColorVariable ].range[1],
-                    step: this.VARIABLE_CONFIG[ newColorVariable ].step
+                    step: this.VARIABLE_CONFIG[ newColorVariable ].step,
+                    animate: false
                 };
                 this.colorRange = this.VARIABLE_CONFIG[ newColorVariable ].range;
                 this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
@@ -150,7 +154,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.thresholdOptions = {
                     floor: this.VARIABLE_CONFIG[ newThresholdVariable ].range[0],
                     ceil: this.VARIABLE_CONFIG[ newThresholdVariable ].range[1],
-                    step: this.VARIABLE_CONFIG[ newThresholdVariable ].step
+                    step: this.VARIABLE_CONFIG[ newThresholdVariable ].step,
+                    animate: false
                 };
                 this.thresholdRange = this.VARIABLE_CONFIG[ newThresholdVariable ].defaultRange;
                 this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
