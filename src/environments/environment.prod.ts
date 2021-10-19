@@ -8,6 +8,7 @@ if ( siteRootUrl.substr(-1) !== '/' ) {
 
 export const environment = {
     aws: {
+        api: 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com',
         cognito: {
             appClientId: 'vha7hq4ant83mhvt47pffkk5k',
             region: 'us-east-1',

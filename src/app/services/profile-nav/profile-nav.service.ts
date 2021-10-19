@@ -4,9 +4,8 @@ import { Router } from '@angular/router';
 import * as CognitoIdentity from 'aws-sdk/clients/cognitoidentity';
 import * as CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import { LaspNavService } from 'lasp-nav';
-
-import { environment } from '../../environments/environment';
-import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from '../models/auth';
+import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';
+import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class ProfileNavService extends LaspNavService {

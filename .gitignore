@@ -30,6 +30,11 @@ speed-measure-plugin.json
 !.vscode/extensions.json
 .history/*
 
+# large files
+**/dev-videos/*.mov
+**/dev-videos/*.mp4
+**/dev-videos/*.gif
+
 # misc
 /.sass-cache
 /connect.lock
