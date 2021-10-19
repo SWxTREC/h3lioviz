@@ -2,9 +2,8 @@
     <mat-icon class="viz__error">error</mat-icon>
     {{ errorMessage }}, please refresh or try again later
 </div>
-<div [class.viz__fade]="errorMessage">
-    <div class="viz__split">
-        <as-split direction="horizontal">
+<div class="viz__split" [class.viz__fade]="errorMessage">
+    <as-split direction="horizontal">
         <as-split-area class="viz__panel" [size]="visualizerSplit[0]">
             <swt-control-panel [pvView]="pvView"></swt-control-panel>
         </as-split-area>
@@ -18,5 +17,4 @@
             </div>
         </as-split-area>
     </as-split>
-    </div>
 </div>

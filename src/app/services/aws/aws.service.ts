@@ -12,9 +12,9 @@ export class AwsService {
         private _http: HttpClient
     ) { }
 
-    startEC2() {
+    startEc2() {
         // StartEC2Instances.py lambda link
-        this._http.get( this.awsUrl + '/BrianTestStartEC2');
+        return this._http.get( this.awsUrl + '/BrianTestStartEC2');
         // const API_URL = 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com/BrianTestStartEC2';
 
         // const request = new XMLHttpRequest();
