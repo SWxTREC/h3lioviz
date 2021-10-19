@@ -31,9 +31,9 @@ speed-measure-plugin.json
 .history/*
 
 # large files
-**/dev-videos/*.mov
-**/dev-videos/*.mp4
-**/dev-videos/*.gif
+**/videos/*.mov
+**/videos/*.mp4
+**/videos/*.gif
 
 # misc
 /.sass-cache
