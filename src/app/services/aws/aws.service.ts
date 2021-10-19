@@ -24,7 +24,7 @@ export class AwsService {
         //     console.log(request);
         //     if (request.status === 200) {
         //   // Immediately reload status update
-        //         this.getEC2Status();
+        //         this.getEc2Status();
         //         console.log(request.response);
         //     } else {
         //         console.log(`error ${request.status} ${request.statusText}`);
@@ -46,16 +46,16 @@ export class AwsService {
         //     if (request.status === 200) {
         //         console.log(request.response);
         //   // Immediately reload status update
-        //         this.getEC2Status();
+        //         this.getEc2Status();
         //     } else {
         //         console.log(`error ${request.status} ${request.statusText}`);
         //     }
         // };
     }
 
-    getEC2Status() {
+    getEc2Status() {
         // CheckEC2Status.py lambda link
-        this._http.get( this.awsUrl + 'BrianTestStatusEC2');
+        return this._http.get( this.awsUrl + '/BrianTestStatusEC2');
 
       //   const API_URL = 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com/BrianTestStatusEC2';
       //
@@ -74,7 +74,7 @@ export class AwsService {
       //
       //
       //       if (request.status === 200 && (eC2state === 'stopped' || eC2state === 'terminated')) {
-      //     // document.getElementById('status').innerHTML = '<p>The Visualizer EC2 instance is currently shutdown. Please press the start button to startup the EC2 instance. Once the EC2 instance is running you will be redirected to the visualizer page.</p><button class='btn default' onClick='startEC2()'>Start EC2</button>';
+      //     // document.getElementById('status').innerHTML = '<p>The Visualizer EC2 instance is currently shutdown. Please press the start button to startup the EC2 instance. Once the EC2 instance is running you will be redirected to the visualizer page.</p><button class='btn default' onClick='startEc2()'>Start EC2</button>';
       //       } else if (request.status === 200 && eC2state === 'pending') {
       //     // document.getElementById('status').innerHTML = '<p>The EC2 instance is currently starting, please wait, and you will soon be redirected to the visualizer page. This process may take a few minutes.</p>';
       //       } else if (request.status === 200 && eC2state === 'running' && eC2status === 'initializing') {

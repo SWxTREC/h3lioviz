@@ -7,6 +7,8 @@ import { LaspNavService } from 'lasp-nav';
 import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';
 import { environment } from 'src/environments/environment';
 
+import { AwsService } from '../aws/aws.service';
+
 @Injectable()
 export class ProfileNavService extends LaspNavService {
     private _cognito: CognitoIdentityServiceProvider;
@@ -19,6 +21,7 @@ export class ProfileNavService extends LaspNavService {
     showUserProfile = true;
 
     constructor(
+        private _aws: AwsService,
         private _router: Router,
         private _http: HttpClient
     ) {
@@ -28,8 +31,7 @@ export class ProfileNavService extends LaspNavService {
             region: environment.aws.cognito.region
         });
 
-        // when a user logs in, they are redirected back to the home page of the SDC site, with certain GET parameters.
-        // if `code` and `state` are GET parameters, that means the user just logged via Cognito and was redirected back here.
+        // when a user logs in, they are redirected back to the home page.
         // This will also resolve if it verifies that the user is not logged in, and is not in the process of logging in
         this.finishedInitialLogin = new Promise( resolve => {
             const params: any = {};
@@ -65,6 +67,10 @@ export class ProfileNavService extends LaspNavService {
                     // save the tokens to localStorage so the session can persist across refreshes
                     window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(response) );
                     this.setLoggedIn( true );
+                    this._aws.startEc2().subscribe( request => {
+                        console.log('Hello, request to start instance sent!');
+                        console.log({ request });
+                    });
                     resolve( undefined );
                 });
             } else {
@@ -82,6 +88,11 @@ export class ProfileNavService extends LaspNavService {
 
     async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
+        console.log('logged in!');
+        this._aws.getEc2Status().subscribe( (status) => {
+            console.log({ status });
+        });
+
         return {
             firstName: cognitoInfo.username,
             lastName: '',
