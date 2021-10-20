@@ -21,6 +21,8 @@ if ( siteRootUrl.substr(-1) !== '/' ) {
 
 export const environment = {
     aws: {
+        // we don't want to hit AWS when developing locally, so an empty api string here
+        api: '#',
         cognito: {
             appClientId: '5itqpae8gseickjbemm5tprpef',
             region: 'us-east-1',

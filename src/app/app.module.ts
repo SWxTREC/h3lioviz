@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
 import { AuthGuard } from './guards/auth-guard.service';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
-import { ProfileNavService } from './services/profile-nav.service';
+import { AwsService, ProfileNavService } from './services';
 
 @NgModule({
     declarations: [
@@ -34,6 +34,7 @@ import { ProfileNavService } from './services/profile-nav.service';
     ],
     providers: [
         AuthGuard,
+        AwsService,
         ProfileNavService,
         LaspNavService,
         {

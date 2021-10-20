@@ -4,9 +4,10 @@ import { Router } from '@angular/router';
 import * as CognitoIdentity from 'aws-sdk/clients/cognitoidentity';
 import * as CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import { LaspNavService } from 'lasp-nav';
+import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';
+import { environment } from 'src/environments/environment';
 
-import { environment } from '../../environments/environment';
-import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from '../models/auth';
+import { AwsService } from '../aws/aws.service';
 
 @Injectable()
 export class ProfileNavService extends LaspNavService {
@@ -20,6 +21,7 @@ export class ProfileNavService extends LaspNavService {
     showUserProfile = true;
 
     constructor(
+        private _aws: AwsService,
         private _router: Router,
         private _http: HttpClient
     ) {
@@ -29,8 +31,7 @@ export class ProfileNavService extends LaspNavService {
             region: environment.aws.cognito.region
         });
 
-        // when a user logs in, they are redirected back to the home page of the SDC site, with certain GET parameters.
-        // if `code` and `state` are GET parameters, that means the user just logged via Cognito and was redirected back here.
+        // when a user logs in, they are redirected back to the home page.
         // This will also resolve if it verifies that the user is not logged in, and is not in the process of logging in
         this.finishedInitialLogin = new Promise( resolve => {
             const params: any = {};
@@ -83,6 +84,8 @@ export class ProfileNavService extends LaspNavService {
 
     async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
+        // start AWS instance after login
+        this._aws.startEc2().subscribe();
         return {
             firstName: cognitoInfo.username,
             lastName: '',
