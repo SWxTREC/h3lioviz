@@ -10,7 +10,7 @@ export const environment = {
     aws: {
         api: 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com',
         cognito: {
-            appClientId: '5itqpae8gseickjbemm5tprpef5k',
+            appClientId: '5itqpae8gseickjbemm5tprpef',
             region: 'us-east-1',
             userPoolId: 'Dgc4otkxZ',
             loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
