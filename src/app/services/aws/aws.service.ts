@@ -1,4 +1,4 @@
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
@@ -10,13 +10,13 @@ export class AwsService {
 
     constructor(
         private _http: HttpClient
-    ) { }
+    ) {}
 
     startEc2() {
         // StartEC2Instances.py lambda link
-        return this._http.get( this.awsUrl + '/BrianTestStartEC2');
-        // const API_URL = 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com/BrianTestStartEC2';
+        return this._http.get( this.awsUrl + '/BrianTestStartEC2', { responseType: 'text' });
 
+        // const API_URL = 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com/BrianTestStartEC2';
         // const request = new XMLHttpRequest();
         // request.open('GET', API_URL);
         // request.send();
@@ -34,7 +34,7 @@ export class AwsService {
 
     stopEC2() {
         // StopEC2Instances.py lambda link
-        this._http.get( this.awsUrl + '/BrianTestStopEC2');
+        return this._http.get( this.awsUrl + '/BrianTestStopEC2');
 
         // const API_URL = 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com/BrianTestStopEC2';
         //

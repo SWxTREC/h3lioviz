@@ -67,10 +67,6 @@ export class ProfileNavService extends LaspNavService {
                     // save the tokens to localStorage so the session can persist across refreshes
                     window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(response) );
                     this.setLoggedIn( true );
-                    this._aws.startEc2().subscribe( request => {
-                        console.log('Hello, request to start instance sent!');
-                        console.log({ request });
-                    });
                     resolve( undefined );
                 });
             } else {
@@ -88,11 +84,8 @@ export class ProfileNavService extends LaspNavService {
 
     async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
-        console.log('logged in!');
-        this._aws.getEc2Status().subscribe( (status) => {
-            console.log({ status });
-        });
-
+        // start AWS instance after login
+        this._aws.startEc2().subscribe();
         return {
             firstName: cognitoInfo.username,
             lastName: '',
