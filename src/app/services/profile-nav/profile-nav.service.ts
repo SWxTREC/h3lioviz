@@ -46,7 +46,8 @@ export class ProfileNavService extends LaspNavService {
             // verify that the 'state' is the same as the stored loginNonce
             if ( params.state === window.localStorage.getItem(StorageKeys.loginNonce) ) {
                 // redirect to the saved redirect URL and get some tokens from Cognito
-                this._router.navigate([ window.localStorage.getItem(StorageKeys.loginRedirect) ]);
+                this._router.navigateByUrl( window.localStorage.getItem(StorageKeys.loginRedirect) );
+
 
                 // clear the saved localStorage items
                 window.localStorage.removeItem( StorageKeys.loginNonce );
