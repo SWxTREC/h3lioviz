@@ -1,9 +1,11 @@
-import { HttpClientModule } from '@angular/common/http';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'src/app/modules';
+import { AngularSplitModule } from 'angular-split';
+import { MaterialModule } from 'src/app/modules/material.module';
 
+import { ControlPanelComponent, TimePlayerComponent } from './components';
 import { VisualizerComponent } from './visualizer.container';
 
 describe('VisualizerComponent', () => {
@@ -12,12 +14,17 @@ describe('VisualizerComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [ VisualizerComponent ],
+            declarations: [
+                ControlPanelComponent,
+                TimePlayerComponent,
+                VisualizerComponent
+            ],
             imports: [
+                AngularSplitModule,
                 BrowserAnimationsModule,
-                HttpClientModule,
                 ReactiveFormsModule,
-                MaterialModule
+                MaterialModule,
+                NgxSliderModule
             ]
         })
     .compileComponents();

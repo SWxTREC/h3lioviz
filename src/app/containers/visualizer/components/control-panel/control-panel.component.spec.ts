@@ -1,4 +1,8 @@
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from 'src/app/modules/material.module';
 
 import { ControlPanelComponent } from './control-panel.component';
 
@@ -8,6 +12,12 @@ describe('ControlPanelComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
+            imports: [
+                BrowserAnimationsModule,
+                MaterialModule,
+                NgxSliderModule,
+                ReactiveFormsModule
+            ],
             declarations: [ ControlPanelComponent ]
         }).compileComponents();
     });
