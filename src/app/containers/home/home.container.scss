@@ -33,15 +33,4 @@
             text-align: left;
         }
     }
-    &__state {
-        &--stopped {
-            color: $color-warn;
-        }
-        &--started {
-            color: $color-success;
-        }
-        &--active {
-            animation: pulse 1s infinite alternate ease-in-out;
-        }
-    }
 }
