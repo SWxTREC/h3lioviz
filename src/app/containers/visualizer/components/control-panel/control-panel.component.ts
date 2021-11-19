@@ -74,33 +74,32 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         }
     };
 
-    variables: string[] = Object.keys(this.VARIABLE_CONFIG);
-    defaultColorVariable = this.variables[ 6 ];
+    defaultColorVariable: IVariableInfo = this.VARIABLE_CONFIG.velocity;
     colorOptions: Options = {
-        floor: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[0],
-        ceil: this.VARIABLE_CONFIG[ this.defaultColorVariable ].range[1],
-        step: this.VARIABLE_CONFIG[ this.defaultColorVariable ].step,
+        floor: this.defaultColorVariable.range[0],
+        ceil: this.defaultColorVariable.range[1],
+        step: this.defaultColorVariable.step,
         animate: false
     };
-    defaultThresholdVariable = this.variables[ 1 ];
-    colorRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultColorVariable ].range );
+    defaultThresholdVariable: IVariableInfo = this.VARIABLE_CONFIG.density;
+    colorRange: [number, number] = ( this.defaultColorVariable.range );
     controlPanel: FormGroup = new FormGroup({
-        colorVariable: new FormControl( this.defaultColorVariable ),
-        cme: new FormControl( true ),
-        latSlice: new FormControl( true ),
-        lonArrows: new FormControl( false ),
-        lonSlice: new FormControl( false ),
-        lonStreamlines: new FormControl( false ),
-        opacity: new FormControl([ 0, 90 ]),
-        threshold: new FormControl( false ),
-        thresholdVariable: new FormControl( this.defaultThresholdVariable )
+        colorVariable: new FormControl({}),
+        cme: new FormControl(false),
+        latSlice: new FormControl(false),
+        lonArrows: new FormControl(false),
+        lonSlice: new FormControl(false),
+        lonStreamlines: new FormControl(false),
+        opacity: new FormControl([]),
+        threshold: new FormControl(false),
+        thresholdVariable: new FormControl({})
     });
     initialControlPanelValues = {
         colorVariable: this.defaultColorVariable,
         cme: true,
         latSlice: true,
         lonArrows: false,
-        lonSlice: false,
+        lonSlice: true,
         lonStreamlines: false,
         opacity: [ 0, 90 ],
         threshold: false,
@@ -110,18 +109,20 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         floor: 0,
         ceil: 100,
         step: 10,
-        animate: false
+        animate: false,
+        showSelectionBar: true
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
-        floor: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[0],
-        ceil: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range[1],
-        step: this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].step,
+        floor: this.defaultThresholdVariable.range[0],
+        ceil: this.defaultThresholdVariable.range[1],
+        step: this.defaultThresholdVariable.step,
         animate: false
     };
-    thresholdRange: [number, number] = ( this.VARIABLE_CONFIG[ this.defaultThresholdVariable ].range);
+    thresholdRange: [number, number] = ( this.defaultThresholdVariable.range );
+    variables: IVariableInfo[] = Object.values(this.VARIABLE_CONFIG);
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
@@ -136,34 +137,34 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // subscribe to color variable changes and reset color slider options, color range, and 'set_range' for color
         this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
-                const colorVariableServerName = this.VARIABLE_CONFIG[ newColorVariable ].serverName;
+                const colorVariableServerName = newColorVariable.serverName;
                 this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
                 this.colorOptions = {
-                    floor: this.VARIABLE_CONFIG[ newColorVariable ].range[0],
-                    ceil: this.VARIABLE_CONFIG[ newColorVariable ].range[1],
-                    step: this.VARIABLE_CONFIG[ newColorVariable ].step,
+                    floor: newColorVariable.range[0],
+                    ceil: newColorVariable.range[1],
+                    step: newColorVariable.step,
                     animate: false
                 };
-                this.colorRange = this.VARIABLE_CONFIG[ newColorVariable ].range;
+                this.colorRange = newColorVariable.range;
                 this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
             }));
         // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
-                const thresholdVariableServerName = this.VARIABLE_CONFIG[ newThresholdVariable ].serverName;
+                const thresholdVariableServerName = newThresholdVariable.serverName;
                 this.thresholdOptions = {
-                    floor: this.VARIABLE_CONFIG[ newThresholdVariable ].range[0],
-                    ceil: this.VARIABLE_CONFIG[ newThresholdVariable ].range[1],
-                    step: this.VARIABLE_CONFIG[ newThresholdVariable ].step,
+                    floor: newThresholdVariable.range[0],
+                    ceil: newThresholdVariable.range[1],
+                    step: newThresholdVariable.step,
                     animate: false
                 };
-                this.thresholdRange = this.VARIABLE_CONFIG[ newThresholdVariable ].defaultRange;
+                this.thresholdRange = newThresholdVariable.defaultRange;
                 this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
             }));
         // subscribe to opacity slider and 'set_opacity'
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( () => {
-                const name = this.VARIABLE_CONFIG[this.controlPanel.value.colorVariable].serverName;
+                const name = this.controlPanel.value.colorVariable.serverName;
                 const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
                 const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;
                 if ( name[ 0 ] === 'b' ) {
@@ -221,16 +222,16 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     updateColorRange( event: ChangeContext ) {
-        const variable: string = this.controlPanel.value.colorVariable;
+        const variable: IVariableInfo = this.controlPanel.value.colorVariable;
         this.colorRange = [ event.value, event.highValue ];
-        this.session.call('pv.enlil.set_range', [ this.VARIABLE_CONFIG[ variable ].serverName, this.colorRange ] );
+        this.session.call('pv.enlil.set_range', [ variable.serverName, this.colorRange ] );
         this.renderDebouncer.next();
     }
 
     updateThresholdRange( event: ChangeContext ) {
-        const variable: string = this.controlPanel.value.thresholdVariable;
+        const variable: IVariableInfo = this.controlPanel.value.thresholdVariable;
         this.thresholdRange = [ event.value, event.highValue ];
-        this.session.call('pv.enlil.set_threshold', [ this.VARIABLE_CONFIG[ variable ].serverName, this.thresholdRange ] );
+        this.session.call('pv.enlil.set_threshold', [ variable.serverName, this.thresholdRange ] );
         this.renderDebouncer.next();
     }
 }

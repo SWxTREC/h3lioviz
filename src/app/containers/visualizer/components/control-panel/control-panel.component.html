@@ -17,18 +17,18 @@
         <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
         <div class="control-panel__threshold" [class.control-panel__threshold--expand]="controlPanel.value.threshold">
             <ng-container *ngIf="controlPanel.value.threshold">
-                <mat-form-field>
+                <mat-form-field class="control-panel__control control-panel__control--full-width">
                     <mat-label>Threshold variable</mat-label>
                     <mat-select formControlName="thresholdVariable">
                         <mat-option *ngFor="let variable of variables" [value]="variable">
-                            {{ VARIABLE_CONFIG[variable].displayName }}
+                            {{ variable.displayName }}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
                 <div class="control-panel__header">
                     <div>
-                        <strong>{{ VARIABLE_CONFIG[controlPanel.value.thresholdVariable].displayName }} range</strong>
-                        <small innerHTML=" ({{VARIABLE_CONFIG[ controlPanel.value.thresholdVariable ].units}})"></small>
+                        <strong>{{ controlPanel.value.thresholdVariable.displayName }} range</strong>
+                        <small innerHTML=" ({{controlPanel.value.thresholdVariable.units}})"></small>
                     </div>
                 </div>
                 <ngx-slider [options]="thresholdOptions" [value]="thresholdRange[0]" [highValue]="thresholdRange[1]" (userChange)="updateThresholdRange($event)"></ngx-slider>
@@ -40,7 +40,7 @@
             <mat-label>Color variable</mat-label>
             <mat-select formControlName="colorVariable">
                 <mat-option *ngFor="let variable of variables" [value]="variable">
-                    {{ VARIABLE_CONFIG[variable].displayName }}
+                    {{ variable.displayName }}
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -55,7 +55,7 @@
             <div class="control-panel__header">
                 <div>
                     <strong>Color range</strong>
-                    <small innerHTML=" ({{ VARIABLE_CONFIG[ controlPanel.value.colorVariable ].units }})"></small>
+                    <small innerHTML=" ({{ controlPanel.value.colorVariable.units }})"></small>
                 </div>
             </div>
             <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
