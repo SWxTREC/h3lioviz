@@ -2,6 +2,16 @@
 @include misc.ignore-max-page-width;
 @import 'src/theme/theme-colors.scss';
 
+@keyframes pulse {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 :host {
     text-align: center;
     color: white;
@@ -21,6 +31,17 @@
         font-size: large;
         &--server {
             text-align: left;
+        }
+    }
+    &__state {
+        &--stopped {
+            color: $color-warn;
+        }
+        &--started {
+            color: $color-success;
+        }
+        &--active {
+            animation: pulse 1s infinite alternate ease-in-out;
         }
     }
 }

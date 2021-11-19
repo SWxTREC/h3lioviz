@@ -29,7 +29,7 @@ export class VisualizerComponent implements AfterViewInit {
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
             const message = ( httpReq?.response?.error ) || `Connection error`;
             console.error( message );
-            console.log( httpReq );
+            console.log( 'connection error', httpReq );
             this.errorMessage = 'cannot connect to Enlil-3D server';
         });
 
@@ -37,7 +37,7 @@ export class VisualizerComponent implements AfterViewInit {
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
             const message = (httpReq?.response?.error) || `Connection close`;
             console.error( message );
-            console.log( httpReq );
+            console.log( 'connection closed', httpReq );
             this.errorMessage = 'Enlil-3D server is not responding';
         });
 

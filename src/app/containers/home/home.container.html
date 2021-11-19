@@ -3,7 +3,19 @@
         Sign in/Register to explore Enlil model runs in 3 dimensions
     </p>
     <p *ngIf="isLoggedIn" class="home__message home__message--server">
-        Server state: {{ serverState }} {{ serverStatus }}
+        Server state:
+        <span class="home__state home__state--stopped" *ngIf="serverState === 'stopped' || serverState === 'terminated'">
+            <mat-icon>cloud_off</mat-icon>
+        </span>
+        <span class="home__state home__state--stopped home__state--active" *ngIf="serverState === 'stopping' || serverState === 'shutting-down'">
+            <mat-icon>cloud_queue</mat-icon>
+        </span>
+        <span class="home__state home__state--started home__state--active" *ngIf="serverState === 'pending' || serverStatus === 'initializing'">
+            <mat-icon>cloud_queue</mat-icon>
+        </span>
+        <span class="home__state home__state--started" *ngIf="serverState === 'running' && serverStatus === 'ok'">
+            <mat-icon>cloud_done</mat-icon>
+        </span>
     </p>
     <div class="home__media">
         <img src="assets/videos/enlil-3d.gif" alt="movie showing Enlil 3-d visualization">
