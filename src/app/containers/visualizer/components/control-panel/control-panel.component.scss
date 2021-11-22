@@ -11,8 +11,10 @@
             flex-direction: column;
         }
     }
-    &__full-width-slider {
-        width: 100%;
+    &__control {
+        &--full-width {
+            width: 100%;
+        }
     }
     &__header {
         text-align: center;
