@@ -52,7 +52,6 @@ export class AwsService {
             const starting: boolean = serverState === 'pending' || serverStatus === 'initializing';
             const started: boolean = serverState === 'running' && serverStatus === 'ok';
             const status: string = stopped ? 'stopped' : stopping ? 'stopping' : starting ? 'starting' : started ? 'started' : undefined;
-            // TODO: if build === 'dev', return a status of 'started'
             this.serverStatus$.next( status );
         })
     }
@@ -60,7 +59,16 @@ export class AwsService {
     getEc2Status() {
         // CheckEC2Status.py lambda link
         // this endpoint is in the code and the repo and is not secure
-        return this._http.get( this.awsUrl + '/BrianTestStatusEC2');
+        // if dev, fake a response with a valid server state
+        if (this.awsUrl === '#') {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({ state: 'running', status: 'ok'});
+                }, 2000);
+            });
+        } else {
+            return this._http.get(this.awsUrl + '/BrianTestStatusEC2');
+        }
     }
 
     startEc2() {
