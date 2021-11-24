@@ -24,12 +24,18 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     validConnection: boolean = false;
     visualizerSplit: [number, number] = [ 30, 70 ];
     subscriptions: Subscription[] = [];
+    waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ]
+    waitingMessage: string = this.waitingMessages[0];
 
     constructor(
         private _awsService: AwsService
-    ) {}
+    ) {
+
+    }
 
     ngAfterViewInit() {
+        const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…']
+        const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
         this.subscriptions.push( this._awsService.serverStatus$.pipe(
             distinctUntilChanged()
         ).subscribe( status => {
@@ -37,6 +43,9 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
                 // connect once
                 if ( status === 'started' && !this.validConnection) {
                     this.connectToSocket();
+                    if (interval ) {
+                        clearInterval(interval);
+                    }
                 }
             }))
     }

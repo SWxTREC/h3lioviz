@@ -188,7 +188,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                         this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
                     }
                 }));
-
         }
     }
 
