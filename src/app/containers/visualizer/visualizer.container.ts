@@ -1,4 +1,7 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
@@ -11,15 +14,34 @@ import SmartConnect from 'wslink/src/SmartConnect';
     templateUrl: './visualizer.container.html',
     styleUrls: [ './visualizer.container.scss' ]
 })
-export class VisualizerComponent implements AfterViewInit {
+export class VisualizerComponent implements AfterViewInit, OnDestroy {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
     loading = true;
     pvView: any;
+    serverStatus: string;
     timeTicks: number[] = [];
     errorMessage: string;
+    validConnection: boolean = false;
     visualizerSplit: [number, number] = [ 30, 70 ];
+    subscriptions: Subscription[] = [];
 
-    ngAfterViewInit(): void {
+    constructor(
+        private _awsService: AwsService
+    ) {}
+
+    ngAfterViewInit() {
+        this.subscriptions.push( this._awsService.serverStatus$.pipe(
+            distinctUntilChanged()
+        ).subscribe( status => {
+                this.serverStatus = status;
+                // connect once
+                if ( status === 'started' && !this.validConnection) {
+                    this.connectToSocket();
+                }
+            }))
+    }
+
+    connectToSocket(): void {
         // set up websocket
         vtkWSLinkClient.setSmartConnectClass(SmartConnect);
         const clientToConnect = vtkWSLinkClient.newInstance();
@@ -27,21 +49,22 @@ export class VisualizerComponent implements AfterViewInit {
 
         // Error
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
+            this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
             console.error( message );
-            console.log( 'connection error', httpReq );
             this.errorMessage = 'cannot connect to Enlil-3D server';
         });
 
         // Close
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
+            this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection close`;
             console.error( message );
-            console.log( 'connection closed', httpReq );
             this.errorMessage = 'Enlil-3D server is not responding';
         });
 
         clientToConnect.onConnectionReady( validClient => {
+            this.validConnection = true;
             this.errorMessage = undefined;
             const session = validClient.getConnection().getSession();
 
@@ -71,6 +94,10 @@ export class VisualizerComponent implements AfterViewInit {
 
         // Connect
         clientToConnect.connect( config );
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
     getTimestep( timeIndex: number ) {

@@ -140,7 +140,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            console.log('session is defined here')
             this.controlPanel.setValue( this.initialControlPanelValues );
             // subscribe to any form change
             this.subscriptions.push( this.controlPanel.valueChanges
@@ -180,7 +179,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             // subscribe to opacity slider and 'set_opacity'
             this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
                 .pipe( debounceTime( 300 ) ).subscribe( () => {
-                    console.log('opacity slider')
                     const name = this.controlPanel.value.colorVariable.serverName;
                     const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
                     const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;

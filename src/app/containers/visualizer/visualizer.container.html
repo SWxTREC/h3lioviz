@@ -1,9 +1,12 @@
-<swt-server-status></swt-server-status>
-<div *ngIf="errorMessage" class="viz__loading viz__loading--disconnect">
-    <mat-icon class="viz__error">error</mat-icon>
-    {{ errorMessage }}, please refresh or try again later
+<div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
+    <swt-server-status></swt-server-status>
+    <p *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p *ngIf="(serverStatus === 'starting' || serverStatus === 'stopping')">please wait…</p>
+    <p *ngIf="(serverStatus === 'starting' || serverStatus === 'stopping') && message2">this can take a minute…</p>
+    <p *ngIf="serverStatus === 'stopped'"> please refresh or try again later</p>
+    <mat-spinner *ngIf="!validConnection && serverStatus !== 'stopped'" color="primary" diameter="40"></mat-spinner>
 </div>
-<div class="viz__split" [class.viz__fade]="errorMessage">
+<div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split direction="horizontal">
         <as-split-area class="viz__panel" [size]="visualizerSplit[0]">
             <swt-control-panel [pvView]="pvView"></swt-control-panel>

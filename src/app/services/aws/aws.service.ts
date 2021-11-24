@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { interval, Observable } from 'rxjs';
-import { distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { distinctUntilChanged, startWith, switchMap, takeWhile } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
 
@@ -10,7 +10,9 @@ import { ProfileNavService } from '../profile-nav/profile-nav.service';
 })
 export class AwsService {
     awsUrl: string = environment.aws.api;
-    serverStatus$: Observable<any>;
+    loggedIn: boolean;
+    serverStatus$: BehaviorSubject<string> = new BehaviorSubject('');
+    timeInterval: Subscription;
 
     constructor(
         private _http: HttpClient,
@@ -19,19 +21,40 @@ export class AwsService {
         this._profileService.isLoggedIn.pipe(
             distinctUntilChanged()
         ).subscribe( loginStatus => {
+            this.loggedIn = loginStatus;
             if ( loginStatus ) {
                 // once logged in, start the Ec2 service here
-                this.startEc2().subscribe();
+                // don't send the start command unless the server is stopped
+                if ( this.serverStatus$.value === 'stopped') {
+                    this.startEc2().subscribe();
+                    // set the status to starting
+                    this.serverStatus$.next('starting')
+                }
+            }
+            else {
+                if ( this.timeInterval ) {
+                    this.timeInterval.unsubscribe();
+                }
             }
         });
 
-        // check server status every 20 seconds
-        // this is lazy, so will only run when a subscription to this.serverStatus$ is active
-        this.serverStatus$ = interval(1000 * 20)
+        // while logged in, check server status every 20 seconds
+        this.timeInterval = interval(1000 * 20)
         .pipe(
+            takeWhile( () => this.loggedIn),
             startWith(0),
             switchMap(() => this.getEc2Status())
-        )
+        ).subscribe( (ec2: { status: string, state: string}) => {
+            const serverState: string = ec2.state;
+            const serverStatus: string = ec2.status;
+            const stopped: boolean = serverState === 'stopped' || serverState === 'terminated';
+            const stopping: boolean = serverState === 'stopping' || serverState === 'shutting-down';
+            const starting: boolean = serverState === 'pending' || serverStatus === 'initializing';
+            const started: boolean = serverState === 'running' && serverStatus === 'ok';
+            const status: string = stopped ? 'stopped' : stopping ? 'stopping' : starting ? 'starting' : started ? 'started' : undefined;
+            // TODO: if build === 'dev', return a status of 'started'
+            this.serverStatus$.next( status );
+        })
     }
 
     getEc2Status() {

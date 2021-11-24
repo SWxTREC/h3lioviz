@@ -10,7 +10,6 @@ import { AwsService, ProfileNavService } from 'src/app/services';
 })
 export class ServerStatusComponent implements OnDestroy {
     isLoggedIn: boolean;
-    serverState: string;
     serverStatus: string;
     subscriptions: Subscription[] = []
     serverStatusSubscription: Subscription;
@@ -22,9 +21,8 @@ export class ServerStatusComponent implements OnDestroy {
         this.subscriptions.push( this.profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
             if ( loginStatus ) {
-                this.serverStatusSubscription = this.awsService.serverStatus$.subscribe( (ec2: { status: string, state: string}) => {
-                    this.serverState = ec2.state;
-                    this.serverStatus = ec2.status
+                this.serverStatusSubscription = this.awsService.serverStatus$.pipe( distinctUntilChanged() ).subscribe( (status: string) => {
+                    this.serverStatus = status;
                 });
                 this.subscriptions.push( this.serverStatusSubscription );
             } else {
