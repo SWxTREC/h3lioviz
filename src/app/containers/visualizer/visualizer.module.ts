@@ -4,17 +4,16 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
 import { MomentModule } from 'ngx-moment';
-
-import { MaterialModule } from '../../modules';
+import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import { ControlPanelComponent, TimePlayerComponent } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
-
 @NgModule({
     imports: [
         CommonModule,
+        ComponentsModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,

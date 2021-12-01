@@ -7,8 +7,6 @@ import { LaspNavService } from 'lasp-nav';
 import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';
 import { environment } from 'src/environments/environment';
 
-import { AwsService } from '../aws/aws.service';
-
 @Injectable()
 export class ProfileNavService extends LaspNavService {
     private _cognito: CognitoIdentityServiceProvider;
@@ -21,7 +19,6 @@ export class ProfileNavService extends LaspNavService {
     showUserProfile = true;
 
     constructor(
-        private _aws: AwsService,
         private _router: Router,
         private _http: HttpClient
     ) {
@@ -85,8 +82,6 @@ export class ProfileNavService extends LaspNavService {
 
     async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
-        // start AWS instance after login
-        this._aws.startEc2().subscribe();
         return {
             firstName: cognitoInfo.username,
             lastName: '',

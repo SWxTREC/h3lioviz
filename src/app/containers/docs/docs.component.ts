@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'lasp-docs',
+    selector: 'swt-docs',
     templateUrl: './docs.component.html',
     styleUrls: [ './docs.component.scss' ]
 })

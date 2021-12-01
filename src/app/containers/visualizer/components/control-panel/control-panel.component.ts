@@ -126,53 +126,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
-        // subscribe to any form change
-        this.subscriptions.push( this.controlPanel.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
-                this.updateVisibilityControls( newFormValues );
-                // this will render every time any named control of the form is updated
-                // the threshold and color ranges are outside of the form and are updated and rendered manually
-                this.renderDebouncer.next();
-            }));
-        // subscribe to color variable changes and reset color slider options, color range, and 'set_range' for color
-        this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
-                const colorVariableServerName = newColorVariable.serverName;
-                this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
-                this.colorOptions = {
-                    floor: newColorVariable.range[0],
-                    ceil: newColorVariable.range[1],
-                    step: newColorVariable.step,
-                    animate: false
-                };
-                this.colorRange = newColorVariable.range;
-                this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
-            }));
-        // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
-        this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
-                const thresholdVariableServerName = newThresholdVariable.serverName;
-                this.thresholdOptions = {
-                    floor: newThresholdVariable.range[0],
-                    ceil: newThresholdVariable.range[1],
-                    step: newThresholdVariable.step,
-                    animate: false
-                };
-                this.thresholdRange = newThresholdVariable.defaultRange;
-                this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
-            }));
-        // subscribe to opacity slider and 'set_opacity'
-        this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( () => {
-                const name = this.controlPanel.value.colorVariable.serverName;
-                const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
-                const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;
-                if ( name[ 0 ] === 'b' ) {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityHigh, opacityLow, opacityHigh ] ] );
-                } else {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
-                }
-            }));
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
@@ -188,6 +141,53 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
             this.controlPanel.setValue( this.initialControlPanelValues );
+            // subscribe to any form change
+            this.subscriptions.push( this.controlPanel.valueChanges
+                .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
+                    this.updateVisibilityControls( newFormValues );
+                    // this will render every time any named control of the form is updated
+                    // the threshold and color ranges are outside of the form and are updated and rendered manually
+                    this.renderDebouncer.next();
+                }));
+            // subscribe to color variable changes and reset color slider options, color range, and 'set_range' for color
+            this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
+                .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
+                    const colorVariableServerName = newColorVariable.serverName;
+                    this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
+                    this.colorOptions = {
+                        floor: newColorVariable.range[0],
+                        ceil: newColorVariable.range[1],
+                        step: newColorVariable.step,
+                        animate: false
+                    };
+                    this.colorRange = newColorVariable.range;
+                    this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
+                }));
+            // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
+            this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
+                .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
+                    const thresholdVariableServerName = newThresholdVariable.serverName;
+                    this.thresholdOptions = {
+                        floor: newThresholdVariable.range[0],
+                        ceil: newThresholdVariable.range[1],
+                        step: newThresholdVariable.step,
+                        animate: false
+                    };
+                    this.thresholdRange = newThresholdVariable.defaultRange;
+                    this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
+                }));
+            // subscribe to opacity slider and 'set_opacity'
+            this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
+                .pipe( debounceTime( 300 ) ).subscribe( () => {
+                    const name = this.controlPanel.value.colorVariable.serverName;
+                    const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
+                    const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;
+                    if ( name[ 0 ] === 'b' ) {
+                        this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityHigh, opacityLow, opacityHigh ] ] );
+                    } else {
+                        this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
+                    }
+                }));
         }
     }
 
