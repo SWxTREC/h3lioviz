@@ -23,7 +23,7 @@ export class AwsService {
         ).subscribe( loginStatus => {
             this.loggedIn = loginStatus;
             if ( loginStatus ) {
-                // once logged in, start the Ec2 service here
+                // once logged in, start the EC2 service here
                 // don't send the start command unless the server is stopped
                 if ( this.serverStatus$.value === 'stopped') {
                     this.startEc2().subscribe();
@@ -82,8 +82,4 @@ export class AwsService {
         // this endpoint is in the code and the repo and is not secure
         return this._http.get( this.awsUrl + '/BrianTestStopEC2');
     }
-
-
-
-
 }

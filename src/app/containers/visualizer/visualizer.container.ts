@@ -69,7 +69,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection close`;
             console.error( message );
-            this.errorMessage = 'Enlil-3D server is not responding';
+            this.errorMessage = 'The connection to the Enlil-3D server was closed';
         });
 
         clientToConnect.onConnectionReady( validClient => {
