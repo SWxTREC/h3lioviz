@@ -115,7 +115,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
-        // create formGroup with deafult control names and values
+        // create FormGroup with default control panel names and values
         Object.keys(this.CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
             this.controlPanel.addControl(controlName, new FormControl(this.CONTROL_PANEL_DEFAULT_VALUES[controlName]));
         })
