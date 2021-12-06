@@ -93,6 +93,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         step: this.defaultColorVariable.step,
         animate: false
     };
+    colorRange: [number, number] = ( this.defaultColorVariable.range );
     controlPanel: FormGroup = new FormGroup({});
     opacityOptions: Options = {
         floor: 0,
