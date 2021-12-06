@@ -51,7 +51,7 @@
                 </div>
                 {{ controlPanel.value.opacity[0] }}% to {{ controlPanel.value.opacity[1] }}%
             </div>
-            <ngx-slider [options]="opacityOptions" [value]="controlPanel.value.opacity[0]" [highValue]="controlPanel.value.opacity[1]" formControlName="opacity"></ngx-slider>
+            <ngx-slider [options]="opacityOptions" formControlName="opacity"></ngx-slider>
             <div class="control-panel__header">
                 <div>
                     <strong>Color range</strong>

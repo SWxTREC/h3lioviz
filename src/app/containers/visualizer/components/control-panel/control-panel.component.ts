@@ -73,28 +73,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             step: 1
         }
     };
-
     defaultColorVariable: IVariableInfo = this.VARIABLE_CONFIG.velocity;
-    colorOptions: Options = {
-        floor: this.defaultColorVariable.range[0],
-        ceil: this.defaultColorVariable.range[1],
-        step: this.defaultColorVariable.step,
-        animate: false
-    };
     defaultThresholdVariable: IVariableInfo = this.VARIABLE_CONFIG.density;
-    colorRange: [number, number] = ( this.defaultColorVariable.range );
-    controlPanel: FormGroup = new FormGroup({
-        colorVariable: new FormControl({}),
-        cme: new FormControl(false),
-        latSlice: new FormControl(false),
-        lonArrows: new FormControl(false),
-        lonSlice: new FormControl(false),
-        lonStreamlines: new FormControl(false),
-        opacity: new FormControl([]),
-        threshold: new FormControl(false),
-        thresholdVariable: new FormControl({})
-    });
-    initialControlPanelValues = {
+    CONTROL_PANEL_DEFAULT_VALUES = {
         colorVariable: this.defaultColorVariable,
         cme: true,
         latSlice: true,
@@ -105,12 +86,19 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
+
+    colorOptions: Options = {
+        floor: this.defaultColorVariable.range[0],
+        ceil: this.defaultColorVariable.range[1],
+        step: this.defaultColorVariable.step,
+        animate: false
+    };
+    controlPanel: FormGroup = new FormGroup({});
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
         step: 10,
-        animate: false,
-        showSelectionBar: true
+        animate: false
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
@@ -126,6 +114,10 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
+        // create formGroup with deafult control names and values
+        Object.keys(this.CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
+            this.controlPanel.addControl(controlName, new FormControl(this.CONTROL_PANEL_DEFAULT_VALUES[controlName]));
+        })
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
@@ -140,7 +132,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            this.controlPanel.setValue( this.initialControlPanelValues );
             // subscribe to any form change
             this.subscriptions.push( this.controlPanel.valueChanges
                 .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
