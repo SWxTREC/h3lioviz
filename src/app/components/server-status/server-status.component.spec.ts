@@ -1,9 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileNavService } from 'src/app/services';
-import { routes } from '../../routes';
-
 
 import { ServerStatusComponent } from './server-status.component';
 
@@ -16,7 +14,7 @@ describe('ServerStatusComponent', () => {
             declarations: [ ServerStatusComponent ],
             imports: [
                 HttpClientTestingModule,
-                RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+                RouterTestingModule
             ],
             providers: [ ProfileNavService ]
         })
