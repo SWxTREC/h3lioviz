@@ -13,15 +13,15 @@ export class HomeComponent implements OnDestroy {
     isLoggedIn: boolean;
     serverState: string;
     serverStatus: string;
-    subscriptions: Subscription[] = []
+    subscriptions: Subscription[] = [];
     serverStatusSubscription: Subscription;
 
     constructor(
-        private profileService: ProfileNavService,
+        private profileService: ProfileNavService
     ) {
         this.subscriptions.push( this.profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
-        }))
+        }));
     }
 
     ngOnDestroy(): void {

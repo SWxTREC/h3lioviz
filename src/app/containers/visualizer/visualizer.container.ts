@@ -21,10 +21,10 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     serverStatus: string;
     timeTicks: number[] = [];
     errorMessage: string;
-    validConnection: boolean = false;
+    validConnection = false;
     visualizerSplit: [number, number] = [ 30, 70 ];
     subscriptions: Subscription[] = [];
-    waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ]
+    waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
     waitingMessage: string = this.waitingMessages[0];
 
     constructor(
@@ -34,20 +34,20 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…']
+        const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
         const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
         this.subscriptions.push( this._awsService.serverStatus$.pipe(
             distinctUntilChanged()
         ).subscribe( status => {
-                this.serverStatus = status;
+            this.serverStatus = status;
                 // connect once
-                if ( status === 'started' && !this.validConnection) {
-                    this.connectToSocket();
-                    if (interval ) {
-                        clearInterval(interval);
-                    }
+            if ( status === 'started' && !this.validConnection) {
+                this.connectToSocket();
+                if (interval ) {
+                    clearInterval(interval);
                 }
-            }))
+            }
+        }));
     }
 
     connectToSocket(): void {

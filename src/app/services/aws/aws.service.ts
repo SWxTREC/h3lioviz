@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
 import { distinctUntilChanged, startWith, switchMap, takeWhile } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
 
 @Injectable({
@@ -28,10 +29,9 @@ export class AwsService {
                 if ( this.serverStatus$.value === 'stopped') {
                     this.startEc2().subscribe();
                     // set the status to starting
-                    this.serverStatus$.next('starting')
+                    this.serverStatus$.next('starting');
                 }
-            }
-            else {
+            } else {
                 if ( this.timeInterval ) {
                     this.timeInterval.unsubscribe();
                 }
@@ -53,7 +53,7 @@ export class AwsService {
             const started: boolean = serverState === 'running' && serverStatus === 'ok';
             const status: string = stopped ? 'stopped' : stopping ? 'stopping' : starting ? 'starting' : started ? 'started' : undefined;
             this.serverStatus$.next( status );
-        })
+        });
     }
 
     getEc2Status() {
@@ -63,7 +63,7 @@ export class AwsService {
         if (this.awsUrl === '#') {
             return new Promise(resolve => {
                 setTimeout(() => {
-                    resolve({ state: 'running', status: 'ok'});
+                    resolve({ state: 'running', status: 'ok' });
                 }, 2000);
             });
         } else {

@@ -118,7 +118,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // create FormGroup with default control panel names and values
         Object.keys(this.CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
             this.controlPanel.addControl(controlName, new FormControl(this.CONTROL_PANEL_DEFAULT_VALUES[controlName]));
-        })
+        });
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
