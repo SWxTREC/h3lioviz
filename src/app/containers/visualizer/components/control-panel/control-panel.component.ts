@@ -198,6 +198,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             }));
     }
 
+    snapTo( view: string ) {
+        this.session.call( 'pv.enlil.snap_to_view', [ view ] );
+        this.renderDebouncer.next();
+    }
+
     toggleZoom() {
         const getZoom = this.pvView.get().rpcWheelEvent;
         // if zoom is on, turn it off and vice versa

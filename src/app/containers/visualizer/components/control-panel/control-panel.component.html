@@ -5,8 +5,23 @@
     <div class="control-panel__controls">
         Mouse zoom {{ zoomState }}
         <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+        Rotate center
+        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+        Pan
+        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+
     </div>
-    <button mat-raised-button color="accent" (click)="resetZoom()">reset zoom</button>
+    <div>
+        <button mat-raised-button color="accent" (click)="toggleZoom()">+zoom </button>
+        <button mat-raised-button color="accent" (click)="toggleZoom()">-zoom</button>
+        <button mat-raised-button color="accent" (click)="resetZoom()">reset zoom</button>
+    </div>
+    <div>
+        Snap to view
+        <button mat-raised-button color="accent" (click)="snapTo('ecliptic')">ecliptic</button>
+        <button mat-raised-button color="accent" (click)="snapTo('meridional')">meridional</button>
+    </div>
+
     <mat-divider class="control-panel__spacer"></mat-divider>
     <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
