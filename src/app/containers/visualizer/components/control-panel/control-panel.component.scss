@@ -4,6 +4,7 @@
     &__controls{
         display: flex;
         justify-content: space-between;
+        margin-bottom: 1rem;
         &--child {
             margin-left: 2rem;
         }
@@ -18,6 +19,14 @@
     }
     &__header {
         text-align: center;
+    }
+    &__hint {
+        font-size: small;
+        display: flex;
+        line-height: 1.3;
+        small {
+            margin-right: 1em;
+        }
     }
     &__spacer {
         margin: 1rem 0;
