@@ -11,12 +11,10 @@
 
     <h2>Keyboad tips for panning:</h2>
     <dl>
-        <dt>shift + left</dt>
-        <dd>only allows rotation about the center</dd>
-        <dt>shift + right</dt>
-        <dd>picks up the image to move the center around (pan)</dd>
-        <dt>ctrl + right up/down</dt>
-        <dd>zooms in/out</dd>
+        <ng-container *ngFor="let shortcut of keyboardShortcuts">
+            <dt>{{shortcut.action}}</dt>
+            <dd>{{shortcut.instruction}}</dd>
+        </ng-container>
     </dl>
 
     <markdown [src]="'https://raw.githubusercontent.com/SWxTREC/enlil-3d/main/README.md'"></markdown>

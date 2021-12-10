@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IKeyboard, KEYBOARD_SHORTCUTS } from 'src/app/models';
 
 @Component({
     selector: 'swt-docs',
@@ -6,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
     styleUrls: [ './docs.component.scss' ]
 })
 export class DocsComponent implements OnInit {
+    keyboardShortcuts: IKeyboard[] = KEYBOARD_SHORTCUTS;
 
     constructor() { }
 

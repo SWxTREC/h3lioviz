@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { IVariableInfo } from 'src/app/models';
+import { IKeyboard, IVariableInfo, KEYBOARD_SHORTCUTS } from 'src/app/models';
 
 @Component({
     selector: 'swt-control-panel',
@@ -13,6 +13,7 @@ import { IVariableInfo } from 'src/app/models';
 })
 export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
+    keyboardShortcuts = KEYBOARD_SHORTCUTS;
 
     // TODO: set these in the server on load
     VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
@@ -196,6 +197,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
                 }
             }));
+    }
+
+    snapTo( view: string ) {
+        this.session.call( 'pv.enlil.snap_to_view', [ view ] );
+        this.renderDebouncer.next();
     }
 
     toggleZoom() {
