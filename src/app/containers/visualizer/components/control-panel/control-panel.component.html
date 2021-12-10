@@ -13,9 +13,7 @@
         <button mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
     </div>
     <div class="control-panel__hint">
-        <small>Rotate <code>shift+left&#8209;click</code></small>
-        <small>Pan <code>shift+right&#8209;click</code></small>
-        <small>Zoom in/out <code>ctrl+up/down</code></small>
+        <small *ngFor="let shortcut of keyboardShortcuts">{{shortcut.action}} <code>{{shortcut.instruction}}</code></small>
     </div>
 
     <mat-divider class="control-panel__spacer"></mat-divider>
