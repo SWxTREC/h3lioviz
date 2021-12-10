@@ -13,10 +13,9 @@
         <button mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
     </div>
     <div class="control-panel__hint">
-        <small>Rotate <code>shift+left</code></small>
-        <small>Pan <code>shift+right</code></small>
-        <small>Zoom in <code>ctrl+right+up</code></small>
-        <small>Zoom out <code>shift+right+down</code></small>
+        <small>Rotate <code>shift+left&#8209;click</code></small>
+        <small>Pan <code>shift+right&#8209;click</code></small>
+        <small>Zoom in/out <code>ctrl+up/down</code></small>
     </div>
 
     <mat-divider class="control-panel__spacer"></mat-divider>
@@ -25,7 +24,7 @@
         <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic plane</mat-checkbox>
         <mat-checkbox color="primary" formControlName="latSlice">Meridional section</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
-        <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonArrows">Magnetic field vectors</mat-checkbox>
         <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
         <div class="control-panel__threshold" [class.control-panel__threshold--expand]="controlPanel.value.threshold">
             <ng-container *ngIf="controlPanel.value.threshold">
