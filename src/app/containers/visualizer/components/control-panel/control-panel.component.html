@@ -3,17 +3,26 @@
         Control Panel
     </mat-card-title>
     <div class="control-panel__controls">
-        Mouse zoom {{ zoomState }}
-        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+        <strong>Snap to view</strong>
+        <button mat-raised-button color="primary" (click)="snapTo('ecliptic')">ecliptic</button>
+        <button mat-raised-button color="primary" (click)="snapTo('meridional')">meridional</button>
     </div>
-    <button mat-raised-button color="accent" (click)="resetZoom()">reset zoom</button>
+    <div class="control-panel__controls">
+        <strong>Mouse zoom {{ zoomState }}</strong>
+        <mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+        <button mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
+    </div>
+    <div class="control-panel__hint">
+        <small *ngFor="let shortcut of keyboardShortcuts">{{shortcut.action}} <code>{{shortcut.instruction}}</code></small>
+    </div>
+
     <mat-divider class="control-panel__spacer"></mat-divider>
     <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic plane</mat-checkbox>
         <mat-checkbox color="primary" formControlName="latSlice">Meridional section</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Solar wind streamlines</mat-checkbox>
-        <mat-checkbox color="primary" formControlName="lonArrows">Solar wind vectors</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="lonArrows">Magnetic field vectors</mat-checkbox>
         <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
         <div class="control-panel__threshold" [class.control-panel__threshold--expand]="controlPanel.value.threshold">
             <ng-container *ngIf="controlPanel.value.threshold">
