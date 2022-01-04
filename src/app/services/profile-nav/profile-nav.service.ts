@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 export class ProfileNavService extends LaspNavService {
     private _cognito: CognitoIdentityServiceProvider;
     private _cognitoIdentity: CognitoIdentity;
+    private _refreshTokenRequest: Promise<void>;
     cognitoIdentityId: string;
     cognitoIdentityCredentials: CognitoIdentity.Credentials;
     // a promise that resolves shortly after the app has loaded, after the login process has completed,
@@ -178,8 +179,12 @@ export class ProfileNavService extends LaspNavService {
             return await requestPromiseFactory();
         } catch ( e ) {
             // if it fails with a 4XX error code, try to refresh the access token
-            if ( e.status >= 400 && e.status < 500 ) {
-                await this._refreshCognitoAccessToken();
+            const status = e.status ?? e.statusCode;
+            if ( status >= 400 && status < 500 ) {
+                if ( this._refreshTokenRequest == null ) {
+                    this._refreshTokenRequest = this._refreshCognitoAccessToken();
+                }
+                await this._refreshTokenRequest;
                 // make the original request again. This time, it will use the new access token
                 return await requestPromiseFactory();
             } else {
