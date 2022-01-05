@@ -33,6 +33,14 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             defaultRange: [ 15, 30 ],
             step: 1
         },
+        pressure: {
+            serverName: 'pressure',
+            displayName: 'Ram pressure',
+            units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
+            range: [ 100000, 10000000 ],
+            defaultRange: [ 500000, 10000000 ],
+            step: 10000
+        },
         temperature: {
             serverName: 'temperature',
             displayName: 'Temperature',
