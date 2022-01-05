@@ -29,9 +29,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private _awsService: AwsService
-    ) {
-
-    }
+    ) {}
 
     ngAfterViewInit() {
         const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
@@ -40,12 +38,15 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             distinctUntilChanged()
         ).subscribe( status => {
             this.serverStatus = status;
-                // connect once
-            if ( status === 'started' && !this.validConnection) {
+            // connect once
+            if ( !this.validConnection && status === 'started') {
                 this.connectToSocket();
                 if (interval ) {
                     clearInterval(interval);
                 }
+            } else if ( !this.validConnection && ( status === 'stopped' || status === '' )) {
+                // start service once, here too
+                this._awsService.startEc2().subscribe();
             }
         }));
     }
@@ -60,7 +61,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
-            console.error( message );
             this.errorMessage = 'cannot connect to Enlil-3D server';
         });
 
@@ -68,7 +68,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection close`;
-            console.error( message );
             this.errorMessage = 'The connection to the Enlil-3D server was closed';
         });
 

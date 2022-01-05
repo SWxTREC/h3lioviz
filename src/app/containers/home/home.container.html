@@ -1,5 +1,5 @@
 <div class="home">
-    <swt-server-status class="home__message home__message--server"></swt-server-status>
+    <swt-server-status class="home__message"></swt-server-status>
     <div *ngIf="!isLoggedIn" class="home__message">
         <button mat-button (click)="profileService.onSignInClick('')">Sign in/Register</button>
         <p>

@@ -1,6 +1,6 @@
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
     <swt-server-status></swt-server-status>
-    <p *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p *ngIf="errorMessage">{{ errorMessage }}<span *ngIf="serverStatus === 'started'">, please refresh your browser</span></p>
     <p *ngIf="(serverStatus === 'starting' || serverStatus === 'stopping')">{{waitingMessage}}</p>
     <p *ngIf="serverStatus === 'stopped'"> please refresh or try again later</p>
     <mat-spinner *ngIf="!validConnection && serverStatus !== 'stopped'" color="primary" diameter="40"></mat-spinner>
