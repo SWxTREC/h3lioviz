@@ -34,9 +34,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     ngAfterViewInit() {
         const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
         const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
-        this.subscriptions.push( this._awsService.serverStatus$.pipe(
-            distinctUntilChanged()
-        ).subscribe( status => {
+        this.subscriptions.push( this._awsService.serverStatus$.subscribe( status => {
             this.serverStatus = status;
             // connect once
             if ( !this.validConnection && status === 'started') {
@@ -46,7 +44,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
                 }
             } else if ( !this.validConnection && ( status === 'stopped' || status === '' )) {
                 // start service once, here too
-                this._awsService.startEc2().subscribe();
+                this._awsService.monitorPvServer();
             }
         }));
     }
@@ -61,14 +59,14 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
-            this.errorMessage = 'cannot connect to Enlil-3D server: ' + message;
+            this.errorMessage = message;
         });
 
         // Close
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection closed`;
-            this.errorMessage = 'The connection to the Enlil-3D server was closed: ' + message;
+            this.errorMessage = message;
         });
 
         clientToConnect.onConnectionReady( validClient => {

@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
-import { startWith, switchMap, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
+import { catchError, sampleTime, startWith, switchMap, takeWhile } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
 
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
@@ -12,9 +12,8 @@ import { ProfileNavService } from '../profile-nav/profile-nav.service';
 export class AwsService {
     awsUrl: string = environment.aws.api;
     loggedIn: boolean;
-    serverStatus$: BehaviorSubject<string> = new BehaviorSubject('');
-    monitorEc2: Subscription;
-    monitorPvServer: Observable<HttpResponse<string>>;
+    serverStatus$: BehaviorSubject<string> = new BehaviorSubject('stopped');
+    ec2Subscription: Subscription;
 
     constructor(
         private _http: HttpClient,
@@ -23,95 +22,73 @@ export class AwsService {
         this._profileService.isLoggedIn.subscribe( loginStatus => {
             this.loggedIn = loginStatus;
             if ( loginStatus ) {
-                // once logged in, start the EC2 service here
-                // don't send the start command unless the server is stopped or undefined
-                if ( this.serverStatus$.value === 'stopped' || this.serverStatus$.value === '' ) {
-                    this.startEc2().subscribe();
-                }
-            } else {
-                if ( this.monitorEc2 ) {
-                    this.monitorEc2.unsubscribe();
-                }
+                // once logged in, start checking the status of the PV Server
+                this.monitorPvServer();
             }
         });
 
-        // subscription to check EC2 server status every 20 seconds
-        // monitors the server until it is 'ready' and then switches to monitoring the Paraview server
-        this.monitorEc2 = interval(1000 * 20)
+    }
+
+    monitorPvServer() {
+        interval(1000)
         .pipe(
-            takeWhile( () => this.serverStatus$.value !== 'started'),
+            takeWhile(() => this.serverStatus$.value !== 'started'),
             startWith(0),
-            switchMap(() => this.getEc2Status())
-        ).subscribe( (ec2: { status: string, state: string}) => {
-            const serverState: string = ec2.state;
-            const serverStatus: string = ec2.status;
-            const stopped: boolean = serverState === 'stopped' || serverState === 'terminated';
-            const stopping: boolean = serverState === 'stopping' || serverState === 'shutting-down';
-            const starting: boolean = serverState === 'pending' || serverStatus === 'initializing';
-            const ready: boolean = serverState === 'running';
-            const status: string = stopped ? 'stopped' : stopping ? 'stopping' : starting ? 'starting' : ready ? 'ready' : undefined;
-            this.serverStatus$.next( status );
-            if ( status === 'ready' ) {
-                // once 'ready', subscribe to a shorter interval for start of paraview server
-                this.monitorPvServer.subscribe( (pvStatus: {status: number}) => {
-                    if ( pvStatus.status === 200 ) {
-                        // good to connect!, trigger connection
-                        this.serverStatus$.next('started')
-                        if ( this.monitorEc2 ) {
-                            this.monitorEc2.unsubscribe();
-                        }
+            // look for 200 status, but pass through fails with status: 0
+            switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({status: 0}) ))),
+            switchMap( (pvStatus: {status: number}) => {
+                // returns when the PV server is NOT yet ready
+                // stops the interval with PV server responds with 200 status
+                const serverStatus = pvStatus.status;
+                if ( serverStatus === 200 ) {
+                    // good to connect!, trigger connection
+                    if ( this.ec2Subscription ) {
+                        this.ec2Subscription.unsubscribe();
+                    }
+                    // stop interval
+                    this.serverStatus$.next('started');
+                    return of( false );
+                } else {
+                    return of( true );
+                }
+            })
+        ).pipe( sampleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
+            // if PV server is not ready, check the EC2 server status at a much slower rate
+            this.ec2Subscription = this.getEc2Status().pipe( takeWhile(() => pvNotReady ))
+                .subscribe( (ec2: { status: string, state: string}) => {
+                    const serverState: string = ec2.state;
+                    const serverStatus: string = ec2.status;
+                    const stopped: boolean = serverState === 'stopped' || serverState === 'terminated';
+                    const stopping: boolean = serverState === 'stopping' || serverState === 'shutting-down';
+                    const starting: boolean = serverState === 'pending' || serverStatus === 'initializing';
+                    const started: boolean = serverState === 'running';
+                    const status: string = stopped ? 'stopped' : stopping ? 'stopping' : starting ? 'starting' : started ? 'started' : undefined;
+                    this.serverStatus$.next( status );
+                    if ( stopped ) {
+                        // start it up!
+                        this.startEc2().subscribe();
                     }
                 });
-            }
-        });
-
-        // check paraview server status every second
-        this.monitorPvServer = interval(1000)
-        .pipe(
-            takeWhile( () => this.serverStatus$.value !== 'started'),
-            startWith(0),
-            switchMap(() => this.getParaviewServerStatus())
-        )
+        })
     }
 
     getEc2Status() {
         // CheckEC2Status.py lambda link
-        // this endpoint is in the code and the repo and is not secure
         // if dev, fake a response with a valid server state
         if (this.awsUrl === '#') {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve({ state: 'running', status: 'ok' });
-                }, 2000);
-            });
+            return of({ state: 'running', status: 'ok' });
         } else {
             return this._http.get(this.awsUrl + '/BrianTestStatusEC2');
         }
     }
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
-        let pvSessionUrl: string;
-        // local server has sessionURL, prod server has sessionManagerURL
-        if ( environmentConfig.sessionURL ) {
-            pvSessionUrl = environmentConfig.sessionURL;
-
-        } else if ( environmentConfig.sessionManagerURL ) {
-            const baseUrl: string = (environmentConfig.sessionManagerURL.split('//')[1].split('/')[0]);
-            pvSessionUrl = 'https://' + baseUrl;
-        }
-        return this._http.get( pvSessionUrl, { responseType: 'text', observe: 'response' } )
+        return this._http.get( environmentConfig.pvServer, { responseType: 'text', observe: 'response' } )
     }
 
     startEc2() {
         this.serverStatus$.next('starting');
         // StartEC2Instances.py lambda link
-        // this endpoint is in the code and the repo and is not secure
         return this._http.get( this.awsUrl + '/BrianTestStartEC2', { responseType: 'text' });
-    }
-
-    stopEC2() {
-        // StopEC2Instances.py lambda link
-        // this endpoint is in the code and the repo and is not secure
-        return this._http.get( this.awsUrl + '/BrianTestStopEC2');
     }
 }
