@@ -1,9 +1,10 @@
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
-    <swt-server-status></swt-server-status>
-    <p *ngIf="errorMessage">{{ errorMessage }}<span *ngIf="serverStatus === 'started'">, please refresh your browser</span></p>
+    PV server started? {{ pvServerStarted }}
+    <!-- <swt-server-status *ngIf="serverStatus !== 'started' && !pvServerStarted"></swt-server-status> -->
+    <p *ngIf="errorMessage">{{ errorMessage }} please refresh your browser</p>
     <p *ngIf="(serverStatus === 'starting' || serverStatus === 'stopping')">{{waitingMessage}}</p>
     <p *ngIf="serverStatus === 'stopped'"> please refresh or try again later</p>
-    <mat-spinner *ngIf="!validConnection && serverStatus !== 'stopped'" color="primary" diameter="40"></mat-spinner>
+    <mat-spinner *ngIf="serverStatus !== 'stopped' && serverStatus !=='started' && !errorMessge" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split direction="horizontal">
