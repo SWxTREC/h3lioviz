@@ -26,25 +26,32 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     subscriptions: Subscription[] = [];
     waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
     waitingMessage: string = this.waitingMessages[0];
+    pvServerStarted = false;
 
     constructor(
         private _awsService: AwsService
-    ) {}
-
-    ngAfterViewInit() {
+    ) {
         const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
         const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
-        this.subscriptions.push( this._awsService.serverStatus$.subscribe( status => {
-            this.serverStatus = status;
+        // this.subscriptions.push( this._awsService.serverStatus$.subscribe( status => {
+        //     this.serverStatus = status;
+        //     // connect once
+        //     if ( status === 'started') {
+        //         if (interval ) {
+        //             clearInterval(interval);
+        //         }
+        //     }
+        // }));
+        //
+    }
+
+    ngAfterViewInit() {
+        this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
+            this.pvServerStarted = started;
             // connect once
-            if ( !this.validConnection && status === 'started') {
+            if ( !this.validConnection && started === true ) {
+                console.log('connect to Socket')
                 this.connectToSocket();
-                if (interval ) {
-                    clearInterval(interval);
-                }
-            } else if ( !this.validConnection && ( status === 'stopped' || status === '' )) {
-                // start service once, here too
-                this._awsService.monitorPvServer();
             }
         }));
     }
@@ -60,6 +67,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
             this.errorMessage = message;
+            this.unsubscribeAll();
         });
 
         // Close
@@ -67,6 +75,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection closed`;
             this.errorMessage = message;
+            this.unsubscribeAll();
         });
 
         clientToConnect.onConnectionReady( validClient => {
@@ -103,12 +112,16 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+        this.unsubscribeAll();
     }
 
     getTimestep( timeIndex: number ) {
         this.loading = true;
         const session = this.pvView.get().session;
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+    }
+
+    unsubscribeAll () {
+        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 }
