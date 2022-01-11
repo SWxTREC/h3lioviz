@@ -41,7 +41,9 @@ export class AwsService {
                 if ( serverStatus === 200 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);
-                    this.startEc2Subscription.unsubscribe();
+                    if ( this.startEc2Subscription ) {
+                        this.startEc2Subscription.unsubscribe();
+                    }
                     return of( false );
                 } else {
                     // carry on
