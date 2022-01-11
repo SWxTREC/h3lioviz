@@ -9,10 +9,14 @@
 
 .viz {
     &__error {
-        color: $color-warn;
+        display: flex;
+        align-items: center;
     }
     &__fade {
         opacity: 20%;
+    }
+    &__icon {
+        color: $color-primary;
     }
     &__loading {
         position: absolute;

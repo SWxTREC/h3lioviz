@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { interval } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, startWith, switchMap, take, takeWhile } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -18,40 +19,32 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
     loading = true;
     pvView: any;
-    serverStatus: string;
     timeTicks: number[] = [];
     errorMessage: string;
     validConnection = false;
     visualizerSplit: [number, number] = [ 30, 70 ];
     subscriptions: Subscription[] = [];
-    waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
+    waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     pvServerStarted = false;
+    waiting = true;
 
     constructor(
         private _awsService: AwsService
-    ) {
-        const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
-        const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
-        // this.subscriptions.push( this._awsService.serverStatus$.subscribe( status => {
-        //     this.serverStatus = status;
-        //     // connect once
-        //     if ( status === 'started') {
-        //         if (interval ) {
-        //             clearInterval(interval);
-        //         }
-        //     }
-        // }));
-        //
-    }
+    ) {}
 
     ngAfterViewInit() {
+        const waitingMessageInterval = setInterval(() => this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
+
         this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
             this.pvServerStarted = started;
             // connect once
             if ( !this.validConnection && started === true ) {
-                console.log('connect to Socket')
-                this.connectToSocket();
+                // TODO: do I need this `setTimeout`? It seems the connectToSocket function does some retries…?
+                setTimeout(() => this.connectToSocket(), 1000)
+                if (waitingMessageInterval) {
+                    clearInterval(waitingMessageInterval);
+                }
             }
         }));
     }

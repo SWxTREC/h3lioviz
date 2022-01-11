@@ -10,9 +10,9 @@ import { AwsService, ProfileNavService } from 'src/app/services';
 })
 export class ServerStatusComponent implements OnDestroy {
     isLoggedIn: boolean;
-    serverStatus: string;
+    serverStarted: boolean;
     subscriptions: Subscription[] = [];
-    serverStatusSubscription: Subscription;
+    serverStartedSubscription: Subscription;
 
     constructor(
         private profileService: ProfileNavService,
@@ -22,14 +22,14 @@ export class ServerStatusComponent implements OnDestroy {
         .subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
             if ( loginStatus ) {
-                this.serverStatusSubscription = this.awsService.serverStatus$.pipe( distinctUntilChanged() )
-                .subscribe( (status: string) => {
-                    this.serverStatus = status;
+                this.serverStartedSubscription = this.awsService.pvServerStarted$.pipe( distinctUntilChanged() )
+                .subscribe( ( status: boolean ) => {
+                    this.serverStarted = status;
                 });
-                this.subscriptions.push( this.serverStatusSubscription );
+                this.subscriptions.push( this.serverStartedSubscription );
             } else {
-                if ( this.serverStatusSubscription ) {
-                    this.serverStatusSubscription.unsubscribe();
+                if ( this.serverStartedSubscription ) {
+                    this.serverStartedSubscription.unsubscribe();
                 }
             }
         }));
@@ -38,6 +38,4 @@ export class ServerStatusComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.subscriptions.forEach(subscription => subscription.unsubscribe());
     }
-
-
 }
