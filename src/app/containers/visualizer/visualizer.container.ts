@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { interval } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { distinctUntilChanged, startWith, switchMap, take, takeWhile } from 'rxjs/operators';
+import { finalize, take, takeWhile } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -40,8 +40,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.pvServerStarted = started;
             // connect once
             if ( !this.validConnection && started === true ) {
-                // TODO: do I need this `setTimeout`? It seems the connectToSocket function does some retries…?
-                setTimeout(() => this.connectToSocket(), 1000)
+                this.connectToSocket()
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
@@ -60,7 +59,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
             this.errorMessage = message;
-            this.unsubscribeAll();
         });
 
         // Close
@@ -68,7 +66,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection closed`;
             this.errorMessage = message;
-            this.unsubscribeAll();
         });
 
         clientToConnect.onConnectionReady( validClient => {
@@ -101,7 +98,19 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        clientToConnect.connect( config );
+        // use an interval to try a couple of times and set errorMessage when failed
+        interval( 1000 * 5 ).pipe(
+            takeWhile( () => !this.validConnection ),
+            take( 2 ),
+            finalize(() => {
+                // if it fails to connect, show an error message
+                if ( !this.validConnection ) {
+                    this.errorMessage = 'Failed to connect to socket'
+                }
+            })
+        ).subscribe( () => {
+            clientToConnect.connect( config );
+        })
     }
 
     ngOnDestroy() {
