@@ -17,9 +17,7 @@
         width: 100%;
     }
     &__status {
-        &--stopped {
-            color: $color-warn;
-        }
+        color: $color-primary;
         &--started {
             color: $color-success;
         }
