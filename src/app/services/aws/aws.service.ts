@@ -23,7 +23,12 @@ export class AwsService {
             this.loggedIn = loginStatus;
             if ( loginStatus ) {
                 // once logged in, start checking the status of Paraview server
-                this.monitorPvServer();
+                // for prod use monitor function, when running a local server, fake a connection
+                if ( environment.production ) {
+                    this.monitorPvServer();
+                } else {
+                    this.pvServerStarted$.next(true);
+                }
             }
         });
     }
