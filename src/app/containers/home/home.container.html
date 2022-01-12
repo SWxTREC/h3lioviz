@@ -1,7 +1,7 @@
 <div class="home">
     <swt-server-status class="home__message"></swt-server-status>
     <div *ngIf="!isLoggedIn" class="home__message">
-        <button mat-button (click)="profileService.onSignInClick('')">Sign in/Register</button>
+        <button mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
         <p>
             Explore Enlil model runs in 3 dimensions
         </p>

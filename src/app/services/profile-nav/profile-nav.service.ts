@@ -91,8 +91,8 @@ export class ProfileNavService extends LaspNavService {
     }
 
     onSignInClick( destinationUrl?: string ) {
-        // capture the current page so that the user will be redirected to it again after logging in
-        destinationUrl = destinationUrl || this._router.url;
+        // after login, redirect to the visualizer by default (the only page with an auth guard)
+        destinationUrl = destinationUrl || '/visualizer';
         // create a login nonce for security, and store that as well as the current route so we can properly redirect after login.
         // generate a random 11-character string by converting a random number to base 36, which uses letters and numbers,
         // then remove the `0.` from the beginning of the string
