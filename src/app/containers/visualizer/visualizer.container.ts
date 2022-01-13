@@ -31,13 +31,14 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     ) {}
 
     ngAfterViewInit() {
-        const waitingMessageInterval = setInterval(() => this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
+        const waitingMessageInterval = setInterval(() =>
+            this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
 
         this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
             this.pvServerStarted = started;
             // connect once
             if ( !this.validConnection && started === true ) {
-                this.connectToSocket()
+                this.connectToSocket();
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
@@ -98,13 +99,13 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         clientToConnect.connect(config).then( () => {
             // if connection fails, add error message
             if (!clientToConnect.isConnected()) {
-                this.errorMessage = 'Failed to connect to socket'
+                this.errorMessage = 'Failed to connect to socket';
             }
         });
 
         setTimeout( () => {
             if (!clientToConnect.isConnected()) {
-                this.errorMessage = 'Failed to connect to socket'
+                this.errorMessage = 'Failed to connect to socket';
             }
         }, 1000 * 30);
     }
@@ -119,7 +120,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
-    unsubscribeAll () {
+    unsubscribeAll() {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 }

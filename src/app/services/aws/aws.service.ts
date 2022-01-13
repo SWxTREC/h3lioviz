@@ -40,7 +40,7 @@ export class AwsService {
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
-            switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({status: 0}) ))),
+            switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({ status: 0 }) ))),
             switchMap( (pvStatus: {status: number}) => {
                 // returns when the PV server is NOT yet ready
                 const serverStatus = pvStatus.status;
@@ -65,11 +65,11 @@ export class AwsService {
                 // send the start command every throttled interval until PV server returns 200
                 this.startEc2Subscription = this.startEc2().subscribe();
             }
-        })
+        });
     }
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
-        return this._http.get( environmentConfig.pvServer, { responseType: 'text', observe: 'response' } )
+        return this._http.get( environmentConfig.pvServer, { responseType: 'text', observe: 'response' } );
     }
 
     startEc2(): Observable<string> {
