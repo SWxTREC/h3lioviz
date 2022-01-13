@@ -95,15 +95,18 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        const timeToWait: number = 1000 * 15;
-        // if connection fails, after 20 seconds, add error message
+        clientToConnect.connect(config).then( () => {
+            // if connection fails, add error message
+            if (!clientToConnect.isConnected()) {
+                this.errorMessage = 'Failed to connect to socket'
+            }
+        });
+
         setTimeout( () => {
-            clientToConnect.connect(config).then( () => {
-                if (!this.validConnection) {
-                    this.errorMessage = 'Failed to connect to socket'
-                }
-            });
-        }, timeToWait);
+            if (!clientToConnect.isConnected()) {
+                this.errorMessage = 'Failed to connect to socket'
+            }
+        }, 1000 * 30);
     }
 
     ngOnDestroy() {
