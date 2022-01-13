@@ -38,5 +38,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionURL: 'ws://localhost:1234/ws'
+    pvServer: 'ws://localhost:1234',
+    sessionURL: 'ws://localhost:1234/ws',
+    sessionManagerURL: ''
 };

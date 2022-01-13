@@ -1,7 +1,6 @@
 <div *ngIf="isLoggedIn" class="server__message ">
-    <mat-icon *ngIf="serverStatus === 'stopped'" class="server__status server__status--stopped">cloud_off</mat-icon>
-    <mat-icon *ngIf="serverStatus === 'stopping'" class="server__status server__status--stopped server__status--active">cloud_queue</mat-icon>
-    <mat-icon *ngIf="serverStatus === 'starting'" class="server__status server__status--started server__status--active">cloud_queue</mat-icon>
-    <mat-icon *ngIf="serverStatus === 'started'" class="server__status server__status--started">cloud_done</mat-icon>
-    <p>Server {{serverStatus}}</p>
+    <mat-icon *ngIf="!serverStarted" class="server__status server__status--active">cloud_queue</mat-icon>
+    <mat-icon *ngIf="serverStarted" class="server__status server__status--started">cloud_done</mat-icon>
+    <p *ngIf="serverStarted">Server started</p>
+    <p *ngIf="!serverStarted">Waiting for server</p>
 </div>

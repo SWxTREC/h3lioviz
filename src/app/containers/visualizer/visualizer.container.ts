@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -18,33 +17,29 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
     loading = true;
     pvView: any;
-    serverStatus: string;
     timeTicks: number[] = [];
     errorMessage: string;
     validConnection = false;
     visualizerSplit: [number, number] = [ 30, 70 ];
     subscriptions: Subscription[] = [];
-    waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
+    waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
+    pvServerStarted = false;
 
     constructor(
         private _awsService: AwsService
-    ) {
-
-    }
+    ) {}
 
     ngAfterViewInit() {
-        const waitingMessages: string[] = [ 'please wait…', 'this can take a minute…' ];
-        const interval = setInterval(() => this.waitingMessage = waitingMessages[Math.round(Math.random())], 6000);
-        this.subscriptions.push( this._awsService.serverStatus$.pipe(
-            distinctUntilChanged()
-        ).subscribe( status => {
-            this.serverStatus = status;
-                // connect once
-            if ( status === 'started' && !this.validConnection) {
-                this.connectToSocket();
-                if (interval ) {
-                    clearInterval(interval);
+        const waitingMessageInterval = setInterval(() => this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
+
+        this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
+            this.pvServerStarted = started;
+            // connect once
+            if ( !this.validConnection && started === true ) {
+                this.connectToSocket()
+                if (waitingMessageInterval) {
+                    clearInterval(waitingMessageInterval);
                 }
             }
         }));
@@ -60,22 +55,20 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
-            console.error( message );
-            this.errorMessage = 'cannot connect to Enlil-3D server';
+            this.errorMessage = message;
         });
 
         // Close
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
             this.validConnection = false;
-            const message = (httpReq?.response?.error) || `Connection close`;
-            console.error( message );
-            this.errorMessage = 'The connection to the Enlil-3D server was closed';
+            const message = (httpReq?.response?.error) || `Connection closed`;
+            this.errorMessage = message;
         });
 
         clientToConnect.onConnectionReady( validClient => {
-            this.validConnection = true;
             this.errorMessage = undefined;
             const session = validClient.getConnection().getSession();
+            this.validConnection = true;
 
             const viewStream = validClient.getImageStream().createViewStream( -1 );
             const remoteView = vtkRemoteView.newInstance({ session, viewStream });
@@ -102,16 +95,31 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        clientToConnect.connect( config );
+        clientToConnect.connect(config).then( () => {
+            // if connection fails, add error message
+            if (!clientToConnect.isConnected()) {
+                this.errorMessage = 'Failed to connect to socket'
+            }
+        });
+
+        setTimeout( () => {
+            if (!clientToConnect.isConnected()) {
+                this.errorMessage = 'Failed to connect to socket'
+            }
+        }, 1000 * 30);
     }
 
     ngOnDestroy() {
-        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+        this.unsubscribeAll();
     }
 
     getTimestep( timeIndex: number ) {
         this.loading = true;
         const session = this.pvView.get().session;
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+    }
+
+    unsubscribeAll () {
+        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 }

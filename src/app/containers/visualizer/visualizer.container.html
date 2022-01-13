@@ -1,9 +1,9 @@
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
-    <swt-server-status></swt-server-status>
-    <p *ngIf="errorMessage">{{ errorMessage }}</p>
-    <p *ngIf="(serverStatus === 'starting' || serverStatus === 'stopping')">{{waitingMessage}}</p>
-    <p *ngIf="serverStatus === 'stopped'"> please refresh or try again later</p>
-    <mat-spinner *ngIf="!validConnection && serverStatus !== 'stopped'" color="primary" diameter="40"></mat-spinner>
+    <p *ngIf="errorMessage" class="viz__error">{{ errorMessage }} please <mat-icon class="viz__icon">refresh</mat-icon> refresh your browser</p>
+    <swt-server-status *ngIf="!serverStatus && !errorMessage"></swt-server-status>
+    <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
+    <p *ngIf="!errorMessage && pvServerStarted && !validConnection">connecting to websocket…</p>
+    <mat-spinner *ngIf="!validConnection && !errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split direction="horizontal">

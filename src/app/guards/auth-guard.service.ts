@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
         if ( !isLoggedIn ) {
             // execute the handler for clicking the 'sign in' button,
             // and pass it the URL that the user wanted to go to
-            this._profileNavService.onSignInClick( state.url );
+            this._profileNavService.onSignInClick( '/visualizer' );
         }
 
         return isLoggedIn;

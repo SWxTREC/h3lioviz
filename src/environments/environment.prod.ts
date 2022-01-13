@@ -24,5 +24,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
+    pvServer: 'https://paraview-web.swx-trec.com',
+    sessionURL: '',
     sessionManagerURL: 'https://paraview-web.swx-trec.com/paraview'
 };

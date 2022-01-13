@@ -18,6 +18,7 @@
                     "builder": "@angular-builders/custom-webpack:browser",
                     "options": {
                         "allowedCommonJsDependencies": [
+                          "aws-sdk",
                           "lodash",
                           "moment",
                           "moment-timezone",

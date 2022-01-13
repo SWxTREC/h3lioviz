@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 export class ProfileNavService extends LaspNavService {
     private _cognito: CognitoIdentityServiceProvider;
     private _cognitoIdentity: CognitoIdentity;
+    private _refreshTokenRequest: Promise<void>;
     cognitoIdentityId: string;
     cognitoIdentityCredentials: CognitoIdentity.Credentials;
     // a promise that resolves shortly after the app has loaded, after the login process has completed,
@@ -90,8 +91,8 @@ export class ProfileNavService extends LaspNavService {
     }
 
     onSignInClick( destinationUrl?: string ) {
-        // capture the current page so that the user will be redirected to it again after logging in
-        destinationUrl = destinationUrl || this._router.url;
+        // after login, redirect to the visualizer by default (the only page with an auth guard)
+        destinationUrl = destinationUrl || '/visualizer';
         // create a login nonce for security, and store that as well as the current route so we can properly redirect after login.
         // generate a random 11-character string by converting a random number to base 36, which uses letters and numbers,
         // then remove the `0.` from the beginning of the string
@@ -178,8 +179,12 @@ export class ProfileNavService extends LaspNavService {
             return await requestPromiseFactory();
         } catch ( e ) {
             // if it fails with a 4XX error code, try to refresh the access token
-            if ( e.status >= 400 && e.status < 500 ) {
-                await this._refreshCognitoAccessToken();
+            const status = e.status ?? e.statusCode;
+            if ( status >= 400 && status < 500 ) {
+                if ( this._refreshTokenRequest == null ) {
+                    this._refreshTokenRequest = this._refreshCognitoAccessToken();
+                }
+                await this._refreshTokenRequest;
                 // make the original request again. This time, it will use the new access token
                 return await requestPromiseFactory();
             } else {
