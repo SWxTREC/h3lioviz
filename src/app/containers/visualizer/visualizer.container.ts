@@ -1,7 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { interval } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { finalize, take, takeWhile } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -27,7 +25,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     pvServerStarted = false;
-    waiting = true;
 
     constructor(
         private _awsService: AwsService
@@ -69,9 +66,9 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         });
 
         clientToConnect.onConnectionReady( validClient => {
-            this.validConnection = true;
             this.errorMessage = undefined;
             const session = validClient.getConnection().getSession();
+            this.validConnection = true;
 
             const viewStream = validClient.getImageStream().createViewStream( -1 );
             const remoteView = vtkRemoteView.newInstance({ session, viewStream });
@@ -98,19 +95,15 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        // use an interval to try a couple of times and set errorMessage when failed
-        interval( 1000 * 5 ).pipe(
-            takeWhile( () => !this.validConnection ),
-            take( 2 ),
-            finalize(() => {
-                // if it fails to connect, show an error message
-                if ( !this.validConnection ) {
+        const timeToWait: number = 1000 * 15;
+        // if connection fails, after 20 seconds, add error message
+        setTimeout( () => {
+            clientToConnect.connect(config).then( () => {
+                if (!this.validConnection) {
                     this.errorMessage = 'Failed to connect to socket'
                 }
-            })
-        ).subscribe( () => {
-            clientToConnect.connect( config );
-        })
+            });
+        }, timeToWait);
     }
 
     ngOnDestroy() {

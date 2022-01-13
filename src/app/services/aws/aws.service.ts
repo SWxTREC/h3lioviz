@@ -36,6 +36,7 @@ export class AwsService {
     monitorPvServer() {
         interval(1000)
         .pipe(
+            takeWhile( () => this.loggedIn ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
