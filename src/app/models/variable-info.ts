@@ -3,6 +3,7 @@ export interface IVariableInfo {
     displayName: string;
     units: string;
     range: [number, number];
+    defaultColormap: string;
     defaultRange: [number, number];
     step: number;
 }

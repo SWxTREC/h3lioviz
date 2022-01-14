@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { IKeyboard, IVariableInfo, KEYBOARD_SHORTCUTS } from 'src/app/models';
+import { IVariableInfo, KEYBOARD_SHORTCUTS } from 'src/app/models';
 
 @Component({
     selector: 'swt-control-panel',
@@ -22,6 +22,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Velocity',
             units: 'km/s',
             range: [ 300, 900 ],
+            defaultColormap: 'Plasma (matplotlib)',
             defaultRange: [ 600, 900 ],
             step: 100
         },
@@ -30,6 +31,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Density',
             units: 'r<sup>2</sup>N/cm<sup>3</sup>',
             range: [ 0, 30 ],
+            defaultColormap: 'Viridis (matplotlib)',
             defaultRange: [ 15, 30 ],
             step: 1
         },
@@ -38,6 +40,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Ram pressure',
             units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
             range: [ 100000, 10000000 ],
+            defaultColormap: 'Viridis (matplotlib)',
             defaultRange: [ 500000, 10000000 ],
             step: 10000
         },
@@ -46,6 +49,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Temperature',
             units: 'K',
             range: [ 10000, 1000000 ],
+            defaultColormap: 'Inferno (matplotlib)',
             defaultRange: [ 500000, 1000000 ],
             step: 10000
         },
@@ -54,6 +58,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'B',
             units: 'nT',
             range: [ -10, 10 ],
+            defaultColormap: 'Cool Warm',
             defaultRange: [ -10, 0 ],
             step: 1
         },
@@ -62,6 +67,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Bx',
             units: 'nT',
             range: [ -10, 10 ],
+            defaultColormap: 'Cool Warm',
             defaultRange: [ -10, 0 ],
             step: 1
         },
@@ -70,6 +76,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'By',
             units: 'nT',
             range: [ -10, 10 ],
+            defaultColormap: 'Cool Warm',
             defaultRange: [ -10, 0 ],
             step: 1
         },
@@ -78,6 +85,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Bz',
             units: 'nT',
             range: [ -10, 10 ],
+            defaultColormap: 'Cool Warm',
             defaultRange: [ -10, 0 ],
             step: 1
         }
@@ -86,6 +94,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     defaultThresholdVariable: IVariableInfo = this.VARIABLE_CONFIG.density;
     CONTROL_PANEL_DEFAULT_VALUES = {
         colorVariable: this.defaultColorVariable,
+        colormap: this.defaultColorVariable.defaultColormap,
         cme: true,
         latSlice: true,
         lonArrows: false,
@@ -95,7 +104,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
-
+    colormaps = [
+        'Cool Warm',
+        'Inferno (matplotlib)',
+        'Plasma (matplotlib)',
+        'Viridis (matplotlib)'
+    ]
     colorOptions: Options = {
         floor: this.defaultColorVariable.range[0],
         ceil: this.defaultColorVariable.range[1],
@@ -120,6 +134,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false
     };
     thresholdRange: [number, number] = ( this.defaultThresholdVariable.range );
+    userColormaps: { [parameter: string]: string } = {};
     variables: IVariableInfo[] = Object.values(this.VARIABLE_CONFIG);
     zoomState: 'on' | 'off' = 'on';
 
@@ -127,6 +142,10 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // create FormGroup with default control panel names and values
         Object.keys(this.CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
             this.controlPanel.addControl(controlName, new FormControl(this.CONTROL_PANEL_DEFAULT_VALUES[controlName]));
+        });
+        // create default user colormap object
+        Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
+            this.userColormaps[variable] = this.VARIABLE_CONFIG[variable].defaultColormap;
         });
         // debounce render
         this.subscriptions.push(
@@ -171,6 +190,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
                 const colorVariableServerName = newColorVariable.serverName;
                 this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
+                this.controlPanel.controls.colormap.setValue( this.userColormaps[colorVariableServerName])
                 this.colorOptions = {
                     floor: newColorVariable.range[0],
                     ceil: newColorVariable.range[1],
@@ -179,6 +199,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 };
                 this.colorRange = newColorVariable.range;
                 this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
+            }));
+        // subscribe to color map changes and reset colormap
+        this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newcolormap => {
+                const colorVariableName = this.controlPanel.value.colorVariable.serverName;
+                this.session.call('pv.enlil.set_colormap', [ colorVariableName, newcolormap ]);
             }));
         // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
