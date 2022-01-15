@@ -124,6 +124,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         // force reload for Firefox
         window.location.reload(true);
     }
+    
     unsubscribeAll() {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
