@@ -202,9 +202,10 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             }));
         // subscribe to color map changes and reset colormap
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newcolormap => {
+            .pipe( debounceTime( 300 ) ).subscribe( newColormap => {
                 const colorVariableName = this.controlPanel.value.colorVariable.serverName;
-                this.session.call('pv.enlil.set_colormap', [ colorVariableName, newcolormap ]);
+                this.userColormaps[colorVariableName] = newColormap
+                this.session.call('pv.enlil.set_colormap', [ colorVariableName, newColormap ]);
             }));
         // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
