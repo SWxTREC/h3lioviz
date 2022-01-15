@@ -109,7 +109,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         'Inferno (matplotlib)',
         'Plasma (matplotlib)',
         'Viridis (matplotlib)'
-    ]
+    ];
     colorOptions: Options = {
         floor: this.defaultColorVariable.range[0],
         ceil: this.defaultColorVariable.range[1],
@@ -190,7 +190,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
                 const colorVariableServerName = newColorVariable.serverName;
                 this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
-                this.controlPanel.controls.colormap.setValue( this.userColormaps[colorVariableServerName])
+                this.controlPanel.controls.colormap.setValue( this.userColormaps[ colorVariableServerName ] );
                 this.colorOptions = {
                     floor: newColorVariable.range[0],
                     ceil: newColorVariable.range[1],
@@ -200,11 +200,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.colorRange = newColorVariable.range;
                 this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
             }));
-        // subscribe to color map changes and reset colormap
+        // subscribe to color map changes, set userColormap, and reset PV colormap
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColormap => {
                 const colorVariableName = this.controlPanel.value.colorVariable.serverName;
-                this.userColormaps[colorVariableName] = newColormap
+                this.userColormaps[colorVariableName] = newColormap;
                 this.session.call('pv.enlil.set_colormap', [ colorVariableName, newColormap ]);
             }));
         // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
