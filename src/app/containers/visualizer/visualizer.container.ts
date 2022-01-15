@@ -119,6 +119,11 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
+    reload() {
+        // force reload for Firefox
+        window.location.reload(true);
+    }
+
     unsubscribeAll () {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }

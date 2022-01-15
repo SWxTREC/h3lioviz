@@ -10,7 +10,10 @@ import { ProfileNavService } from '../profile-nav/profile-nav.service';
     providedIn: 'root'
 })
 export class AwsService {
+    // if we need to wait to connect to socket
+    addDelayForSocket = false;
     awsUrl: string = environment.aws.api;
+    connectionReady = false;
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
@@ -37,7 +40,7 @@ export class AwsService {
         interval(1000)
         .pipe(
             takeWhile( () => this.loggedIn ),
-            takeWhile( () => this.pvServerStarted$.value === false ),
+            takeWhile( () => this.connectionReady === false ),
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
             switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({status: 0}) ))),
@@ -46,7 +49,12 @@ export class AwsService {
                 const serverStatus = pvStatus.status;
                 if ( serverStatus === 200 ) {
                     // good to connect!
-                    this.pvServerStarted$.next(true);
+                    this.connectionReady = true;
+                    // add a delay for docker container build if starting EC2 up from scratch
+                    const delayDuration: number = this.addDelayForSocket ? 1000 * 10 : 1000;
+                    setTimeout(() => {
+                        this.pvServerStarted$.next(true);
+                    }, delayDuration)
                     if ( this.startEc2Subscription ) {
                         this.startEc2Subscription.unsubscribe();
                     }
@@ -58,6 +66,8 @@ export class AwsService {
             })
         ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
             if ( pvNotReady === true ) {
+                // if start command needs to be sent, add a delay when connecting to websocket
+                this.addDelayForSocket = true;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
                     this.startEc2Subscription.unsubscribe();

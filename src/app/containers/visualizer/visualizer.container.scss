@@ -13,7 +13,10 @@
         align-items: center;
     }
     &__fade {
-        opacity: 20%;
+        // note: percentages for opacity do not work on Firefox
+        opacity: 0.2;
+        // disable mouse interactions
+        pointer-events: none;
     }
     &__icon {
         color: $color-primary;
