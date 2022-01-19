@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { delay, filter, take } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -31,13 +32,21 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     ) {}
 
     ngAfterViewInit() {
+        console.log('vizualizer is now intialized, start subscription')
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
-
-        this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
+        this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
+            delay( this._awsService.socketDelay),
+            filter( started => started === true),
+            take(1)
+        ).subscribe( started => {
+            console.log({ started })
+            console.log('after socket delay duration', this._awsService.socketDelay, new Date());
             this.pvServerStarted = started;
+            console.log('check if we should connect', this.validConnection, started)
             // connect once
             if ( !this.validConnection && started === true ) {
+                console.log('CONNECT ONCE')
                 this.connectToSocket();
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);

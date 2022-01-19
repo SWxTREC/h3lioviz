@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
-import { catchError, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
+import { catchError, startWith, switchMap, takeWhile, tap, throttleTime } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
 
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
@@ -10,13 +10,12 @@ import { ProfileNavService } from '../profile-nav/profile-nav.service';
     providedIn: 'root'
 })
 export class AwsService {
-    // if we need to wait to connect to socket
-    addDelayForSocket = false;
     awsUrl: string = environment.aws.api;
-    connectionReady = false;
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
+    // how much to wait to connect to socket, allow for docker build when sending the start command
+    socketDelay: number = 1000;
 
     constructor(
         private _http: HttpClient,
@@ -40,34 +39,36 @@ export class AwsService {
         interval(1000)
         .pipe(
             takeWhile( () => this.loggedIn ),
-            takeWhile( () => this.connectionReady === false ),
+            takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
-            switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({ status: 0 }) ))),
+            switchMap(() => this.getParaviewServerStatus().pipe(
+                tap( thing => console.log({ thing })),
+                catchError( () => {
+                return of({ status: 0 })
+                })
+            )),
             switchMap( (pvStatus: {status: number}) => {
                 // returns when the PV server is NOT yet ready
-                const serverStatus = pvStatus.status;
-                if ( serverStatus === 200 ) {
+                console.log('serverStatus', pvStatus.status)
+                if ( pvStatus.status === 200 ) {
                     // good to connect!
-                    this.connectionReady = true;
-                    // add a delay for docker container build if starting EC2 up from scratch
-                    const delayDuration: number = this.addDelayForSocket ? 1000 * 10 : 1000;
-                    setTimeout(() => {
-                        this.pvServerStarted$.next(true);
-                    }, delayDuration);
+                    this.pvServerStarted$.next(true);
+                    console.log('connection ready before delay', this.pvServerStarted$.value, new Date())
                     if ( this.startEc2Subscription ) {
                         this.startEc2Subscription.unsubscribe();
                     }
                     return of( false );
                 } else {
                     // carry on
+                    console.log('carry on, this should stop after connection ready')
                     return of( true );
                 }
             })
         ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
             if ( pvNotReady === true ) {
                 // if start command needs to be sent, add a delay when connecting to websocket
-                this.addDelayForSocket = true;
+                this.socketDelay = 1000 * 10;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
                     this.startEc2Subscription.unsubscribe();
