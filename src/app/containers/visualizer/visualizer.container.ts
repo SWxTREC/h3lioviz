@@ -36,9 +36,9 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
         this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
-            delay( this._awsService.socketDelay),
             filter( started => started === true),
-            take(1)
+            take(1),
+            delay( this._awsService.socketDelay)
         ).subscribe( started => {
             console.log({ started })
             console.log('after socket delay duration', this._awsService.socketDelay, new Date());
