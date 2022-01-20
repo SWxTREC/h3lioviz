@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
-import { catchError, startWith, switchMap, takeWhile, tap, throttleTime } from 'rxjs/operators';
+import { catchError, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
 
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
@@ -43,7 +43,6 @@ export class AwsService {
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
             switchMap(() => this.getParaviewServerStatus().pipe(
-                tap( thing => console.log({ thing })),
                 catchError( () => {
                 return of({ status: 0 })
                 })
