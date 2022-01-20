@@ -15,7 +15,7 @@ export class AwsService {
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
     // how much to wait to connect to socket, allow for docker build when sending the start command
-    socketDelay: number = 1000;
+    socketDelay = 1000;
 
     constructor(
         private _http: HttpClient,
@@ -43,24 +43,19 @@ export class AwsService {
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
             switchMap(() => this.getParaviewServerStatus().pipe(
-                catchError( () => {
-                return of({ status: 0 })
-                })
+                catchError( () => of({ status: 0 }))
             )),
             switchMap( (pvStatus: {status: number}) => {
                 // returns when the PV server is NOT yet ready
-                console.log('serverStatus', pvStatus.status)
                 if ( pvStatus.status === 200 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);
-                    console.log('connection ready before delay', this.pvServerStarted$.value, new Date())
                     if ( this.startEc2Subscription ) {
                         this.startEc2Subscription.unsubscribe();
                     }
                     return of( false );
                 } else {
                     // carry on
-                    console.log('carry on, this should stop after connection ready')
                     return of( true );
                 }
             })

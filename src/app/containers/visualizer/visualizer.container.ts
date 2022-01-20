@@ -32,23 +32,18 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     ) {}
 
     ngAfterViewInit() {
-        console.log('vizualizer is now intialized, start subscription')
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
         this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
             filter( started => started === true),
             take(1)
         ).subscribe( started => {
-            console.log({ started })
             this.pvServerStarted = started;
-            console.log('check if we should connect', this.validConnection, started)
             // connect once after a delay (delay is needed when starting pv server from scratch)
             if ( !this.validConnection && started === true ) {
                 setTimeout( () => {
-                    console.log('CONNECT ONCE', new Date())
                     this.connectToSocket();
-                    }
-                , this._awsService.socketDelay)
+                }, this._awsService.socketDelay);
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
