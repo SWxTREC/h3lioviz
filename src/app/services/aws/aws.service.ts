@@ -74,7 +74,8 @@ export class AwsService {
     }
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
-        return this._http.get( environmentConfig.pvServer, { responseType: 'text', observe: 'response' } );
+        // add a random query parameter, the easiest way to keep the request from being cached in the browser
+        return this._http.get( environmentConfig.pvServer + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
     }
 
     startEc2(): Observable<string> {
