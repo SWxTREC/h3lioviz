@@ -61,7 +61,8 @@ export class AwsService {
             })
         ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
             if ( pvNotReady === true ) {
-                // if start command needs to be sent, add a delay when connecting to websocket
+                // if start command needs to be sent, add a delay for spinning up the docker container before
+                // connecting to websocket
                 this.socketDelay = 1000 * 10;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
