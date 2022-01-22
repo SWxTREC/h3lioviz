@@ -15,79 +15,107 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
     keyboardShortcuts = KEYBOARD_SHORTCUTS;
 
+    // serverName must match an option on the server
+    COLORMAPS = {
+        coolToWarm: {
+            displayName: 'Cool to warm',
+            serverName: 'Cool to Warm'
+        },
+        inferno: {
+            displayName: 'Inferno',
+            serverName: 'Inferno (matplotlib)'
+        },
+        plasma: {
+            displayName: 'Plasma',
+            serverName: 'Plasma (matplotlib)'
+        },
+        viridis: {
+            displayName: 'Viridis',
+            serverName: 'Viridis (matplotlib)'
+        },
+        rainbow: {
+            displayName: 'Rainbow',
+            serverName: 'nic_CubicL'
+        },
+        divergent: {
+            displayName: 'Divergent',
+            serverName: 'Blue Orange (divergent)'
+        }
+    };
+
     // TODO: set these in the server on load
     VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         velocity: {
             serverName: 'velocity',
             displayName: 'Velocity',
             units: 'km/s',
-            range: [ 300, 900 ],
-            defaultColormap: 'Plasma (matplotlib)',
-            defaultRange: [ 600, 900 ],
-            step: 100
+            colorRange: [ 300, 900 ],
+            defaultColormap: this.COLORMAPS.plasma,
+            thresholdRange: [ 600, 900 ],
+            step: 50
         },
         density: {
             serverName: 'density',
             displayName: 'Density',
             units: 'r<sup>2</sup>N/cm<sup>3</sup>',
-            range: [ 0, 30 ],
-            defaultColormap: 'Viridis (matplotlib)',
-            defaultRange: [ 15, 30 ],
+            colorRange: [ 0, 30 ],
+            defaultColormap: this.COLORMAPS.viridis,
+            thresholdRange: [ 15, 30 ],
             step: 1
         },
         pressure: {
             serverName: 'pressure',
             displayName: 'Ram pressure',
             units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
-            range: [ 100000, 10000000 ],
-            defaultColormap: 'Viridis (matplotlib)',
-            defaultRange: [ 500000, 10000000 ],
+            colorRange: [ 100000, 10000000 ],
+            defaultColormap: this.COLORMAPS.viridis,
+            thresholdRange: [ 500000, 10000000 ],
             step: 10000
         },
         temperature: {
             serverName: 'temperature',
             displayName: 'Temperature',
             units: 'K',
-            range: [ 10000, 1000000 ],
-            defaultColormap: 'Inferno (matplotlib)',
-            defaultRange: [ 500000, 1000000 ],
+            colorRange: [ 10000, 1000000 ],
+            defaultColormap: this.COLORMAPS.inferno,
+            thresholdRange: [ 500000, 1000000 ],
             step: 10000
         },
         b: {
             serverName: 'b',
             displayName: 'B',
             units: 'nT',
-            range: [ -10, 10 ],
-            defaultColormap: 'Cool Warm',
-            defaultRange: [ -10, 0 ],
-            step: 1
+            colorRange: [ -100, 100 ],
+            defaultColormap: this.COLORMAPS.coolToWarm,
+            thresholdRange: [ -50, 0 ],
+            step: 5
         },
         bx: {
             serverName: 'bx',
             displayName: 'Bx',
             units: 'nT',
-            range: [ -10, 10 ],
-            defaultColormap: 'Cool Warm',
-            defaultRange: [ -10, 0 ],
-            step: 1
+            colorRange: [ -100, 100 ],
+            defaultColormap: this.COLORMAPS.coolToWarm,
+            thresholdRange: [ -50, 0 ],
+            step: 5
         },
         by: {
             serverName: 'by',
             displayName: 'By',
             units: 'nT',
-            range: [ -10, 10 ],
-            defaultColormap: 'Cool Warm',
-            defaultRange: [ -10, 0 ],
-            step: 1
+            colorRange: [ -100, 100 ],
+            defaultColormap: this.COLORMAPS.coolToWarm,
+            thresholdRange: [ -50, 0 ],
+            step: 5
         },
         bz: {
             serverName: 'bz',
             displayName: 'Bz',
             units: 'nT',
-            range: [ -10, 10 ],
-            defaultColormap: 'Cool Warm',
-            defaultRange: [ -10, 0 ],
-            step: 1
+            colorRange: [ -100, 100 ],
+            defaultColormap: this.COLORMAPS.coolToWarm,
+            thresholdRange: [ -50, 0 ],
+            step: 5
         }
     };
     defaultColorVariable: IVariableInfo = this.VARIABLE_CONFIG.velocity;
@@ -100,23 +128,18 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         lonArrows: false,
         lonSlice: true,
         lonStreamlines: false,
-        opacity: [ 0, 90 ],
+        opacity: [ 70, 100 ],
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
-    colormaps = [
-        'Cool Warm',
-        'Inferno (matplotlib)',
-        'Plasma (matplotlib)',
-        'Viridis (matplotlib)'
-    ];
     colorOptions: Options = {
-        floor: this.defaultColorVariable.range[0],
-        ceil: this.defaultColorVariable.range[1],
+        floor: this.defaultColorVariable.colorRange[0],
+        ceil: this.defaultColorVariable.colorRange[1],
         step: this.defaultColorVariable.step,
         animate: false
     };
-    colorRange: [number, number] = ( this.defaultColorVariable.range );
+    colormaps: string[] = Object.keys(this.COLORMAPS);
+    colorRange: [number, number] = ( this.defaultColorVariable.colorRange );
     controlPanel: FormGroup = new FormGroup({});
     opacityOptions: Options = {
         floor: 0,
@@ -128,13 +151,13 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
-        floor: this.defaultThresholdVariable.range[0],
-        ceil: this.defaultThresholdVariable.range[1],
+        floor: this.defaultThresholdVariable.colorRange[0],
+        ceil: this.defaultThresholdVariable.colorRange[1],
         step: this.defaultThresholdVariable.step,
         animate: false
     };
-    thresholdRange: [number, number] = ( this.defaultThresholdVariable.range );
-    userColormaps: { [parameter: string]: string } = {};
+    thresholdRange: [number, number] = ( this.defaultThresholdVariable.colorRange );
+    userColormaps: { [parameter: string]: { displayName: string, serverName: string } } = {};
     variables: IVariableInfo[] = Object.values(this.VARIABLE_CONFIG);
     zoomState: 'on' | 'off' = 'on';
 
@@ -192,32 +215,32 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
                 this.controlPanel.controls.colormap.setValue( this.userColormaps[ colorVariableServerName ] );
                 this.colorOptions = {
-                    floor: newColorVariable.range[0],
-                    ceil: newColorVariable.range[1],
+                    floor: newColorVariable.colorRange[0],
+                    ceil: newColorVariable.colorRange[1],
                     step: newColorVariable.step,
                     animate: false
                 };
-                this.colorRange = newColorVariable.range;
+                this.colorRange = newColorVariable.colorRange;
                 this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
             }));
         // subscribe to color map changes, set userColormap, and reset PV colormap
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newColormap => {
+            .pipe( debounceTime( 300 ) ).subscribe( newColorMapObject => {
                 const colorVariableName = this.controlPanel.value.colorVariable.serverName;
-                this.userColormaps[colorVariableName] = newColormap;
-                this.session.call('pv.enlil.set_colormap', [ colorVariableName, newColormap ]);
+                this.userColormaps[colorVariableName] = newColorMapObject;
+                this.session.call('pv.enlil.set_colormap', [ colorVariableName, newColorMapObject.serverName ]);
             }));
         // subscribe to threshold variable changes and reset threshold slider options, threshold range, and 'set_threshold'
         this.subscriptions.push( this.controlPanel.controls.thresholdVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
                 const thresholdVariableServerName = newThresholdVariable.serverName;
                 this.thresholdOptions = {
-                    floor: newThresholdVariable.range[0],
-                    ceil: newThresholdVariable.range[1],
+                    floor: newThresholdVariable.colorRange[0],
+                    ceil: newThresholdVariable.colorRange[1],
                     step: newThresholdVariable.step,
                     animate: false
                 };
-                this.thresholdRange = newThresholdVariable.defaultRange;
+                this.thresholdRange = newThresholdVariable.thresholdRange;
                 this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
             }));
         // subscribe to opacity slider and 'set_opacity'

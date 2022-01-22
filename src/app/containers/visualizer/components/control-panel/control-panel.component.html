@@ -55,8 +55,8 @@
         <mat-form-field>
             <mat-label>Colormap for {{controlPanel.value.colorVariable.displayName}}</mat-label>
             <mat-select formControlName="colormap">
-                <mat-option *ngFor="let color of colormaps" [value]="color">
-                    {{ color }}
+                <mat-option *ngFor="let color of colormaps" [value]="COLORMAPS[color]">
+                    {{ COLORMAPS[color].displayName }}
                 </mat-option>
             </mat-select>
         </mat-form-field>
