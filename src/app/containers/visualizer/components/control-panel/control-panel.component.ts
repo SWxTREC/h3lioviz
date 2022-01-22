@@ -33,13 +33,13 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             displayName: 'Viridis',
             serverName: 'Viridis (matplotlib)'
         },
-        rainbow: {
-            displayName: 'Rainbow',
-            serverName: 'nic_CubicL'
-        },
         divergent: {
             displayName: 'Divergent',
             serverName: 'Blue Orange (divergent)'
+        },
+        rainbow: {
+            displayName: 'Rainbow',
+            serverName: 'nic_CubicL'
         }
     };
 
