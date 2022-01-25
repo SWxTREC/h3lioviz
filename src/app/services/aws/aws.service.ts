@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
-import { catchError, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
 
 import { ProfileNavService } from '../profile-nav/profile-nav.service';
@@ -14,12 +14,14 @@ export class AwsService {
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
+    // how much to wait to connect to socket, allow for docker build when sending the start command
+    socketDelay = 1000;
 
     constructor(
         private _http: HttpClient,
         private _profileService: ProfileNavService
     ) {
-        this._profileService.isLoggedIn.subscribe( loginStatus => {
+        this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( loginStatus => {
             this.loggedIn = loginStatus;
             if ( loginStatus ) {
                 // once logged in, start checking the status of Paraview server
@@ -40,11 +42,12 @@ export class AwsService {
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // look for 200 status, but pass through fails with status: 0
-            switchMap(() => this.getParaviewServerStatus().pipe( catchError( () => of({ status: 0 }) ))),
+            switchMap(() => this.getParaviewServerStatus().pipe(
+                catchError( () => of({ status: 0 }))
+            )),
             switchMap( (pvStatus: {status: number}) => {
                 // returns when the PV server is NOT yet ready
-                const serverStatus = pvStatus.status;
-                if ( serverStatus === 200 ) {
+                if ( pvStatus.status === 200 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);
                     if ( this.startEc2Subscription ) {
@@ -58,6 +61,9 @@ export class AwsService {
             })
         ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
             if ( pvNotReady === true ) {
+                // if start command needs to be sent, add a delay for spinning up the docker container before
+                // connecting to websocket
+                this.socketDelay = 1000 * 15;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
                     this.startEc2Subscription.unsubscribe();
@@ -71,7 +77,8 @@ export class AwsService {
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
         // remove '/paraview' from the sessionManagerURL to ping the server for 200 response
         const pvServerUrl: string = environmentConfig.sessionManagerURL.split('/').slice(0, -1).join('');
-        return this._http.get( pvServerUrl, { responseType: 'text', observe: 'response' } );
+        // add a random query parameter, the easiest way to keep the request from being cached in the browser
+        return this._http.get( pvServerUrl + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
     }
 
     startEc2(): Observable<string> {
