@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { filter, take } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
@@ -33,12 +34,16 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
     ngAfterViewInit() {
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
-
-        this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( started => {
+        this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
+            filter( started => started === true),
+            take(1)
+        ).subscribe( started => {
             this.pvServerStarted = started;
-            // connect once
+            // connect once after a delay (delay is needed when starting pv server from scratch)
             if ( !this.validConnection && started === true ) {
-                this.connectToSocket();
+                setTimeout( () => {
+                    this.connectToSocket();
+                }, this._awsService.socketDelay);
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
@@ -118,6 +123,11 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         this.loading = true;
         const session = this.pvView.get().session;
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+    }
+
+    reload() {
+        // force reload for Firefox
+        window.location.reload(true);
     }
 
     unsubscribeAll() {
