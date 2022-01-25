@@ -69,7 +69,9 @@ export class AwsService {
     }
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
-        return this._http.get( environmentConfig.pvServer, { responseType: 'text', observe: 'response' } );
+        // remove '/paraview' from the sessionManagerURL to ping the server for 200 response
+        const pvServerUrl: string = environmentConfig.sessionManagerURL.split('/').slice(0, -1).join('');
+        return this._http.get( pvServerUrl, { responseType: 'text', observe: 'response' } );
     }
 
     startEc2(): Observable<string> {
