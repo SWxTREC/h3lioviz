@@ -91,7 +91,6 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             });
         });
 
-        // only need sessionURL in development environment
         const config = environmentConfig;
         // TODO?: after login, access clientId and client credentials to this config: config?
 
