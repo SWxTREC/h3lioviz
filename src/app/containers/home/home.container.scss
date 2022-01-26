@@ -19,5 +19,8 @@
     }
     &__message {
         font-size: large;
+        &--hide {
+            visibility: hidden;
+        }
     }
 }
