@@ -1,4 +1,4 @@
-<div *ngIf="isLoggedIn" class="server__message ">
+<div class="server__message ">
     <mat-icon *ngIf="!serverStarted" class="server__status server__status--active">cloud_queue</mat-icon>
     <mat-icon *ngIf="serverStarted" class="server__status server__status--started">cloud_done</mat-icon>
     <p *ngIf="serverStarted">Server started</p>
