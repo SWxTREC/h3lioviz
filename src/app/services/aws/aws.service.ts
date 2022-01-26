@@ -63,7 +63,7 @@ export class AwsService {
             if ( pvNotReady === true ) {
                 // if start command needs to be sent, add a delay for spinning up the docker container before
                 // connecting to websocket
-                this.socketDelay = 1000 * 15;
+                this.socketDelay = 1000 * 5;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
                     this.startEc2Subscription.unsubscribe();

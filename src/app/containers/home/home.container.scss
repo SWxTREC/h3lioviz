@@ -18,9 +18,8 @@
         }
     }
     &__message {
+        display: block;
         font-size: large;
-        &--hide {
-            visibility: hidden;
-        }
+        height: 5rem;
     }
 }
