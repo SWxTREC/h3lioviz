@@ -107,11 +107,12 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             }
         });
 
+        // if the socket doesn't connect after 10 seconds, show an error
         setTimeout( () => {
             if (!clientToConnect.isConnected()) {
                 this.errorMessage = 'Failed to connect to socket';
             }
-        }, 1000 * 30);
+        }, 1000 * 10);
     }
 
     ngOnDestroy() {

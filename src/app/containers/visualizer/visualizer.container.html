@@ -5,8 +5,8 @@
     </ng-container>
     <swt-server-status *ngIf="!serverStatus && !errorMessage"></swt-server-status>
     <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
-    <p *ngIf="!errorMessage && pvServerStarted && !validConnection">connecting to websocket…</p>
-    <mat-spinner *ngIf="!validConnection && !errorMessage" color="primary" diameter="40"></mat-spinner>
+    <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
+    <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split direction="horizontal">

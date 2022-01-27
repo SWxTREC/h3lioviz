@@ -11,10 +11,7 @@ import { ProfileNavService } from 'src/app/services';
 export class HomeComponent implements OnDestroy {
     @ViewChild('video') video: ElementRef;
     isLoggedIn: boolean;
-    serverState: string;
-    serverStatus: string;
     subscriptions: Subscription[] = [];
-    serverStatusSubscription: Subscription;
 
     constructor(
         private profileService: ProfileNavService
