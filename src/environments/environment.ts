@@ -38,5 +38,6 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
+    pvServer: 'http://localhost:8080',
     sessionManagerURL: 'http://localhost:8080/paraview'
 };
