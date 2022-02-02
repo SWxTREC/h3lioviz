@@ -138,7 +138,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
-    colorbarWidth = '100%';
     colorOptions: Options = {
         floor: this.defaultColorVariable.colorRange[0],
         ceil: this.defaultColorVariable.colorRange[1],
@@ -148,6 +147,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colormaps: string[] = Object.keys(this.COLORMAPS);
     colorRange: [number, number] = ( this.defaultColorVariable.colorRange );
     controlPanel: FormGroup = new FormGroup({});
+    colorbarLeftOffset = '0';
+    colorbarRightOffset = '0';
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
@@ -200,6 +201,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    }
+
+    getPercentageOfFullColorRange( offset: number ): string {
+        const fullRange = this.colorOptions.ceil - this.colorOptions.floor;
+        return offset / fullRange * 100 + '%';
     }
 
     resetZoom() {
@@ -292,9 +298,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     updateColorRange( event: ChangeContext ) {
-        const rangeWidth = this.colorOptions.ceil - this.colorOptions.floor;
-        const currentWidth = event.highValue - event.value;
-        this.colorbarWidth = (currentWidth/rangeWidth * 100) + '%';
+        // add padding to offset the sides of the colorbar the selected amount
+        const leftOffset = event.value - this.colorOptions.floor;
+        const rightOffset = this.colorOptions.ceil - event.highValue;
+        this.colorbarLeftOffset = this.getPercentageOfFullColorRange( leftOffset );
+        this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         const variable: IVariableInfo = this.controlPanel.value.colorVariable;
         this.colorRange = [ event.value, event.highValue ];
         this.session.call('pv.enlil.set_range', [ variable.serverName, this.colorRange ] );

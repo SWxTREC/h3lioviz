@@ -84,7 +84,7 @@
                     <small innerHTML=" ({{ controlPanel.value.colorVariable.units }})"></small>
                 </div>
             </div>
-            <img class="control-panel__label" [src]="controlPanel.value.colormap.imgSrc" height="20" [style.width]="colorbarWidth">
+            <img class="control-panel__label" [src]="controlPanel.value.colormap.imgSrc" height="20" width="100%" [style.paddingRight]="colorbarRightOffset" [style.paddingLeft]="colorbarLeftOffset">
             <ngx-slider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
         </div>
     </form>
