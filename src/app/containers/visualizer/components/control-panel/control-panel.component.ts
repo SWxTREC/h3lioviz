@@ -19,32 +19,32 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     COLORMAPS = {
         coolToWarm: {
             displayName: 'Cool to warm',
-            imgSrc: 'assets/images/cool-warm.png',
+            imgSrc: 'assets/images/cool_to_warm.png',
             serverName: 'Cool to Warm'
         },
         inferno: {
             displayName: 'Inferno',
-            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/inferno.png',
+            imgSrc: 'assets/images/inferno.png',
             serverName: 'Inferno (matplotlib)'
         },
         plasma: {
             displayName: 'Plasma',
-            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/plasma.png',
+            imgSrc: 'assets/images/plasma.png',
             serverName: 'Plasma (matplotlib)'
         },
         viridis: {
             displayName: 'Viridis',
-            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/viridis.png',
+            imgSrc: 'assets/images/viridis.png',
             serverName: 'Viridis (matplotlib)'
         },
         divergent: {
             displayName: 'Divergent',
-            imgSrc: 'assets/images/blue-orange.png',
+            imgSrc: 'assets/images/blue_orange.png',
             serverName: 'Blue Orange (divergent)'
         },
         rainbow: {
             displayName: 'Rainbow',
-            imgSrc: 'assets/images/nic_cubicl.png',
+            imgSrc: 'assets/images/nic_CubicL.png',
             serverName: 'nic_CubicL'
         }
     };
