@@ -98,7 +98,7 @@ This will:
 
 ### Deploy to AWS
 
-Merge `dev` into `main`. From main, `npm run build:prod` to create the `/dist` folder. Upload the contents of `/dist` to AWS.
+Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS.
 
 ### Deploy to GitHub pages
 

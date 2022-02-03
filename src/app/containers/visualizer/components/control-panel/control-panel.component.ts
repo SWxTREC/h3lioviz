@@ -19,26 +19,32 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     COLORMAPS = {
         coolToWarm: {
             displayName: 'Cool to warm',
+            imgSrc: 'assets/images/cool-warm.png',
             serverName: 'Cool to Warm'
         },
         inferno: {
             displayName: 'Inferno',
+            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/inferno.png',
             serverName: 'Inferno (matplotlib)'
         },
         plasma: {
             displayName: 'Plasma',
+            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/plasma.png',
             serverName: 'Plasma (matplotlib)'
         },
         viridis: {
             displayName: 'Viridis',
+            imgSrc: 'https://medvis.org/wp-content/uploads/2016/02/viridis.png',
             serverName: 'Viridis (matplotlib)'
         },
         divergent: {
             displayName: 'Divergent',
+            imgSrc: 'assets/images/blue-orange.png',
             serverName: 'Blue Orange (divergent)'
         },
         rainbow: {
             displayName: 'Rainbow',
+            imgSrc: 'assets/images/nic_cubicl.png',
             serverName: 'nic_CubicL'
         }
     };
@@ -141,6 +147,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colormaps: string[] = Object.keys(this.COLORMAPS);
     colorRange: [number, number] = ( this.defaultColorVariable.colorRange );
     controlPanel: FormGroup = new FormGroup({});
+    colorbarLeftOffset = '0';
+    colorbarRightOffset = '0';
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
@@ -193,6 +201,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    }
+
+    getPercentageOfFullColorRange( offset: number ): string {
+        const fullRange = this.colorOptions.ceil - this.colorOptions.floor;
+        return offset / fullRange * 100 + '%';
     }
 
     resetZoom() {
@@ -285,6 +298,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     updateColorRange( event: ChangeContext ) {
+        // add padding to offset the sides of the colorbar the selected amount
+        const leftOffset = event.value - this.colorOptions.floor;
+        const rightOffset = this.colorOptions.ceil - event.highValue;
+        this.colorbarLeftOffset = this.getPercentageOfFullColorRange( leftOffset );
+        this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         const variable: IVariableInfo = this.controlPanel.value.colorVariable;
         this.colorRange = [ event.value, event.highValue ];
         this.session.call('pv.enlil.set_range', [ variable.serverName, this.colorRange ] );

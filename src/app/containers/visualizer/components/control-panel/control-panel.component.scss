@@ -1,7 +1,13 @@
 @import 'src/theme/theme-colors.scss';
 
 .control-panel {
-    &__controls{
+    &__block-label {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+        margin: 2px;
+    }
+    &__controls {
         display: flex;
         justify-content: space-between;
         margin-bottom: 1rem;
@@ -17,6 +23,11 @@
             width: 100%;
         }
     }
+    &__dropdown-block {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
     &__header {
         text-align: center;
     }
@@ -30,6 +41,13 @@
         code {
             white-space: nowrap;
         }
+    }
+    &__swatch {
+        height: 20px;
+    }
+    &__label {
+        display: flex;
+        justify-content: center;
     }
     &__spacer {
         margin: 1rem 0;
