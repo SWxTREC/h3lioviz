@@ -44,7 +44,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         },
         rainbow: {
             displayName: 'Rainbow',
-            imgSrc: 'assets/images/nic_CubicL.png',
+            imgSrc: 'assets/images/nic_cubicl.png',
             serverName: 'nic_CubicL'
         }
     };
