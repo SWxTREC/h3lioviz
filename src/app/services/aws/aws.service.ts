@@ -14,8 +14,6 @@ export class AwsService {
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
-    // how much to wait to connect to socket, allow for docker build when sending the start command
-    socketDelay = 1000;
 
     constructor(
         private _http: HttpClient,
@@ -25,7 +23,7 @@ export class AwsService {
             this.loggedIn = loginStatus;
             if ( loginStatus ) {
                 // once logged in, start checking the status of Paraview server
-                // for prod use monitor function, when running a local server, fake a connection
+                // for prod, use monitor function, when running a local server, fake a connection
                 if ( environment.production ) {
                     this.monitorPvServer();
                 } else {
@@ -41,13 +39,14 @@ export class AwsService {
             takeWhile( () => this.loggedIn ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
-            // look for 200 status, but pass through fails with status: 0
+            // pass through fails—looking specifically for a 500
             switchMap(() => this.getParaviewServerStatus().pipe(
-                catchError( () => of({ status: 0 }))
+                catchError( (error) => of(error) )
             )),
             switchMap( (pvStatus: {status: number}) => {
-                // returns when the PV server is NOT yet ready
-                if ( pvStatus.status === 200 ) {
+                // status is 0 when server is not ready, 500 when it is ready
+                // a network error of 502 for stopping, 503 for starting, but those statuses are passed through as errror='unknown' and status=0
+                if ( pvStatus.status === 500 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);
                     if ( this.startEc2Subscription ) {
@@ -61,14 +60,11 @@ export class AwsService {
             })
         ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
             if ( pvNotReady === true ) {
-                // if start command needs to be sent, add a delay for spinning up the docker container before
-                // connecting to websocket
-                this.socketDelay = 1000 * 5;
                 // remove existing subscriptions
                 if ( this.startEc2Subscription ) {
                     this.startEc2Subscription.unsubscribe();
                 }
-                // send the start command every throttled interval until PV server returns 200
+                // send the start command every throttled interval until PV server returns a 500 status
                 this.startEc2Subscription = this.startEc2().subscribe();
             }
         });
@@ -76,7 +72,7 @@ export class AwsService {
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
         // add a random query parameter to the request, the easiest way to keep the request from being cached in the browser
-        return this._http.get( environmentConfig.pvServer + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
+        return this._http.get( environmentConfig.sessionManagerURL + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
     }
 
     startEc2(): Observable<string> {

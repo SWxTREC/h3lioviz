@@ -39,7 +39,7 @@ See 'Developement server' below.
 
 ### Project Dependencies
 
-ENLIL backend is needed in production.
+ENLIL backend is needed in production. Follow the README instruction in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
 
 ### Development server
 
