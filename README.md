@@ -1,6 +1,6 @@
 # ENLIL
 
-Deployed site: https://swxtrec.github.io/enlil-3d
+Deployed site: https://enlil.swx-trec.com
 
 This is a frontend visualizing the ENLIL 3d model.
 
@@ -23,15 +23,15 @@ NA
 
 ## Production URLs
 
-https://swxtrec.github.io/enlil
+https://enlil.swx-trec.com
 
 ## Necessary Permissions
 
-TK
+Access to AWS S3 console is currently required to deploy.
 
 ## Architecture
 
-This is a visualizer for the ENLIL 3d model.
+This is a visualizer for the ENLIL 3d model built with Angular.
 
 ## Running ENLIL Locally
 
@@ -39,11 +39,15 @@ See 'Developement server' below.
 
 ### Project Dependencies
 
-ENLIL backend is needed in production. Follow the README instruction in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
+A backend with the ENLIL paraview server is required.
+
+`ng serve --prod` will use the production backend deployed to AWS.
+
+To test with a local paraview server, follow the README instructions in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
 
 ### Development server
 
-Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm start` for a frontend dev server (use `ng serve --prod` to connect to the deployed AWS backend). Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ### Code scaffolding
 
@@ -82,9 +86,9 @@ Cleaning up old images is also a good idea from time to time. To clean up your u
 When you are ready to push your image, contact the web team infrastructure group for credentials and instructions on how to log in. Once this is complete you can run `./docker-publish.sh` to publish your image to the server.
 
 ## Deploy ENLIL
-Who needs to be made aware of a release? What limitations/restrictions are there before making a
+<!-- Who needs to be made aware of a release? What limitations/restrictions are there before making a
 release? For example, is there an explicit vetting process, or perhaps certain time windows when a
-release shouldn't be made?
+release shouldn't be made? -->
 
 ### Bump the version
 
@@ -92,15 +96,15 @@ From the `dev` branch, run `npm version <major | minor | patch>` where major ind
 
 This will:
 
-* run the linter and unit tests, and abort if they fail
+* run the linter and unit tests and abort if they fail
 * increment the version, commit the change, and create a git tag
 * push the changes and the new tag to the remote repo
 
 ### Deploy to AWS
 
-Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS.
+Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS. The deployed site should reflect the code contained in the `main` branch. 
 
-### Deploy to GitHub pages
+<!-- ### Deploy to GitHub pages
 
 From the main branch, run `npm run deploy`
 
@@ -112,4 +116,4 @@ This will:
 
 After a few minutes, you will see the changes at the GitHub-hosted site https://swxtrec.github.io/enlil.
 
-You can run this script from any branch, but the site should reflect the content of the current main branch.
+You can run this script from any branch, but the site should reflect the content of the current main branch. -->
