@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { ProfileNavService } from 'src/app/services';
+import { AwsService, ProfileNavService } from 'src/app/services';
 
 @Component({
     selector: 'swt-home',
@@ -12,13 +12,18 @@ export class HomeComponent implements OnDestroy {
     @ViewChild('video') video: ElementRef;
     isLoggedIn: boolean;
     subscriptions: Subscription[] = [];
+    serverStarted: boolean;
 
     constructor(
-        private profileService: ProfileNavService
+        private _profileService: ProfileNavService,
+        private _awsService: AwsService
     ) {
-        this.subscriptions.push( this.profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
+        this.subscriptions.push( this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
         }));
+        this.subscriptions.push( this._awsService.pvServerStarted$.pipe( distinctUntilChanged() )
+            .subscribe( ( status: boolean ) => this.serverStarted = status )
+        );
     }
 
     ngOnDestroy(): void {
