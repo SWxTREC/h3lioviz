@@ -41,13 +41,13 @@ See 'Developement server' below.
 
 A backend with the ENLIL paraview server is required.
 
-`ng serve --prod` will use the production backend deployed to AWS.
+`npm run start:prod` will use the production backend deployed to AWS.
 
 To test with a local paraview server, follow the README instructions in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
 
 ### Development server
 
-Run `npm start` for a frontend dev server (use `ng serve --prod` to connect to the deployed AWS backend). Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm start` for a frontend dev server (use `npm run start:prod` to connect to the deployed AWS backend). Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ### Code scaffolding
 
@@ -102,7 +102,7 @@ This will:
 
 ### Deploy to AWS
 
-Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS. The deployed site should reflect the code contained in the `main` branch. 
+Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS. The deployed site should reflect the code contained in the `main` branch.
 
 <!-- ### Deploy to GitHub pages
 
