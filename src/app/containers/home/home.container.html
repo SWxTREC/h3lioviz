@@ -1,6 +1,10 @@
 <div class="home">
+    <!-- isLoggedIn and two possible messages depending on server status becauser serverStarted could be stale -->
     <swt-server-status *ngIf="isLoggedIn && !serverStarted" class="home__message"></swt-server-status>
-    <a *ngIf="isLoggedIn && serverStarted" class="home__message" routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
+    <div class="home__message">
+        <button *ngIf="isLoggedIn && serverStarted" (click)="reloadVisualizer()" mat-raised-button color="primary">Go to visualizer</button>
+    </div>
+    <!-- is not logged in -->
     <div *ngIf="!isLoggedIn" class="home__message">
         <button mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
         <p>
