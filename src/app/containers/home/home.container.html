@@ -1,5 +1,5 @@
 <div class="home">
-    <!-- isLoggedIn and two possible messages depending on server status becauser serverStarted could be stale -->
+    <!-- isLoggedIn and two possible messages depending on server status because serverStarted could be stale -->
     <swt-server-status *ngIf="isLoggedIn && !serverStarted" class="home__message"></swt-server-status>
     <div class="home__message">
         <button *ngIf="isLoggedIn && serverStarted" (click)="reloadVisualizer()" mat-raised-button color="primary">Go to visualizer</button>

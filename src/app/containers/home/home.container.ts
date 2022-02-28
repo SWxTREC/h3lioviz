@@ -29,7 +29,7 @@ export class HomeComponent implements OnDestroy {
     }
 
     reloadVisualizer() {
-        // navigate to visualizer then force reload for Firefox
+        // navigate to visualizer then force reload, 'true' argument is for Firefox
         this._router.navigate([ '/visualizer' ]).then( () => window.location.reload(true) )
     }
 
