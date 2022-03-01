@@ -14,12 +14,7 @@ export class AwsService {
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
-<<<<<<< HEAD
-    // how much to wait to connect to socket, allow for docker build when sending the start command
-    socketDelay = 1000;
     monitoringInterval: Subscription;
-=======
->>>>>>> origin/dev
 
     constructor(
         private _http: HttpClient,
@@ -34,18 +29,17 @@ export class AwsService {
         // for prod use monitor function, when using a local server, fake a connection
         if ( environment.production) {
             // remove any existing monitoring interval
-            this.monitoringInterval = undefined;
+            this.monitoringInterval?.unsubscribe();
             this.monitorPvServer();
         } else {
             this.pvServerStarted$.next(true);
         }
-
     }
 
     monitorPvServer() {
         this.monitoringInterval = interval(1000)
         .pipe(
-            takeWhile( () => this.loggedIn ),
+            takeWhile( () => this.loggedIn === true ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // pass through fails—looking specifically for a 500
@@ -64,6 +58,7 @@ export class AwsService {
                     return of( false );
                 } else {
                     // carry on
+                    this.pvServerStarted$.next(false);
                     return of( true );
                 }
             })

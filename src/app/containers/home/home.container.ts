@@ -20,7 +20,7 @@ export class HomeComponent implements OnDestroy {
         private _profileService: ProfileNavService,
         private _router: Router
     ) {
-        this.subscriptions.push( this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
+        this.subscriptions.push( this._profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
         }));
         this.subscriptions.push( this._awsService.pvServerStarted$.subscribe( ( status: boolean ) => {
