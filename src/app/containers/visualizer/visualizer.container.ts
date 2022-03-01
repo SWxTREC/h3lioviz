@@ -41,11 +41,8 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
             take(1)
         ).subscribe( started => {
             this.pvServerStarted = started;
-            // connect once after a delay (delay is needed when starting pv server from scratch)
             if ( !this.validConnection && started === true ) {
-                setTimeout( () => {
-                    this.connectToSocket();
-                }, this._awsService.socketDelay);
+                this.connectToSocket();
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
