@@ -28,11 +28,6 @@ export class HomeComponent implements OnDestroy {
         }));
     }
 
-    reloadVisualizer() {
-        // navigate to visualizer then force reload, 'true' argument is for Firefox
-        this._router.navigate([ '/visualizer' ]).then( () => window.location.reload(true) )
-    }
-
     ngOnDestroy(): void {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }

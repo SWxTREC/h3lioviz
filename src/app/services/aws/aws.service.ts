@@ -16,6 +16,7 @@ export class AwsService {
     startEc2Subscription: Subscription;
     // how much to wait to connect to socket, allow for docker build when sending the start command
     socketDelay = 1000;
+    monitoringInterval: Subscription;
 
     constructor(
         private _http: HttpClient,
@@ -23,55 +24,58 @@ export class AwsService {
     ) {
         this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( loginStatus => {
             this.loggedIn = loginStatus;
-            if ( loginStatus ) {
-                // once logged in, start checking the status of Paraview server
-                // for prod use monitor function, when running a local server, fake a connection
-                if ( environment.production ) {
-                    this.monitorPvServer();
-                } else {
-                    this.pvServerStarted$.next(true);
-                }
-            }
         });
     }
 
+    startUp() {
+        // for prod use monitor function, when using a local server, fake a connection
+        if ( environment.production) {
+            // remove any existing monitoring interval
+            this.monitoringInterval = undefined;
+            this.monitorPvServer();
+        } else {
+            this.pvServerStarted$.next(true);
+        }
+
+    }
+
     monitorPvServer() {
-        interval(1000)
-        .pipe(
-            takeWhile( () => this.loggedIn ),
-            takeWhile( () => this.pvServerStarted$.value === false ),
-            startWith(0),
-            // look for 200 status, but pass through fails with status: 0
-            switchMap(() => this.getParaviewServerStatus().pipe(
-                catchError( () => of({ status: 0 }))
-            )),
-            switchMap( (pvStatus: {status: number}) => {
-                // returns when the PV server is NOT yet ready
-                if ( pvStatus.status === 200 ) {
-                    // good to connect!
-                    this.pvServerStarted$.next(true);
+        this.monitoringInterval = interval(1000)
+            .pipe(
+                takeWhile( () => this.loggedIn ),
+                takeWhile( () => this.pvServerStarted$.value === false ),
+                startWith(0),
+                // look for 200 status, but pass through fails with status: 0
+                switchMap(() => this.getParaviewServerStatus().pipe(
+                    catchError( () => of({ status: 0 }))
+                )),
+                switchMap( (pvStatus: {status: number}) => {
+                    // returns when the PV server is NOT yet ready
+                    if ( pvStatus.status === 200 ) {
+                        // good to connect!
+                        this.pvServerStarted$.next(true);
+                        if ( this.startEc2Subscription ) {
+                            this.startEc2Subscription.unsubscribe();
+                        }
+                        return of( false );
+                    } else {
+                        // carry on
+                        return of( true );
+                    }
+                })
+            ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
+                if ( pvNotReady === true ) {
+                    // if start command needs to be sent, add a delay for spinning up the docker container before
+                    // connecting to websocket
+                    this.socketDelay = 1000 * 5;
+                    // remove existing subscriptions
                     if ( this.startEc2Subscription ) {
                         this.startEc2Subscription.unsubscribe();
                     }
-                    return of( false );
-                } else {
-                    // carry on
-                    return of( true );
+                    // send the start command every throttled interval until PV server returns 200
+                    this.startEc2Subscription = this.startEc2().subscribe();
                 }
-            })
-        ).pipe( throttleTime( 1000 * 20 ) ).subscribe( pvNotReady => {
-            if ( pvNotReady === true ) {
-                // if start command needs to be sent, add a delay for spinning up the docker container before
-                // connecting to websocket
-                this.socketDelay = 1000 * 5;
-                // remove existing subscriptions
-                if ( this.startEc2Subscription ) {
-                    this.startEc2Subscription.unsubscribe();
-                }
-                // send the start command every throttled interval until PV server returns 200
-                this.startEc2Subscription = this.startEc2().subscribe();
-            }
-        });
+            });
     }
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {

@@ -29,7 +29,9 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private _awsService: AwsService
-    ) {}
+    ) {
+        this._awsService.startUp();
+    }
 
     ngAfterViewInit() {
         const waitingMessageInterval = setInterval(() =>
@@ -125,9 +127,8 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
-    reload() {
-        // force reload for Firefox
-        window.location.reload(true);
+    restart() {
+        this._awsService.startUp();
     }
 
     unsubscribeAll() {
