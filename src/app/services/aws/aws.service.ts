@@ -14,6 +14,7 @@ export class AwsService {
     loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
+    monitoringInterval: Subscription;
 
     constructor(
         private _http: HttpClient,
@@ -21,22 +22,24 @@ export class AwsService {
     ) {
         this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( loginStatus => {
             this.loggedIn = loginStatus;
-            if ( loginStatus ) {
-                // once logged in, start checking the status of Paraview server
-                // for prod, use monitor function, when running a local server, fake a connection
-                if ( environment.production ) {
-                    this.monitorPvServer();
-                } else {
-                    this.pvServerStarted$.next(true);
-                }
-            }
         });
     }
 
+    startUp() {
+        // for prod use monitor function, when using a local server, fake a connection
+        if ( environment.production) {
+            // remove any existing monitoring interval
+            this.monitoringInterval?.unsubscribe();
+            this.monitorPvServer();
+        } else {
+            this.pvServerStarted$.next(true);
+        }
+    }
+
     monitorPvServer() {
-        interval(1000)
+        this.monitoringInterval = interval(1000)
         .pipe(
-            takeWhile( () => this.loggedIn ),
+            takeWhile( () => this.loggedIn === true ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // pass through fails—looking specifically for a 500
@@ -55,6 +58,7 @@ export class AwsService {
                     return of( false );
                 } else {
                     // carry on
+                    this.pvServerStarted$.next(false);
                     return of( true );
                 }
             })

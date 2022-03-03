@@ -9,7 +9,7 @@
 
     <p>Further features and enhancements to come. Learn more and get in touch via the <a target="_blank" href="https://www.colorado.edu/spaceweather/applications">SWx TREC site</a>.</p>
 
-    <h2>Keyboad tips for panning:</h2>
+    <h2>Keyboad tips for panning</h2>
     <dl>
         <ng-container *ngFor="let shortcut of keyboardShortcuts">
             <dt>{{shortcut.action}}</dt>
@@ -17,5 +17,5 @@
         </ng-container>
     </dl>
 
-    <markdown [src]="'https://raw.githubusercontent.com/SWxTREC/enlil-3d/main/README.md'"></markdown>
+    <markdown [src]="'assets/markdown/DOCUMENTATION.md'"></markdown>
 </mat-card>

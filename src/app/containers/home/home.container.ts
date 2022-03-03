@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { ProfileNavService } from 'src/app/services';
 
 @Component({
@@ -14,9 +13,9 @@ export class HomeComponent implements OnDestroy {
     subscriptions: Subscription[] = [];
 
     constructor(
-        private profileService: ProfileNavService
+        private _profileService: ProfileNavService,
     ) {
-        this.subscriptions.push( this.profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( (loginStatus: boolean) => {
+        this.subscriptions.push( this._profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
         }));
     }
