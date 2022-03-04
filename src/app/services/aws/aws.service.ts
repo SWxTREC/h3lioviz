@@ -48,7 +48,7 @@ export class AwsService {
             )),
             switchMap( (pvStatus: {status: number}) => {
                 // status is 0 when server is not ready, 500 when it is ready
-                // a network error of 503 for stopping, 502 for starting, but those statuses are passed through as errror='unknown' and status=0
+                // a network error of 503 for stopping, 502 for starting, but those are passed through as errror='unknown' and status=0
                 if ( pvStatus.status === 500 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);

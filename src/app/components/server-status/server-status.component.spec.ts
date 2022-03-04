@@ -1,6 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MaterialModule } from 'src/app/modules';
 import { ProfileNavService } from 'src/app/services';
 
 import { ServerStatusComponent } from './server-status.component';
@@ -14,6 +15,7 @@ describe('ServerStatusComponent', () => {
             declarations: [ ServerStatusComponent ],
             imports: [
                 HttpClientTestingModule,
+                MaterialModule,
                 RouterTestingModule
             ],
             providers: [ ProfileNavService ]

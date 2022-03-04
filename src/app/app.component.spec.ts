@@ -4,6 +4,7 @@ import { LaspFooterModule } from 'lasp-footer';
 import { LaspNavModule, LaspNavService } from 'lasp-nav';
 
 import { AppComponent } from './app.component';
+import { MaterialModule } from './modules';
 import { routes } from './routes';
 
 describe('AppComponent', () => {
@@ -12,7 +13,8 @@ describe('AppComponent', () => {
             imports: [
                 RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
                 LaspFooterModule,
-                LaspNavModule
+                LaspNavModule,
+                MaterialModule
             ],
             declarations: [
                 AppComponent

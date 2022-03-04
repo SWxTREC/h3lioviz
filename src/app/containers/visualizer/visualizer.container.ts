@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { filter, take } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
@@ -14,7 +14,7 @@ import SmartConnect from 'wslink/src/SmartConnect';
     templateUrl: './visualizer.container.html',
     styleUrls: [ './visualizer.container.scss' ]
 })
-export class VisualizerComponent implements AfterViewInit, OnDestroy {
+export class VisualizerComponent implements OnInit, OnDestroy {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
     loading = true;
     pvView: any;
@@ -33,7 +33,7 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         this._awsService.startUp();
     }
 
-    ngAfterViewInit() {
+    ngOnInit() {
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
         this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
@@ -42,7 +42,8 @@ export class VisualizerComponent implements AfterViewInit, OnDestroy {
         ).subscribe( started => {
             this.pvServerStarted = started;
             if ( !this.validConnection && started === true ) {
-                this.connectToSocket();
+                // add setTimeout to skip a beat and avoid the expressionChanged error with AfterViewInit
+                setTimeout(() => this.connectToSocket());
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }

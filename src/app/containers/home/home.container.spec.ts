@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentsModule, MaterialModule } from 'src/app/modules';
 import { AwsService, ProfileNavService } from 'src/app/services';
 
 import { HomeRoutingModule } from './home-routing.module';
@@ -18,8 +19,10 @@ describe('HomeComponent', () => {
     beforeEach(async() => {
         TestBed.configureTestingModule({
             imports: [
+                ComponentsModule,
                 HomeRoutingModule,
                 HttpClientTestingModule,
+                MaterialModule,
                 RouterTestingModule
             ],
             declarations: [ HomeComponent ],

@@ -5,8 +5,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AngularSplitModule } from 'angular-split';
+import { MomentModule } from 'ngx-moment';
+import { ComponentsModule } from 'src/app/modules';
 import { MaterialModule } from 'src/app/modules/material.module';
-import { ProfileNavService } from 'src/app/services';
+import { AwsService, ProfileNavService } from 'src/app/services';
 
 import { ControlPanelComponent, TimePlayerComponent } from './components';
 import { VisualizerComponent } from './visualizer.container';
@@ -25,13 +27,16 @@ describe('VisualizerComponent', () => {
             imports: [
                 AngularSplitModule,
                 BrowserAnimationsModule,
+                ComponentsModule,
                 HttpClientTestingModule,
                 RouterTestingModule,
                 ReactiveFormsModule,
                 MaterialModule,
+                MomentModule,
                 NgxSliderModule
             ],
             providers: [
+                AwsService,
                 ProfileNavService
             ]
         })
