@@ -30,7 +30,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     constructor(
         private _awsService: AwsService
     ) {
-        this._awsService.startUp();
+        this.triggerStart();
     }
 
     ngOnInit() {
@@ -49,6 +49,10 @@ export class VisualizerComponent implements OnInit, OnDestroy {
                 }
             }
         }));
+    }
+
+    ngOnDestroy() {
+        this.unsubscribeAll();
     }
 
     connectToSocket(): void {
@@ -115,17 +119,13 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         }, 1000 * 10);
     }
 
-    ngOnDestroy() {
-        this.unsubscribeAll();
-    }
-
     getTimestep( timeIndex: number ) {
         this.loading = true;
         const session = this.pvView.get().session;
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
-    restart() {
+    triggerStart() {
         this._awsService.startUp();
     }
 

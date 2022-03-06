@@ -1,9 +1,9 @@
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
     <ng-container *ngIf="errorMessage">
         <p class="viz__error">{{ errorMessage }}</p>
-        <button mat-raised-button color="primary" (click)="restart()">Retry connection</button>
+        <button mat-raised-button color="primary" (click)="triggerStart()">Retry connection</button>
     </ng-container>
-    <swt-server-status *ngIf="!serverStatus && !errorMessage"></swt-server-status>
+    <swt-server-status *ngIf="!errorMessage"></swt-server-status>
     <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
     <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>

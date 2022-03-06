@@ -25,15 +25,9 @@ export class AwsService {
         });
     }
 
-    startUp() {
-        // for prod use monitor function, when using a local server, fake a connection
-        if ( environment.production) {
-            // remove any existing monitoring interval
-            this.monitoringInterval?.unsubscribe();
-            this.monitorPvServer();
-        } else {
-            this.pvServerStarted$.next(true);
-        }
+    getParaviewServerStatus(): Observable<HttpResponse<string>> {
+        // add a random query parameter to the request, the easiest way to keep the request from being cached in the browser
+        return this._http.get( environmentConfig.sessionManagerURL + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
     }
 
     monitorPvServer() {
@@ -74,13 +68,20 @@ export class AwsService {
         });
     }
 
-    getParaviewServerStatus(): Observable<HttpResponse<string>> {
-        // add a random query parameter to the request, the easiest way to keep the request from being cached in the browser
-        return this._http.get( environmentConfig.sessionManagerURL + '?' + Math.random(), { responseType: 'text', observe: 'response' } );
-    }
-
     startEc2(): Observable<string> {
         // StartEC2Instances.py lambda link
         return this._http.get( this.awsUrl + '/BrianTestStartEC2', { responseType: 'text' });
+    }
+
+    startUp() {
+        this.pvServerStarted$.next(false);
+        // for prod use monitor function, when using a local server, fake a connection
+        if ( environment.production) {
+            // remove any existing monitoring interval
+            this.monitoringInterval?.unsubscribe();
+            this.monitorPvServer();
+        } else {
+            this.pvServerStarted$.next(true);
+        }
     }
 }
