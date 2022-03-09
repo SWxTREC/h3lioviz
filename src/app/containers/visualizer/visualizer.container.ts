@@ -30,7 +30,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     constructor(
         private _awsService: AwsService
     ) {
-        this.triggerStart();
+        this._awsService.startUp();
     }
 
     ngOnInit() {
@@ -125,8 +125,8 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
-    triggerStart() {
-        this._awsService.startUp();
+    refresh() {
+        window.location.reload(true);
     }
 
     unsubscribeAll() {

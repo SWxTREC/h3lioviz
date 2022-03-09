@@ -75,10 +75,10 @@ export class AwsService {
 
     startUp() {
         this.pvServerStarted$.next(false);
+        // remove any existing monitoring interval
+        this.monitoringInterval?.unsubscribe();
         // for prod use monitor function, when using a local server, fake a connection
         if ( environment.production) {
-            // remove any existing monitoring interval
-            this.monitoringInterval?.unsubscribe();
             this.monitorPvServer();
         } else {
             this.pvServerStarted$.next(true);
