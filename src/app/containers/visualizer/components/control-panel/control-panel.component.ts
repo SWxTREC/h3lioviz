@@ -134,7 +134,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         lonArrows: false,
         lonSlice: true,
         lonStreamlines: false,
-        opacity: [ 70, 100 ],
+        opacity: [ 70, 100 ] as [number, number],
         threshold: false,
         thresholdVariable: this.defaultThresholdVariable
     };
@@ -145,7 +145,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false
     };
     colormaps: string[] = Object.keys(this.COLORMAPS);
-    colorRange: [number, number] = ( this.defaultColorVariable.colorRange );
+    colorRange: [ number, number ] = ( this.defaultColorVariable.colorRange );
     controlPanel: FormGroup = new FormGroup({});
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
@@ -166,6 +166,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     };
     thresholdRange: [number, number] = ( this.defaultThresholdVariable.colorRange );
     userColormaps: { [parameter: string]: { displayName: string, serverName: string } } = {};
+    userColorRange: { [parameter: string]: [ number, number ] } = {};
+    userOpacity: { [parameter: string]: [ number, number ] } = {};
+    userThresholdRange: { [parameter: string]: [ number, number ] } = {};
     variables: IVariableInfo[] = Object.values(this.VARIABLE_CONFIG);
     zoomState: 'on' | 'off' = 'on';
 
@@ -177,6 +180,18 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // create default user colormap object
         Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
             this.userColormaps[variable] = this.VARIABLE_CONFIG[variable].defaultColormap;
+        });
+        // create default user color range object
+        Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
+            this.userColorRange[variable] = this.VARIABLE_CONFIG[variable].colorRange;
+        });
+        // create default user opacity object
+        Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
+            this.userOpacity[variable] = this.CONTROL_PANEL_DEFAULT_VALUES.opacity;
+        });
+        // create default user threshold range object
+        Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
+            this.userThresholdRange[variable] = this.VARIABLE_CONFIG[variable].thresholdRange;
         });
         // debounce render
         this.subscriptions.push(
@@ -217,24 +232,26 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push( this.controlPanel.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
-                // this will render every time any named control of the form is updated
-                // the threshold and color ranges are outside of the form and are updated and rendered manually
+                // this will render every time any named control in the form is updated
+                // the threshold range and color range are tracked outside of the form and are updated and rendered manually
                 this.renderDebouncer.next();
             }));
-        // subscribe to color variable changes and reset color slider options, color range, and 'set_range' for color
+        // subscribe to color variable changes, color variable is tied to colormap (form subscription via setValue for server),
+        // opacity (form subscription via setValue for server), and color range (update via updateColorRange())
         this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
                 const colorVariableServerName = newColorVariable.serverName;
                 this.session.call('pv.enlil.colorby', [ colorVariableServerName ]);
                 this.controlPanel.controls.colormap.setValue( this.userColormaps[ colorVariableServerName ] );
+                this.controlPanel.controls.opacity.setValue( this.userOpacity[ colorVariableServerName ] );
+                const variableColorRange = this.userColorRange[ colorVariableServerName ];
                 this.colorOptions = {
                     floor: newColorVariable.colorRange[0],
                     ceil: newColorVariable.colorRange[1],
                     step: newColorVariable.step,
                     animate: false
                 };
-                this.colorRange = newColorVariable.colorRange;
-                this.session.call('pv.enlil.set_range', [ colorVariableServerName, this.colorRange ]);
+                this.updateColorRange( { value: variableColorRange[0], highValue: variableColorRange[1], pointerType: undefined })
             }));
         // subscribe to color map changes, set userColormap, and reset PV colormap
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
@@ -253,19 +270,21 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     step: newThresholdVariable.step,
                     animate: false
                 };
-                this.thresholdRange = newThresholdVariable.thresholdRange;
-                this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ]);
+                const newThresholdRange = this.userThresholdRange[ thresholdVariableServerName ];
+                this.updateThresholdRange( { value: newThresholdRange[0], highValue: newThresholdRange[1], pointerType: undefined })
             }));
-        // subscribe to opacity slider and 'set_opacity'
+        // subscribe to opacity slider set user opacity per color variable and 'set_opacity'
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( () => {
-                const name = this.controlPanel.value.colorVariable.serverName;
-                const opacityLow: number = this.controlPanel.value.opacity[0] / 100;
-                const opacityHigh: number = this.controlPanel.value.opacity[1] / 100;
-                if ( name[ 0 ] === 'b' ) {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityHigh, opacityLow, opacityHigh ] ] );
+                const colorVariableServerName = this.controlPanel.value.colorVariable.serverName;
+                const newOpacityRange: [ number, number ] = this.controlPanel.value.opacity;
+                this.userOpacity[colorVariableServerName] = newOpacityRange;
+                const opacityLow: number = newOpacityRange[0] / 100;
+                const opacityHigh: number = newOpacityRange[1] / 100;
+                if ( colorVariableServerName[ 0 ] === 'b' ) {
+                    this.session.call( 'pv.enlil.set_opacity', [ colorVariableServerName, [ opacityHigh, opacityLow, opacityHigh ] ] );
                 } else {
-                    this.session.call( 'pv.enlil.set_opacity', [ name, [ opacityLow, opacityHigh ] ] );
+                    this.session.call( 'pv.enlil.set_opacity', [ colorVariableServerName, [ opacityLow, opacityHigh ] ] );
                 }
             }));
     }
@@ -303,16 +322,19 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         const rightOffset = this.colorOptions.ceil - event.highValue;
         this.colorbarLeftOffset = this.getPercentageOfFullColorRange( leftOffset );
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
-        const variable: IVariableInfo = this.controlPanel.value.colorVariable;
+        const colorVariableServerName: string = this.controlPanel.value.colorVariable.serverName;
         this.colorRange = [ event.value, event.highValue ];
-        this.session.call('pv.enlil.set_range', [ variable.serverName, this.colorRange ] );
+        this.userColorRange[ colorVariableServerName ] = this.colorRange;
+        this.session.call('pv.enlil.set_range', [ colorVariableServerName , this.colorRange ] );
         this.renderDebouncer.next();
     }
 
     updateThresholdRange( event: ChangeContext ) {
-        const variable: IVariableInfo = this.controlPanel.value.thresholdVariable;
-        this.thresholdRange = [ event.value, event.highValue ];
-        this.session.call('pv.enlil.set_threshold', [ variable.serverName, this.thresholdRange ] );
+        const thresholdVariableServerName: string = this.controlPanel.value.thresholdVariable.serverName;
+        const newRange: [ number, number ] = [ event.value, event.highValue ];
+        this.thresholdRange = newRange;
+        this.userThresholdRange[ thresholdVariableServerName ] = newRange;
+        this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ] );
         this.renderDebouncer.next();
     }
 }
