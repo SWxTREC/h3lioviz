@@ -238,7 +238,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     // This mat-select compareWith function is used to verify the proper label for the selection in the dropdown
     compareObjectNames(o1: any, o2: any): boolean {
-      return o1.displayName === o2.displayName;
+        return o1.displayName === o2.displayName;
     }
 
     getPercentageOfFullColorRange( offset: number ): string {
@@ -283,7 +283,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     step: newColorVariable.step,
                     animate: false
                 };
-                this.updateColorRange( { value: variableColorRange[0], highValue: variableColorRange[1], pointerType: undefined })
+                this.updateColorRange( { value: variableColorRange[0], highValue: variableColorRange[1], pointerType: undefined });
             }));
         // subscribe to color map changes, set userColormap, and reset PV colormap
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
@@ -302,7 +302,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                     animate: false
                 };
                 const newThresholdRange = this.userThresholdRanges[ thresholdVariableServerName ];
-                this.updateThresholdRange( { value: newThresholdRange[0], highValue: newThresholdRange[1], pointerType: undefined })
+                this.updateThresholdRange( { value: newThresholdRange[0], highValue: newThresholdRange[1], pointerType: undefined });
             }));
         // subscribe to opacity slider set user opacity per color variable and 'set_opacity'
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
