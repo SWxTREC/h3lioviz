@@ -51,7 +51,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false
     };
     thresholdRange: [number, number] = ( this.defaultThresholdVariable.colorRange );
-    userColormaps: { [parameter: string]: { displayName: string, serverName: string } } = {};
+    userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     userThresholdRanges: { [parameter: string]: [ number, number ] } = {};
@@ -240,7 +240,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         this.colorRange = [ event.value, event.highValue ];
         this.userColorRanges[ this.colorVariableServerName ] = clone(this.colorRange);
-        this.session.call('pv.enlil.set_range', [ this.colorVariableServerName , this.colorRange ] );
+        this.session.call('pv.enlil.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }
 

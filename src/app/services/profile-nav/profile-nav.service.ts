@@ -196,6 +196,7 @@ export class ProfileNavService extends LaspNavService {
     onFailToRefresh(): Promise<any> {
         this.logout();
         this.setLoggedIn( false );
+        // eslint-disable-next-line prefer-promise-reject-errors
         return Promise.reject( 'Failed to refresh authentication' );
     }
 }

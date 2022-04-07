@@ -20,7 +20,9 @@ describe('AwsService', () => {
             ],
             providers: [ ProfileNavService ]
         });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpClient = TestBed.inject(HttpClient);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpTestingController = TestBed.inject(HttpTestingController);
 
         service = TestBed.inject(AwsService);

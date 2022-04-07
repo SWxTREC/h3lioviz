@@ -5,6 +5,7 @@ import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connectImageStream
 } from 'vtk.js/Sources/Rendering/Misc/RemoteView';
 import SmartConnect from 'wslink/src/SmartConnect';

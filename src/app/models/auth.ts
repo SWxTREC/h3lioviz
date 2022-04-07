@@ -9,15 +9,18 @@ export enum StorageKeys {
 
 export interface ICognitoUserInfo {
     email: string;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     email_verified: 'true' | 'false';
     sub: string;
     username: string;
 }
 
 export interface ICognitoTokens {
+    /* eslint-disable */
     access_token: string;
     expires_in: number; // number of seconds
     id_token: string;
     refresh_token: string;
     token_type: string;
+    /* eslint-enable */
 }
