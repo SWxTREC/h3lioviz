@@ -81,7 +81,7 @@ export class ProfileNavService extends LaspNavService {
         return await this.makeAwsRequest( request );
     }
 
-    async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
+    async loadUserProfile(): Promise<{ firstName?: string; lastName?: string; username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
         return {
             firstName: cognitoInfo.username,

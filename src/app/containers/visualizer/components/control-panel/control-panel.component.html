@@ -55,7 +55,7 @@
         <mat-form-field>
             <mat-label>Colormap for {{ VARIABLE_CONFIG[ colorVariableServerName ].displayName }}</mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="colormap">
-                <mat-option *ngFor="let color of COLORMAPS | keyvalue" [value]="color.value">
+                <mat-option *ngFor="let color of colormaps | keyvalue" [value]="color.value">
                     <div class="control-panel__dropdown-block">
                         {{ color.value.displayName }} <img class="control-panel__swatch" [src]="color.value.imgSrc">
                     </div>

@@ -15,7 +15,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
 
-    session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
+    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     startTime: string;
     timestepDebouncer: Subject<number> = new Subject<number>();
 
@@ -39,7 +39,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                     this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
                 }
             }
-        ));
+            ));
     }
 
     ngOnChanges(): void {
@@ -53,7 +53,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    newTimestep(index: { value: number; }) {
+    newTimestep(index: { value: number }) {
         // if playing, immediately stop when there is a click on the timeline
         if ( this.playing ) {
             this.playing = false;

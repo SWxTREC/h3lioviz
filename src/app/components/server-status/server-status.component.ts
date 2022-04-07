@@ -13,9 +13,9 @@ export class ServerStatusComponent implements OnDestroy {
     subscriptions: Subscription[] = [];
 
     constructor(
-        private awsService: AwsService
+        private _awsService: AwsService
     ) {
-        this.subscriptions.push( this.awsService.pvServerStarted$.pipe( distinctUntilChanged() )
+        this.subscriptions.push( this._awsService.pvServerStarted$.pipe( distinctUntilChanged() )
             .subscribe( ( status: boolean ) => this.serverStarted = status )
         );
     }

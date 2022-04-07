@@ -62,14 +62,14 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         const divRenderer = this.pvContent.nativeElement;
 
         // Error
-        clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
+        clientToConnect.onConnectionError((httpReq: { response: { error: any } }) => {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
             this.errorMessage = message;
         });
 
         // Close
-        clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
+        clientToConnect.onConnectionClose(( httpReq: { response: { error: any } } ) => {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection closed`;
             this.errorMessage = message;
