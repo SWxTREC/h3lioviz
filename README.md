@@ -35,7 +35,7 @@ This is a visualizer for the ENLIL 3d model built with Angular.
 
 ## Running ENLIL Locally
 
-See 'Developement server' below.
+See 'Development server' below.
 
 ### Project Dependencies
 
