@@ -29,7 +29,7 @@
                 <mat-form-field class="control-panel__control control-panel__control--full-width">
                     <mat-label>Threshold variable</mat-label>
                     <mat-select [compareWith]="compareObjectNames" formControlName="thresholdVariable">
-                        <mat-option *ngFor="let variable of VARIABLE_CONFIG | keyvalue" [value]="variable.value">
+                        <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
                             {{ variable.value.displayName }}
                         </mat-option>
                     </mat-select>
@@ -47,13 +47,13 @@
         <mat-form-field>
             <mat-label>Color variable</mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="colorVariable">
-                <mat-option *ngFor="let variable of VARIABLE_CONFIG | keyvalue" [value]="variable.value">
+                <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
                     {{ variable.value.displayName }}
                 </mat-option>
             </mat-select>
         </mat-form-field>
         <mat-form-field>
-            <mat-label>Colormap for {{ VARIABLE_CONFIG[ colorVariableServerName ].displayName }}</mat-label>
+            <mat-label>Colormap for {{ variableConfigurations[ colorVariableServerName ].displayName }}</mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="colormap">
                 <mat-option *ngFor="let color of colormaps | keyvalue" [value]="color.value">
                     <div class="control-panel__dropdown-block">
@@ -81,7 +81,7 @@
             <div class="control-panel__header">
                 <div>
                     <strong>Color range</strong>
-                    <small innerHTML=" ({{ VARIABLE_CONFIG[ colorVariableServerName ].units }})"></small>
+                    <small innerHTML=" ({{ variableConfigurations[ colorVariableServerName ].units }})"></small>
                 </div>
             </div>
             <img class="control-panel__label" [src]="controlPanel.value.colormap?.imgSrc" height="20" width="100%" [style.paddingRight]="colorbarRightOffset" [style.paddingLeft]="colorbarLeftOffset">

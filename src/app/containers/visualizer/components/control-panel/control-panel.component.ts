@@ -55,6 +55,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     userThresholdRanges: { [parameter: string]: [ number, number ] } = {};
+    variableConfigurations = VARIABLE_CONFIG;
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
@@ -102,6 +103,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
+                this.saveUserSettings();
             }
             ));
     }
@@ -152,7 +154,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 // this will render every time any named control in the form is updated
                 // the threshold range and color range are tracked outside of the form and are updated and rendered manually
                 this.renderDebouncer.next();
-                this.saveUserSettings();
             }));
         // subscribe to color variable changes, color variable is tied to colormap (form subscription via setValue for server),
         // opacity (form subscription via setValue for server), and color range (update via updateColorRange())
