@@ -1,7 +1,7 @@
 <div class="home">
     <a *ngIf="isLoggedIn" class="home__message" routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
     <div *ngIf="!isLoggedIn" class="home__message">
-        <button mat-button (click)="_profileService.onSignInClick('/visualizer')">Sign in/Register</button>
+        <button mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
         <p>
             Explore Enlil model runs in 3 dimensions
         </p>
