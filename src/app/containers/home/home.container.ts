@@ -13,9 +13,9 @@ export class HomeComponent implements OnDestroy {
     subscriptions: Subscription[] = [];
 
     constructor(
-        private _profileService: ProfileNavService
+        public profileService: ProfileNavService
     ) {
-        this.subscriptions.push( this._profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
+        this.subscriptions.push( this.profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
         }));
     }
