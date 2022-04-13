@@ -4,8 +4,8 @@ export interface IVariableInfo {
     units: string;
     colorRange: [number, number];
     defaultColormap: {
-        displayName: string,
-        serverName: string
+        displayName: string;
+        serverName: string;
     };
     thresholdRange: [number, number];
     step: number;

@@ -5,6 +5,7 @@ import { AwsService } from 'src/app/services';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView, {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     connectImageStream
 } from 'vtk.js/Sources/Rendering/Misc/RemoteView';
 import SmartConnect from 'wslink/src/SmartConnect';
@@ -62,14 +63,14 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         const divRenderer = this.pvContent.nativeElement;
 
         // Error
-        clientToConnect.onConnectionError((httpReq: { response: { error: any; }; }) => {
+        clientToConnect.onConnectionError((httpReq: { response: { error: any } }) => {
             this.validConnection = false;
             const message = ( httpReq?.response?.error ) || `Connection error`;
             this.errorMessage = message;
         });
 
         // Close
-        clientToConnect.onConnectionClose(( httpReq: { response: { error: any; }; } ) => {
+        clientToConnect.onConnectionClose(( httpReq: { response: { error: any } } ) => {
             this.validConnection = false;
             const message = (httpReq?.response?.error) || `Connection closed`;
             this.errorMessage = message;

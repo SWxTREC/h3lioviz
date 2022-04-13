@@ -81,7 +81,7 @@ export class ProfileNavService extends LaspNavService {
         return await this.makeAwsRequest( request );
     }
 
-    async loadUserProfile(): Promise<{ firstName?: string, lastName?: string, username?: string }> {
+    async loadUserProfile(): Promise<{ firstName?: string; lastName?: string; username?: string }> {
         const cognitoInfo = await this.getCognitoUserInfo();
         return {
             firstName: cognitoInfo.username,
@@ -196,6 +196,7 @@ export class ProfileNavService extends LaspNavService {
     onFailToRefresh(): Promise<any> {
         this.logout();
         this.setLoggedIn( false );
+        // eslint-disable-next-line prefer-promise-reject-errors
         return Promise.reject( 'Failed to refresh authentication' );
     }
 }

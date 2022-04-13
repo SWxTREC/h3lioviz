@@ -4,7 +4,13 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { clone, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { IVariableInfo, KEYBOARD_SHORTCUTS } from 'src/app/models';
+import {
+    COLORMAPS,
+    CONTROL_PANEL_DEFAULT_VALUES,
+    IVariableInfo,
+    KEYBOARD_SHORTCUTS,
+    VARIABLE_CONFIG
+} from 'src/app/models';
 
 @Component({
     selector: 'swt-control-panel',
@@ -15,135 +21,15 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
     keyboardShortcuts = KEYBOARD_SHORTCUTS;
 
-    // serverName must match an option on the server
-    COLORMAPS = {
-        coolToWarm: {
-            displayName: 'Cool to warm',
-            imgSrc: 'assets/images/cool_to_warm.png',
-            serverName: 'Cool to Warm'
-        },
-        inferno: {
-            displayName: 'Inferno',
-            imgSrc: 'assets/images/inferno.png',
-            serverName: 'Inferno (matplotlib)'
-        },
-        plasma: {
-            displayName: 'Plasma',
-            imgSrc: 'assets/images/plasma.png',
-            serverName: 'Plasma (matplotlib)'
-        },
-        viridis: {
-            displayName: 'Viridis',
-            imgSrc: 'assets/images/viridis.png',
-            serverName: 'Viridis (matplotlib)'
-        },
-        divergent: {
-            displayName: 'Divergent',
-            imgSrc: 'assets/images/blue_orange.png',
-            serverName: 'Blue Orange (divergent)'
-        },
-        rainbow: {
-            displayName: 'Rainbow',
-            imgSrc: 'assets/images/nic_cubicl.png',
-            serverName: 'nic_CubicL'
-        }
-    };
-
-    // TODO: set these in the server on load
-    VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
-        velocity: {
-            serverName: 'velocity',
-            displayName: 'Velocity',
-            units: 'km/s',
-            colorRange: [ 300, 900 ],
-            defaultColormap: this.COLORMAPS.plasma,
-            thresholdRange: [ 600, 900 ],
-            step: 50
-        },
-        density: {
-            serverName: 'density',
-            displayName: 'Density',
-            units: 'r<sup>2</sup>N/cm<sup>3</sup>',
-            colorRange: [ 0, 30 ],
-            defaultColormap: this.COLORMAPS.viridis,
-            thresholdRange: [ 15, 30 ],
-            step: 1
-        },
-        pressure: {
-            serverName: 'pressure',
-            displayName: 'Ram pressure',
-            units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
-            colorRange: [ 100000, 10000000 ],
-            defaultColormap: this.COLORMAPS.viridis,
-            thresholdRange: [ 500000, 10000000 ],
-            step: 10000
-        },
-        temperature: {
-            serverName: 'temperature',
-            displayName: 'Temperature',
-            units: 'K',
-            colorRange: [ 10000, 1000000 ],
-            defaultColormap: this.COLORMAPS.inferno,
-            thresholdRange: [ 500000, 1000000 ],
-            step: 10000
-        },
-        b: {
-            serverName: 'b',
-            displayName: 'B',
-            units: 'nT',
-            colorRange: [ -100, 100 ],
-            defaultColormap: this.COLORMAPS.coolToWarm,
-            thresholdRange: [ -50, 0 ],
-            step: 5
-        },
-        bx: {
-            serverName: 'bx',
-            displayName: 'Bx',
-            units: 'nT',
-            colorRange: [ -100, 100 ],
-            defaultColormap: this.COLORMAPS.coolToWarm,
-            thresholdRange: [ -50, 0 ],
-            step: 5
-        },
-        by: {
-            serverName: 'by',
-            displayName: 'By',
-            units: 'nT',
-            colorRange: [ -100, 100 ],
-            defaultColormap: this.COLORMAPS.coolToWarm,
-            thresholdRange: [ -50, 0 ],
-            step: 5
-        },
-        bz: {
-            serverName: 'bz',
-            displayName: 'Bz',
-            units: 'nT',
-            colorRange: [ -100, 100 ],
-            defaultColormap: this.COLORMAPS.coolToWarm,
-            thresholdRange: [ -50, 0 ],
-            step: 5
-        }
-    };
-    defaultColorVariable: IVariableInfo = this.VARIABLE_CONFIG.velocity;
-    defaultThresholdVariable: IVariableInfo = this.VARIABLE_CONFIG.density;
-    CONTROL_PANEL_DEFAULT_VALUES = {
-        colorVariable: this.defaultColorVariable,
-        colormap: this.defaultColorVariable.defaultColormap,
-        cme: true,
-        latSlice: true,
-        lonArrows: false,
-        lonSlice: true,
-        lonStreamlines: false,
-        opacity: [ 70, 100 ] as [number, number],
-        threshold: false,
-        thresholdVariable: this.defaultThresholdVariable
-    };
+    defaultColorVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.colorVariable;
+    defaultThresholdVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.thresholdVariable;
     colorOptions: Options = {
         floor: this.defaultColorVariable.colorRange[0],
         ceil: this.defaultColorVariable.colorRange[1],
         step: this.defaultColorVariable.step,
         animate: false
     };
+    colormaps = COLORMAPS;
     colorRange: [ number, number ] = ( this.defaultColorVariable.colorRange );
     controlPanel: FormGroup = new FormGroup({});
     colorbarLeftOffset = '0';
@@ -156,7 +42,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false
     };
     renderDebouncer: Subject<string> = new Subject<string>();
-    session: { call: (arg0: string, arg1: any[]) => Promise<any>; };
+    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
         floor: this.defaultThresholdVariable.colorRange[0],
@@ -165,48 +51,49 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false
     };
     thresholdRange: [number, number] = ( this.defaultThresholdVariable.colorRange );
-    userColormaps: { [parameter: string]: { displayName: string, serverName: string } } = {};
+    userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     userThresholdRanges: { [parameter: string]: [ number, number ] } = {};
+    variableConfigurations = VARIABLE_CONFIG;
     zoomState: 'on' | 'off' = 'on';
 
     constructor() {
         // initialize FormGroup with default control panel names and values
-        Object.keys(this.CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
-            this.controlPanel.addControl(controlName, new FormControl( this.CONTROL_PANEL_DEFAULT_VALUES[controlName]));
+        Object.keys(CONTROL_PANEL_DEFAULT_VALUES).forEach( controlName => {
+            this.controlPanel.addControl(controlName, new FormControl( CONTROL_PANEL_DEFAULT_VALUES[controlName]));
         });
         // create user objects from session storage if it exists, or from defaults
         // colormaps
         if ( sessionStorage.getItem('colormaps') ) {
             this.userColormaps = JSON.parse(sessionStorage.getItem('colormaps'));
         } else {
-            Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
-                this.userColormaps[variable] = this.VARIABLE_CONFIG[variable].defaultColormap;
+            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
+                this.userColormaps[variable] = VARIABLE_CONFIG[variable].defaultColormap;
             });
         }
         // colorRanges
         if ( sessionStorage.getItem('colorRanges')) {
             this.userColorRanges = JSON.parse(sessionStorage.getItem('colorRanges'));
         } else {
-            Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
-                this.userColorRanges[variable] = this.VARIABLE_CONFIG[variable].colorRange;
+            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
+                this.userColorRanges[variable] = VARIABLE_CONFIG[variable].colorRange;
             });
         }
         // opacities
         if ( sessionStorage.getItem('opacities')) {
             this.userOpacities = JSON.parse(sessionStorage.getItem('opacities'));
         } else {
-            Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
-                this.userOpacities[variable] = this.CONTROL_PANEL_DEFAULT_VALUES.opacity;
+            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
+                this.userOpacities[variable] = CONTROL_PANEL_DEFAULT_VALUES.opacity;
             });
         }
         // thresholdRanges
         if ( sessionStorage.getItem('thresholdRanges')) {
             this.userThresholdRanges = JSON.parse(sessionStorage.getItem('thresholdRanges'));
         } else {
-            Object.keys(this.VARIABLE_CONFIG).forEach( (variable) => {
-                this.userThresholdRanges[variable] = this.VARIABLE_CONFIG[variable].thresholdRange;
+            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
+                this.userThresholdRanges[variable] = VARIABLE_CONFIG[variable].thresholdRange;
             });
         }
 
@@ -216,8 +103,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
+                this.saveUserSettings();
             }
-        ));
+            ));
     }
 
     ngOnChanges(): void {
@@ -227,7 +115,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(this.CONTROL_PANEL_DEFAULT_VALUES);
+            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(CONTROL_PANEL_DEFAULT_VALUES);
             this.controlPanel.setValue( initialFormValues );
         }
     }
@@ -266,7 +154,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 // this will render every time any named control in the form is updated
                 // the threshold range and color range are tracked outside of the form and are updated and rendered manually
                 this.renderDebouncer.next();
-                this.saveUserSettings();
             }));
         // subscribe to color variable changes, color variable is tied to colormap (form subscription via setValue for server),
         // opacity (form subscription via setValue for server), and color range (update via updateColorRange())
@@ -336,7 +223,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         }
     }
 
-    updateVisibilityControls(controlStates: { [parameter: string]: any; }) {
+    updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
@@ -354,7 +241,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         this.colorRange = [ event.value, event.highValue ];
         this.userColorRanges[ this.colorVariableServerName ] = clone(this.colorRange);
-        this.session.call('pv.enlil.set_range', [ this.colorVariableServerName , this.colorRange ] );
+        this.session.call('pv.enlil.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }
 
