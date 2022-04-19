@@ -102,7 +102,7 @@ This will:
 
 ### Deploy to AWS
 
-Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/` to AWS. The deployed site should reflect the code contained in the `main` branch.
+Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/swt/` to AWS. The deployed site should reflect the code contained in the `main` branch.
 
 <!-- ### Deploy to GitHub pages
 
