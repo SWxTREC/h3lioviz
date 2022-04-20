@@ -41,7 +41,9 @@ See 'Development server' below.
 
 A backend with the ENLIL paraview server is required.
 
-`npm run start:prod` will use the production backend deployed to AWS.
+`npm run start:dev` or `npm run start:prod` to use the production backend deployed to AWS.
+
+`npm start` is the local development environment and will require a local backend. The 'dev' deploy can be found at enlil.dev.swx-trec.com
 
 To test with a local paraview server, follow the README instructions in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
 
@@ -86,13 +88,12 @@ Cleaning up old images is also a good idea from time to time. To clean up your u
 When you are ready to push your image, contact the web team infrastructure group for credentials and instructions on how to log in. Once this is complete you can run `./docker-publish.sh` to publish your image to the server.
 
 ## Deploy ENLIL
-<!-- Who needs to be made aware of a release? What limitations/restrictions are there before making a
-release? For example, is there an explicit vetting process, or perhaps certain time windows when a
-release shouldn't be made? -->
+Merges to the `dev` branch will automatically be deployed to enlil.dev.swx-trec.com. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
 
-### Bump the version
+Be sure to `npm run lint && npm test` before merging to the `dev` branch.
 
-From the `dev` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
+### Version and release
+Once enlil.dev.swx-trec.com is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
 
 This will:
 
@@ -102,7 +103,11 @@ This will:
 
 ### Deploy to AWS
 
-Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/swt/` to AWS. The deployed site should reflect the code contained in the `main` branch.
+Run this Jenkins job (TK) to make a production build and deploy to the production AWS environment.
+
+Until the job is available, you can manually upload the files with the commented instructions below.
+
+<!-- Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/swt/` to AWS. The deployed site should reflect the code contained in the `main` branch. -->
 
 <!-- ### Deploy to GitHub pages
 
