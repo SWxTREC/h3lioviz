@@ -18,12 +18,12 @@
                     "builder": "@angular-builders/custom-webpack:browser",
                     "options": {
                         "allowedCommonJsDependencies": [
-                          "aws-sdk",
-                          "lodash",
-                          "moment",
-                          "moment-timezone",
-                          "rxjs",
-                          "seedrandom"
+                            "aws-sdk",
+                            "lodash",
+                            "moment",
+                            "moment-timezone",
+                            "rxjs",
+                            "seedrandom"
                         ],
 
                         "aot": true,
@@ -73,6 +73,33 @@
                                     "maximumWarning": "6kb"
                                 }
                             ]
+                        },
+                        "dev": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.dev.ts"
+                                }
+                            ],
+                            "optimization": true,
+                            "outputHashing": "all",
+                            "sourceMap": false,
+                            "namedChunks": false,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": false,
+                            "buildOptimizer": true,
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "6kb"
+                                }
+                            ]
                         }
                     }
                 },
@@ -84,6 +111,9 @@
                     "configurations": {
                         "production": {
                             "browserTarget": "swt:build:production"
+                        },
+                        "dev": {
+                            "browserTarget": "swt:build:dev"
                         }
                     }
                 },
