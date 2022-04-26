@@ -117,7 +117,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
             if (!clientToConnect.isConnected()) {
                 this.errorMessage = 'Failed to connect to socket';
             }
-        }, 1000 * 10);
+        }, 1000 * 15);
     }
 
     getTimestep( timeIndex: number ) {
