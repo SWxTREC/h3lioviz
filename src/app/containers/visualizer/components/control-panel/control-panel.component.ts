@@ -26,6 +26,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colorOptions: Options = {
         floor: this.defaultColorVariable.entireRange[0],
         ceil: this.defaultColorVariable.entireRange[1],
+        combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultColorVariable.step,
         animate: false
     };
@@ -38,6 +39,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
+        combineLabels: (min, max) => min + ' to ' + max,
         step: 10,
         animate: false
     };
@@ -47,6 +49,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     thresholdOptions: Options = {
         floor: this.defaultThresholdVariable.entireRange[0],
         ceil: this.defaultThresholdVariable.entireRange[1],
+        combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultThresholdVariable.step,
         animate: false
     };
@@ -167,6 +170,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.colorOptions = {
                     floor: newColorVariable.entireRange[0],
                     ceil: newColorVariable.entireRange[1],
+                    combineLabels: (min, max) => min + ' to ' + max,
                     step: newColorVariable.step,
                     animate: false
                 };
@@ -185,6 +189,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.thresholdOptions = {
                     floor: newThresholdVariable.entireRange[0],
                     ceil: newThresholdVariable.entireRange[1],
+                    combineLabels: (min, max) => min + ' to ' + max,
                     step: newThresholdVariable.step,
                     animate: false
                 };
