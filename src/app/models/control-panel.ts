@@ -123,7 +123,6 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
     colormap: VARIABLE_CONFIG.velocity.defaultColormap,
     cme: true,
     latSlice: true,
-    lonArrows: false,
     lonSlice: true,
     lonStreamlines: false,
     opacity: [ 70, 100 ] as [ number, number ],
