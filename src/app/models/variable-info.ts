@@ -2,12 +2,13 @@ export interface IVariableInfo {
     serverName: string;
     displayName: string;
     units: string;
-    colorRange: [number, number];
+    defaultColorRange: [ number, number ];
     defaultColormap: {
         displayName: string;
         serverName: string;
     };
-    thresholdRange: [number, number];
+    defaultThresholdRange: [ number, number ];
+    entireRange: [ number, number ]
     step: number;
 }
 
