@@ -112,12 +112,12 @@ export class VisualizerComponent implements OnInit, OnDestroy {
             }
         });
 
-        // if the socket doesn't connect after 10 seconds, show an error
+        // if the socket doesn't connect after a delay, show an error
         setTimeout( () => {
             if (!clientToConnect.isConnected()) {
                 this.errorMessage = 'Failed to connect to socket';
             }
-        }, 1000 * 10);
+        }, 1000 * 15);
     }
 
     getTimestep( timeIndex: number ) {

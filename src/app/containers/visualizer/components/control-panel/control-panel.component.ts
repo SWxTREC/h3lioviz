@@ -24,13 +24,14 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     defaultColorVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.colorVariable;
     defaultThresholdVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.thresholdVariable;
     colorOptions: Options = {
-        floor: this.defaultColorVariable.colorRange[0],
-        ceil: this.defaultColorVariable.colorRange[1],
+        floor: this.defaultColorVariable.entireRange[0],
+        ceil: this.defaultColorVariable.entireRange[1],
+        combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultColorVariable.step,
         animate: false
     };
     colormaps = COLORMAPS;
-    colorRange: [ number, number ] = ( this.defaultColorVariable.colorRange );
+    colorRange: [ number, number ] = ( this.defaultColorVariable.defaultColorRange );
     controlPanel: FormGroup = new FormGroup({});
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
@@ -38,6 +39,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
+        combineLabels: (min, max) => min + ' to ' + max,
         step: 10,
         animate: false
     };
@@ -45,12 +47,13 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
-        floor: this.defaultThresholdVariable.colorRange[0],
-        ceil: this.defaultThresholdVariable.colorRange[1],
+        floor: this.defaultThresholdVariable.entireRange[0],
+        ceil: this.defaultThresholdVariable.entireRange[1],
+        combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultThresholdVariable.step,
         animate: false
     };
-    thresholdRange: [number, number] = ( this.defaultThresholdVariable.colorRange );
+    thresholdRange: [number, number] = ( this.defaultThresholdVariable.defaultThresholdRange );
     userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
@@ -77,7 +80,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             this.userColorRanges = JSON.parse(sessionStorage.getItem('colorRanges'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userColorRanges[variable] = VARIABLE_CONFIG[variable].colorRange;
+                this.userColorRanges[variable] = VARIABLE_CONFIG[variable].defaultColorRange;
             });
         }
         // opacities
@@ -93,7 +96,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             this.userThresholdRanges = JSON.parse(sessionStorage.getItem('thresholdRanges'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userThresholdRanges[variable] = VARIABLE_CONFIG[variable].thresholdRange;
+                this.userThresholdRanges[variable] = VARIABLE_CONFIG[variable].defaultThresholdRange;
             });
         }
 
@@ -165,8 +168,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.controlPanel.controls.opacity.setValue( this.userOpacities[ this.colorVariableServerName ] );
                 const variableColorRange = this.userColorRanges[ this.colorVariableServerName ];
                 this.colorOptions = {
-                    floor: newColorVariable.colorRange[0],
-                    ceil: newColorVariable.colorRange[1],
+                    floor: newColorVariable.entireRange[0],
+                    ceil: newColorVariable.entireRange[1],
+                    combineLabels: (min, max) => min + ' to ' + max,
                     step: newColorVariable.step,
                     animate: false
                 };
@@ -183,8 +187,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             .pipe( debounceTime( 300 ) ).subscribe( newThresholdVariable => {
                 const thresholdVariableServerName = newThresholdVariable.serverName;
                 this.thresholdOptions = {
-                    floor: newThresholdVariable.colorRange[0],
-                    ceil: newThresholdVariable.colorRange[1],
+                    floor: newThresholdVariable.entireRange[0],
+                    ceil: newThresholdVariable.entireRange[1],
+                    combineLabels: (min, max) => min + ' to ' + max,
                     step: newThresholdVariable.step,
                     animate: false
                 };
