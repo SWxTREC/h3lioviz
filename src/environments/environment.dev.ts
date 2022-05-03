@@ -10,11 +10,11 @@ export const environment = {
     aws: {
         api: 'https://apigw.dev.swx-trec.com/enlil',
         cognito: {
-            appClientId: 'c5on4cifsqka5mrqcbbcjd3ur',
+            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
             region: 'us-west-2',
-            userPoolId: 'OigGyk05N',
+            userPoolId: 'm1uXvZDys',
             loginPage: 'https://dev-swx-trec.auth.us-west-2.amazoncognito.com',
-            identityPoolId: '801079fe-6503-4750-9012-22f984383f53'
+            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
         }
     },
     production: true,
