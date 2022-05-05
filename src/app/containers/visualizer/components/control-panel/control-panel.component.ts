@@ -1,6 +1,7 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { MatSliderChange } from '@angular/material/slider';
 import { clone, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -256,6 +257,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.thresholdRange = clone(newRange);
         this.userThresholdRanges[ thresholdVariableServerName ] = clone(newRange);
         this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ] );
+        this.renderDebouncer.next();
+    }
+
+    updateEclipticPlaneAngle( event: MatSliderChange ) {
+        console.log({ event })
+        this.session.call('pv.enlil.rotate_plane', [ 'lon', event.value ] );
         this.renderDebouncer.next();
     }
 }

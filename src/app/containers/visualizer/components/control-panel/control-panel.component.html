@@ -20,6 +20,14 @@
     <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic slice</mat-checkbox>
+            <ng-container *ngIf="controlPanel.value.lonSlice">
+                <div class="control-panel__header">
+                    <div>
+                        <strong>Angle of ecliptic plane (degrees)</strong>
+                    </div>
+                </div>
+                <mat-slider min="-90" max="90" step="1" value="0" thumbLabel="true" (change)="updateEclipticPlaneAngle($event)"></mat-slider>
+            </ng-container>
         <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic streamlines</mat-checkbox>
         <mat-checkbox color="primary" formControlName="threshold">Select a threshold…</mat-checkbox>
