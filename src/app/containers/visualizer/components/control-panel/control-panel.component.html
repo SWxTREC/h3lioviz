@@ -21,12 +21,25 @@
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic slice</mat-checkbox>
             <ng-container *ngIf="controlPanel.value.lonSlice">
-                <div class="control-panel__header">
-                    <div>
-                        <strong>Angle of ecliptic plane (degrees)</strong>
+                <div class="control-panel__controls control-panel__controls--space-around">
+                    <mat-form-field
+                        class="control-panel__control control-panel__control--narrow">
+                        <mat-label>Angle of ecliptic slice (&deg;)</mat-label>
+                        <input matInput
+                            type="number"
+                            [min]="lonSliceOptions.validRange[0]"
+                            [max]="lonSliceOptions.validRange[1]"
+                            [value]="lonSliceAngleCss"
+                            [step]="lonSliceOptions.stepSize"
+                            (change)="updateLonSliceAngle($event)"
+                        >
+                        <mat-hint>Above (-) or below (+) the earth from {{ lonSliceOptions.validRange[0] }} to {{ lonSliceOptions.validRange[1] }}</mat-hint>
+                    </mat-form-field>
+                    <div class="control-panel__relative-container">
+                        <div class="earth-dot"></div>
+                        <mat-slider min="-100" max="100" disabled="true" value="0" [style.transform]="'rotate(' + lonSliceAngleCss + 'deg)'"></mat-slider>
                     </div>
                 </div>
-                <mat-slider min="-90" max="90" step="1" value="0" thumbLabel="true" (change)="updateEclipticPlaneAngle($event)"></mat-slider>
             </ng-container>
         <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
         <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic streamlines</mat-checkbox>

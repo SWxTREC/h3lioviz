@@ -1,6 +1,9 @@
 @import 'src/theme/theme-colors.scss';
 
 .control-panel {
+    &__relative-container {
+        position: relative
+    }
     &__block-label {
         display: flex;
         flex-direction: column;
@@ -11,16 +14,23 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
         &--child {
             margin-left: 2rem;
         }
         &--column {
             flex-direction: column;
         }
+        &--space-around {
+            justify-content: space-around;
+        }
     }
     &__control {
         &--full-width {
             width: 100%;
+        }
+        &--narrow {
+            width: 150px;
         }
     }
     &__dropdown-block {
@@ -83,4 +93,12 @@
             border: 2px solid #5E9ED6;
         }
     }
+}
+
+.earth-dot {
+    position: absolute;
+    border: 2px solid black;
+    border-radius: 50%;
+    right: 27px;
+    top: 22px;
 }

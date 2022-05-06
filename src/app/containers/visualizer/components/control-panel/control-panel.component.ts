@@ -37,6 +37,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
     colorVariableServerName: string = this.defaultColorVariable.serverName;
+    lonSliceAngleCss = parseFloat('0').toFixed(1);
+    lonSliceOptions = {
+        validRange: [ -10, 10 ],
+        stepSize: 0.5
+    }
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
@@ -260,9 +265,17 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.renderDebouncer.next();
     }
 
-    updateEclipticPlaneAngle( event: MatSliderChange ) {
-        console.log({ event })
-        this.session.call('pv.enlil.rotate_plane', [ 'lon', event.value ] );
+    updateLonSliceAngle( event: any ) {
+        // get the valid range the angle
+        const validRange: number[] = this.lonSliceOptions.validRange;
+        const inputValue = event.target.value;
+        // limit to valid range
+        const validInputValue = inputValue < 0 ? Math.max( validRange[0], inputValue ) : Math.min( validRange[1], inputValue );
+        // format value
+        const formattedValidValue = parseFloat( validInputValue.toString() ).toFixed(1);
+        this.lonSliceAngleCss = formattedValidValue;
+        // the angle from sun to earth for the paraview server is opposite the css angle
+        this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( -this.lonSliceAngleCss ) ] );
         this.renderDebouncer.next();
     }
 }
