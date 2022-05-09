@@ -24,6 +24,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     defaultColorVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.colorVariable;
     defaultThresholdVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.thresholdVariable;
+    defaultContourVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.contourVariable;
     colorOptions: Options = {
         floor: this.defaultColorVariable.entireRange[0],
         ceil: this.defaultColorVariable.entireRange[1],
@@ -37,6 +38,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
     colorVariableServerName: string = this.defaultColorVariable.serverName;
+    contourOptions = {
+        validRange: [ this.defaultContourVariable.entireRange[0], this.defaultContourVariable.entireRange[1] ],
+        stepSize: this.defaultContourVariable.step
+    }
+    contourSelections: number;
     lonSliceAngleCss: string;
     lonSliceOptions = {
         validRange: [ -10, 10 ],
@@ -52,6 +58,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     showAngleAdjust = false;
+    showContourSettings = false;
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
         floor: this.defaultThresholdVariable.entireRange[0],
@@ -63,6 +70,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     thresholdRange: [number, number] = ( this.defaultThresholdVariable.defaultThresholdRange );
     userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
+    userContourSelections: { [parameter: string]: number } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     userThresholdRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
@@ -90,6 +98,20 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.userColorRanges[variable] = VARIABLE_CONFIG[variable].defaultColorRange;
             });
         }
+        // contours
+        if ( sessionStorage.getItem('countours')) {
+            this.userContourSelections = JSON.parse(sessionStorage.getItem('contours'));
+        } else {
+            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
+                this.userContourSelections[variable] = 0;
+            });
+        }
+        // lonSliceAngle
+        if ( sessionStorage.getItem('lonSliceAngle')) {
+            this.lonSliceAngleCss = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
+        } else {
+            this.lonSliceAngleCss = parseFloat('0').toFixed(1);
+        }
         // opacities
         if ( sessionStorage.getItem('opacities')) {
             this.userOpacities = JSON.parse(sessionStorage.getItem('opacities'));
@@ -105,12 +127,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
                 this.userThresholdRanges[variable] = VARIABLE_CONFIG[variable].defaultThresholdRange;
             });
-        }
-        // lonSliceAngle
-        if ( sessionStorage.getItem('lonSliceAngle')) {
-            this.lonSliceAngleCss = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
-        } else {
-            this.lonSliceAngleCss = parseFloat('0').toFixed(1);
         }
 
         // debounce render
@@ -211,6 +227,17 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 const newThresholdRange = this.userThresholdRanges[ thresholdVariableServerName ];
                 this.updateThresholdRange( { value: newThresholdRange[0], highValue: newThresholdRange[1], pointerType: undefined });
             }));
+        // subscribe to contour variable changes and reset contour slider options, contour selections, and 'set_contours'
+        this.subscriptions.push( this.controlPanel.controls.contourVariable.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
+                const contourVariableServerName = newContourVariable.serverName;
+                this.contourOptions = {
+                    validRange: [ newContourVariable.entireRange[0], newContourVariable.entireRange[1] ],
+                    stepSize: this.defaultContourVariable.step
+                };
+                const newContourSelections = this.userContourSelections[ contourVariableServerName ];
+                this.updateContours( { source: undefined, value: newContourSelections });
+            }));
         // subscribe to opacity slider set user opacity per color variable and 'set_opacity'
         this.subscriptions.push( this.controlPanel.controls.opacity.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( () => {
@@ -262,6 +289,14 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.colorRange = [ event.value, event.highValue ];
         this.userColorRanges[ this.colorVariableServerName ] = clone(this.colorRange);
         this.session.call('pv.enlil.set_range', [ this.colorVariableServerName, this.colorRange ] );
+        this.renderDebouncer.next();
+    }
+
+    updateContours( event: MatSliderChange ) {
+        const contourVariableServerName = this.controlPanel.value.contourVariable.serverName;
+        this.contourSelections = event.value;
+        console.log( contourVariableServerName, this.contourSelections )
+        this.session.call('pv.enlil.set_contours', [ contourVariableServerName, [ this.contourSelections ] ] );
         this.renderDebouncer.next();
     }
 

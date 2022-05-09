@@ -121,6 +121,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
 export const CONTROL_PANEL_DEFAULT_VALUES = {
     colorVariable: VARIABLE_CONFIG.velocity,
     colormap: VARIABLE_CONFIG.velocity.defaultColormap,
+    contourVariable: VARIABLE_CONFIG.density,
     cme: true,
     latSlice: true,
     lonSlice: true,
