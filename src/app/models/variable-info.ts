@@ -7,7 +7,7 @@ export interface IVariableInfo {
         displayName: string;
         serverName: string;
     };
-    defaultThresholdRange: [ number, number ];
+    defaultSubsetRange: [ number, number ];
     entireRange: [ number, number ]
     step: number;
 }

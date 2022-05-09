@@ -42,7 +42,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
         defaultColormap: COLORMAPS.plasma,
-        defaultThresholdRange: [ 600, 900 ],
+        defaultSubsetRange: [ 600, 900 ],
         entireRange: [ 200, 1600 ],
         step: 50
     },
@@ -52,7 +52,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'r<sup>2</sup>N/cm<sup>3</sup>',
         defaultColorRange: [ 0, 30 ],
         defaultColormap: COLORMAPS.viridis,
-        defaultThresholdRange: [ 15, 30 ],
+        defaultSubsetRange: [ 15, 30 ],
         entireRange: [ 0, 60 ],
         step: 1
     },
@@ -62,7 +62,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
         defaultColorRange: [ 100000, 2500000 ],
         defaultColormap: COLORMAPS.viridis,
-        defaultThresholdRange: [ 500000, 10000000 ],
+        defaultSubsetRange: [ 500000, 10000000 ],
         entireRange: [ 100000, 10000000 ],
         step: 10000
     },
@@ -72,7 +72,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'K',
         defaultColorRange: [ 10000, 200000 ],
         defaultColormap: COLORMAPS.inferno,
-        defaultThresholdRange: [ 500000, 1000000 ],
+        defaultSubsetRange: [ 500000, 1000000 ],
         entireRange: [ 10000, 1000000 ],
         step: 10000
     },
@@ -82,7 +82,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
-        defaultThresholdRange: [ -30, 0 ],
+        defaultSubsetRange: [ -30, 0 ],
         entireRange: [ -100, 100 ],
         step: 5
     },
@@ -92,7 +92,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
-        defaultThresholdRange: [ -30, 0 ],
+        defaultSubsetRange: [ -30, 0 ],
         entireRange: [ -100, 100 ],
         step: 5
     },
@@ -102,7 +102,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
-        defaultThresholdRange: [ -30, 0 ],
+        defaultSubsetRange: [ -30, 0 ],
         entireRange: [ -100, 100 ],
         step: 5
     },
@@ -112,7 +112,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
-        defaultThresholdRange: [ -30, 0 ],
+        defaultSubsetRange: [ -30, 0 ],
         entireRange: [ -100, 100 ],
         step: 5
     }
@@ -123,9 +123,11 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
     colormap: VARIABLE_CONFIG.velocity.defaultColormap,
     contourVariable: VARIABLE_CONFIG.density,
     cme: true,
+    cmeContours: false,
     latSlice: true,
     lonSlice: true,
     lonStreamlines: false,
+    numberOfContours: 3,
     opacity: [ 70, 100 ] as [ number, number ],
     threshold: false,
     thresholdVariable: VARIABLE_CONFIG.density
