@@ -20,8 +20,39 @@
     <mat-divider class="control-panel__spacer"></mat-divider>
     <form [formGroup]="controlPanel" class="control-panel__controls control-panel__controls--column">
         <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="contourVariable">Select a CME contour surface…</mat-checkbox>
+        <div class="control-panel__more-info" [class.control-panel__more-info--expand]="controlPanel.value.contourVariable">
+            <ng-container *ngIf="controlPanel.value.contourVariable">
+                <mat-form-field class="control-panel__control control-panel__control--full-width">
+                    <mat-label>Contour variable</mat-label>
+                    <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
+                        <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
+                            {{ variable.value.displayName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div class="control-panel__header">
+                    <div>
+                        <strong>{{ controlPanel.value.contourVariable.displayName }} contour</strong>
+                        <small innerHTML=" ({{controlPanel.value.contourVariable.units}})"></small>
+                    </div>
+                </div>
+                <mat-slider
+                    class="control-panel__control control-panel__control--full-width"
+                    [min]="contourOptions.validRange[0]"
+                    [max]="contourOptions.validRange[1]"
+                    [step]="contourOptions.stepSize"
+                    [value]="contourSelections"
+                    thumbnails="true"
+                    (change)="updateContours($event)">
+                </mat-slider>
+            </ng-container>
+        </div>
         <div class="control-panel__controls control-panel__controls--align">
-            <mat-checkbox color="primary" formControlName="lonSlice">Ecliptic slice {{ lonSliceAngleCss !== '0' ? 'at ' + lonSliceAngleCss + '&deg;' : '' }}</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="lonSlice">
+                Ecliptic slice
+                <span *ngIf="controlPanel.value.lonSlice">{{ lonSliceAngleCss !== '0' ? 'at ' + lonSliceAngleCss + '&deg;' : '' }}</span>
+            </mat-checkbox>
             <button
                 *ngIf="controlPanel.value.lonSlice"
                 mat-raised-button color="primary"
