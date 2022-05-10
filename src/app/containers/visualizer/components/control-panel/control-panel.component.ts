@@ -359,7 +359,10 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
-            if (typeof controlStates[ controlName ] === 'boolean') {
+            if ( controlName === 'satellites' ) {
+                const state = controlStates[ controlName ] === true ? 'on' : 'off';
+                this.session.call( 'pv.enlil.toggle_satellites', [ state ] );
+            } else if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 this.session.call( 'pv.enlil.visibility', [ name, state ] );
