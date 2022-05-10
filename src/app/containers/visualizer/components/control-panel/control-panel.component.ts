@@ -279,6 +279,13 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.renderDebouncer.next();
     }
 
+    scaleColorRange() {
+        this.session.call( 'pv.enlil.get_variable_range',[ this.colorVariableServerName ]) .then( range => {
+            console.log({ range })
+            this.updateColorRange( { value: range[0], highValue: range[1], pointerType: undefined });
+        })
+    }
+
     toggleZoom() {
         const getZoom = this.pvView.get().rpcWheelEvent;
         // if zoom is on, turn it off and vice versa
