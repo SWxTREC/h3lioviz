@@ -65,7 +65,7 @@
                 {{ showAngleAdjust ? 'done' : 'adjust angle'}}
             </button>
         </div>
-        <div class="control-panel__more-info" [class.control-panel__more-info--expand]="showAngleAdjust">
+        <div *ngIf="controlPanel.value.lonSlice" class="control-panel__more-info" [class.control-panel__more-info--expand]="showAngleAdjust">
             <ng-container *ngIf="showAngleAdjust">
                 <div class="control-panel__controls control-panel__controls--space-around">
                     <mat-form-field class="control-panel__control control-panel__control--narrow">
