@@ -158,7 +158,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(CONTROL_PANEL_DEFAULT_VALUES);
             this.controlPanel.setValue( initialFormValues );
-            this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( -this.lonSliceAngle ) ] );
+            this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
         }
     }
 
