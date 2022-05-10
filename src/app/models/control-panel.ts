@@ -135,5 +135,7 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
 };
 
 export const INITIAL_TICK_STEP =
-    ( CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] - CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
-    (  CONTROL_PANEL_DEFAULT_VALUES.numberOfContours - 1 );
+    // the difference between the high value and the low value, divided by numberOfContours - 1
+    ( CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] -
+        CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
+    ( CONTROL_PANEL_DEFAULT_VALUES.numberOfContours - 1 );

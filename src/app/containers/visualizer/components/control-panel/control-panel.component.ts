@@ -51,13 +51,13 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         animate: false,
         showTicksValues: true,
         tickStep: INITIAL_TICK_STEP,
-        ticksArray: [this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP]
+        ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
     lonSliceAngleCss: string;
     lonSliceOptions = {
         validRange: [ -10, 10 ],
         stepSize: 0.5
-    }
+    };
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
@@ -68,7 +68,6 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     showAngleAdjust = false;
-    showContourSettings = false;
     subscriptions: Subscription[] = [];
     thresholdOptions: Options = {
         floor: this.defaultThresholdVariable.entireRange[0],
@@ -230,7 +229,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.userColormaps[ this.colorVariableServerName ] = clone(newColormapObject);
                 this.session.call('pv.enlil.set_colormap', [ this.colorVariableServerName, newColormapObject.serverName ]);
             }));
-        // subscribe to CONTOUR NUMBER changes and update contour slider and countour array for server
+        // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
         this.subscriptions.push( this.controlPanel.controls.numberOfContours.valueChanges
             .pipe( debounceTime(300) ).subscribe( ( value: number ) => {
                 // TODO: better validation and include possibility of 0 and 1
@@ -280,10 +279,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     scaleColorRange() {
-        this.session.call( 'pv.enlil.get_variable_range',[ this.colorVariableServerName ]) .then( range => {
-            console.log({ range })
+        this.session.call( 'pv.enlil.get_variable_range', [ this.colorVariableServerName ]).then( range => {
             this.updateColorRange( { value: range[0], highValue: range[1], pointerType: undefined });
-        })
+        });
     }
 
     toggleZoom() {
@@ -316,7 +314,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         const numberOfContours = this.controlPanel.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
         this.contourRange = clone( newRange );
-        const indexArray = [...Array(numberOfContours).keys()];
+        const indexArray = [ ...Array(numberOfContours).keys() ];
         const step = numberOfContours > 2 ? this.getTickStep() : undefined;
         this.contourArray = numberOfContours > 2 ?
             indexArray.map( indexValue => this.contourRange[0] + (indexValue * step) ) :
@@ -328,13 +326,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             ceil: contourVariable.entireRange[1],
             combineLabels: (min, max) => min + ' to ' + max,
             step: contourVariable.step,
-            animate: false
-        }
-        if ( step ) {
-            newOptions.showTicksValues = true,
-            newOptions.tickStep = step;
-            newOptions.ticksArray = trimmedArray
-        }
+            animate: false,
+            showTicksValues: !!step,
+            tickStep: step ?? null,
+            ticksArray: step ? trimmedArray : null
+        };
         this.contourOptions = newOptions;
 
         this.session.call('pv.enlil.set_contours', [ contourVariable.serverName, this.contourArray ]);

@@ -8,7 +8,7 @@ export interface IVariableInfo {
         serverName: string;
     };
     defaultSubsetRange: [ number, number ];
-    entireRange: [ number, number ]
+    entireRange: [ number, number ];
     step: number;
 }
 
