@@ -53,7 +53,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         tickStep: INITIAL_TICK_STEP,
         ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
-    lonSliceAngleCss: string;
+    lonSliceAngle: string;
     lonSliceOptions = {
         validRange: [ -10, 10 ],
         stepSize: 0.5
@@ -117,9 +117,9 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         }
         // lonSliceAngle
         if ( sessionStorage.getItem('lonSliceAngle')) {
-            this.lonSliceAngleCss = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
+            this.lonSliceAngle = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
         } else {
-            this.lonSliceAngleCss = parseFloat('0').toFixed(1);
+            this.lonSliceAngle = parseFloat('0').toFixed(1);
         }
         // opacities
         if ( sessionStorage.getItem('opacities')) {
@@ -158,7 +158,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(CONTROL_PANEL_DEFAULT_VALUES);
             this.controlPanel.setValue( initialFormValues );
-            this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( -this.lonSliceAngleCss ) ] );
+            this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( -this.lonSliceAngle ) ] );
         }
     }
 
@@ -193,7 +193,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         sessionStorage.setItem('colorRanges', JSON.stringify( this.userColorRanges ));
         sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
         sessionStorage.setItem('thresholdRanges', JSON.stringify( this.userThresholdRanges ));
-        sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngleCss ));
+        sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngle ));
     }
 
     setFormSubscriptions() {
@@ -345,9 +345,8 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         const validInputValue: number = value < 0 ? Math.max( validRange[0], value) : Math.min( validRange[1], value);
         // format value
         const formattedValidValue: string = parseFloat( validInputValue.toString() ).toFixed(1);
-        this.lonSliceAngleCss = formattedValidValue;
-        // the angle from sun to earth for the paraview server is opposite the css angle
-        this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( -this.lonSliceAngleCss ) ] );
+        this.lonSliceAngle = formattedValidValue;
+        this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
         this.renderDebouncer.next();
     }
 

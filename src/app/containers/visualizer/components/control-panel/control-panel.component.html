@@ -55,7 +55,7 @@
         <div class="control-panel__controls control-panel__controls--align">
             <mat-checkbox color="primary" formControlName="lonSlice">
                 Ecliptic slice
-                <span *ngIf="controlPanel.value.lonSlice">{{ lonSliceAngleCss !== '0' ? 'at ' + lonSliceAngleCss + '&deg;' : '' }}</span>
+                <span *ngIf="controlPanel.value.lonSlice">{{ lonSliceAngle !== '0' ? 'at ' + lonSliceAngle + '&deg;' : '' }}</span>
             </mat-checkbox>
             <button
                 *ngIf="controlPanel.value.lonSlice"
@@ -70,12 +70,12 @@
                 <div class="control-panel__controls control-panel__controls--space-around">
                     <mat-form-field class="control-panel__control control-panel__control--narrow">
                         <mat-label>Angle of ecliptic slice (&deg;)</mat-label>
-                        <input matInput type="number" [min]="lonSliceOptions.validRange[0]" [max]="lonSliceOptions.validRange[1]" [value]="lonSliceAngleCss" [step]="lonSliceOptions.stepSize" (change)="updateLonSliceAngle($event)">
-                        <mat-hint>Above (-) or below (+) the earth from {{ lonSliceOptions.validRange[0] }} to +{{ lonSliceOptions.validRange[1] }}</mat-hint>
+                        <input matInput type="number" [min]="lonSliceOptions.validRange[0]" [max]="lonSliceOptions.validRange[1]" [value]="lonSliceAngle" [step]="lonSliceOptions.stepSize" (change)="updateLonSliceAngle($event)">
+                        <mat-hint>From {{ lonSliceOptions.validRange[1] }} to {{ lonSliceOptions.validRange[0] }}</mat-hint>
                     </mat-form-field>
                     <div class="control-panel__relative-container">
                         <div class="earth-dot"></div>
-                        <mat-slider min="-100" max="100" disabled="true" value="0" [style.transform]="'rotate(' + lonSliceAngleCss + 'deg)'"></mat-slider>
+                        <mat-slider min="-100" max="100" disabled="true" value="0" [style.transform]="'rotate(' + -lonSliceAngle + 'deg)'"></mat-slider>
                     </div>
                 </div>
             </ng-container>
