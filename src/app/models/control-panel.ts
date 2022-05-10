@@ -121,7 +121,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
 export const CONTROL_PANEL_DEFAULT_VALUES = {
     colorVariable: VARIABLE_CONFIG.velocity,
     colormap: VARIABLE_CONFIG.velocity.defaultColormap,
-    contourVariable: VARIABLE_CONFIG.density,
+    contourVariable: VARIABLE_CONFIG.velocity,
     cme: true,
     cmeContours: false,
     latSlice: true,
@@ -132,3 +132,7 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
     threshold: false,
     thresholdVariable: VARIABLE_CONFIG.density
 };
+
+export const INITIAL_TICK_STEP =
+    ( CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] - CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
+    (  CONTROL_PANEL_DEFAULT_VALUES.numberOfContours - 1 );

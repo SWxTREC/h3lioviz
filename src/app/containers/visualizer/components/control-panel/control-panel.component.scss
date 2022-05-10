@@ -13,6 +13,9 @@
             align-items: center;
             margin: 0;
         }
+        &--center {
+            text-align: center;
+        }
         &--child {
             margin-left: 2rem;
         }
@@ -39,7 +42,6 @@
     &__header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
     }
     &__hint {
         font-size: small;
@@ -93,6 +95,14 @@
 
         .ngx-slider .ngx-slider-pointer:after {
             display: none;
+        }
+
+        .ngx-slider-tick {
+            left: -10px;
+        }
+
+        .ngx-slider-ticks-values-under .ngx-slider-tick-value {
+            bottom: 20px;
         }
 
         .ngx-slider-active {

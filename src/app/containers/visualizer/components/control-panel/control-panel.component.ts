@@ -7,6 +7,7 @@ import { debounceTime } from 'rxjs/operators';
 import {
     COLORMAPS,
     CONTROL_PANEL_DEFAULT_VALUES,
+    INITIAL_TICK_STEP,
     IVariableInfo,
     KEYBOARD_SHORTCUTS,
     VARIABLE_CONFIG
@@ -37,15 +38,21 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
     colorVariableServerName: string = this.defaultColorVariable.serverName;
+    // contourArray keeps track of the array of contour values sent to the server
+    // the numbers are calculated from the contour range and the number of contours
+    contourArray: number[] = [];
+    // contourRange keeps track of the user settings on the contour range slider
+    contourRange: [number, number] = ( this.defaultContourVariable.defaultSubsetRange );
     contourOptions: Options = {
         floor: this.defaultContourVariable.entireRange[0],
         ceil: this.defaultContourVariable.entireRange[1],
         combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultContourVariable.step,
-        animate: false
-    }
-    contourRange: [number, number] = ( this.defaultContourVariable.defaultSubsetRange );
-    contourSelections: number;
+        animate: false,
+        showTicksValues: true,
+        tickStep: INITIAL_TICK_STEP,
+        ticksArray: [this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP]
+    };
     lonSliceAngleCss: string;
     lonSliceOptions = {
         validRange: [ -10, 10 ],
@@ -102,7 +109,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             });
         }
         // contours
-        if ( sessionStorage.getItem('countourRanges')) {
+        if ( sessionStorage.getItem('contourRanges')) {
             this.userContourRanges = JSON.parse(sessionStorage.getItem('contourRanges'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
@@ -170,6 +177,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         return offset / fullRange * 100 + '%';
     }
 
+    getTickStep(): number {
+        const numberOfContours = this.controlPanel.value.numberOfContours;
+        const step = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
+        return Number( step.toFixed(1) );
+    }
+
     resetZoom() {
         this.pvView.get().viewStream.resetCamera();
     }
@@ -179,6 +192,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         sessionStorage.setItem('opacities', JSON.stringify( this.userOpacities ));
         sessionStorage.setItem('colormaps', JSON.stringify( this.userColormaps ));
         sessionStorage.setItem('colorRanges', JSON.stringify( this.userColorRanges ));
+        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
         sessionStorage.setItem('thresholdRanges', JSON.stringify( this.userThresholdRanges ));
         sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngleCss ));
     }
@@ -216,17 +230,18 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 this.userColormaps[ this.colorVariableServerName ] = clone(newColormapObject);
                 this.session.call('pv.enlil.set_colormap', [ this.colorVariableServerName, newColormapObject.serverName ]);
             }));
-        // subscribe to CONTOUR VARIABLE changes and reset contour slider options, contour selections, and 'set_contours'
+        // subscribe to CONTOUR NUMBER changes and update contour slider and countour array for server
+        this.subscriptions.push( this.controlPanel.controls.numberOfContours.valueChanges
+            .pipe( debounceTime(300) ).subscribe( ( value: number ) => {
+                // TODO: better validation and include possibility of 0 and 1
+                if ( value > 1 ) {
+                    this.updateContourRange( { value: this.contourRange[0], highValue: this.contourRange[1], pointerType: undefined });
+                }
+            }));
+        // subscribe to CONTOUR VARIABLE changes and call update contour function with new contour variable values
         this.subscriptions.push( this.controlPanel.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
-                this.contourOptions = {
-                    floor: newContourVariable.entireRange[0],
-                    ceil: newContourVariable.entireRange[1],
-                    combineLabels: (min, max) => min + ' to ' + max,
-                    step: this.defaultColorVariable.step,
-                    animate: false
-                };
                 const newContourRange = this.userContourRanges[ contourVariableServerName ];
                 this.updateContourRange( { value: newContourRange[0], highValue: newContourRange[1], pointerType: undefined });
             }));
@@ -289,12 +304,33 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     updateContourRange( event: ChangeContext ) {
-        const contourVariableServerName: string = this.controlPanel.value.contourVariable.serverName;
+        const contourVariable: IVariableInfo = this.controlPanel.value.contourVariable;
         const newRange: [ number, number ] = [ event.value, event.highValue ];
+        const numberOfContours = this.controlPanel.value.numberOfContours;
+        this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
         this.contourRange = clone( newRange );
-        this.userContourRanges[ contourVariableServerName ] = clone( newRange );
-        // TODO: add in the number of contours and do the calculation for the array to pass to the server
-        this.session.call('pv.enlil.set_contours', [ contourVariableServerName, this.contourRange]);
+        const indexArray = [...Array(numberOfContours).keys()];
+        const step = numberOfContours > 2 ? this.getTickStep() : undefined;
+        this.contourArray = numberOfContours > 2 ?
+            indexArray.map( indexValue => this.contourRange[0] + (indexValue * step) ) :
+            clone(newRange);
+        const trimmedArray: number[] = this.contourArray.slice(1, -1);
+
+        const newOptions: Options = {
+            floor: contourVariable.entireRange[0],
+            ceil: contourVariable.entireRange[1],
+            combineLabels: (min, max) => min + ' to ' + max,
+            step: contourVariable.step,
+            animate: false
+        }
+        if ( step ) {
+            newOptions.showTicksValues = true,
+            newOptions.tickStep = step;
+            newOptions.ticksArray = trimmedArray
+        }
+        this.contourOptions = newOptions;
+
+        this.session.call('pv.enlil.set_contours', [ contourVariable.serverName, this.contourArray ]);
         this.renderDebouncer.next();
     }
 
