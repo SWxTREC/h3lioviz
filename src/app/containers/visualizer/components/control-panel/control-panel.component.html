@@ -39,7 +39,7 @@
                 </div>
                 <ngx-slider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="updateContourRange($event)"></ngx-slider>
                 <div class="control-panel__controls">
-                    <div>
+                    <div class="control-panel__control control-panel__control--half">
                         <strong>Contour surface values</strong>
                         <div>
                             {{ contourArray | json }}

@@ -30,6 +30,9 @@
         &--full-width {
             width: 100%;
         }
+        &--half {
+            max-width: 50%;
+        }
         &--narrow {
             width: 150px;
         }

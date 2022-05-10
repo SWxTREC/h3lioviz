@@ -179,7 +179,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     getTickStep(): number {
         const numberOfContours = this.controlPanel.value.numberOfContours;
         const step = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
-        return Number( step.toFixed(1) );
+        return step;
     }
 
     resetZoom() {
@@ -317,7 +317,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         const indexArray = [ ...Array(numberOfContours).keys() ];
         const step = numberOfContours > 2 ? this.getTickStep() : undefined;
         this.contourArray = numberOfContours > 2 ?
-            indexArray.map( indexValue => this.contourRange[0] + (indexValue * step) ) :
+            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * step)) ) :
             clone(newRange);
         const trimmedArray: number[] = this.contourArray.slice(1, -1);
 
