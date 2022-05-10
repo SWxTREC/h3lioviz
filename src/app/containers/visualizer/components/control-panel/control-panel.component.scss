@@ -1,26 +1,40 @@
 @import 'src/theme/theme-colors.scss';
 
 .control-panel {
-    &__block-label {
-        display: flex;
-        flex-direction: column;
-        line-height: 1;
-        margin: 2px;
+    &__relative-container {
+        position: relative
     }
     &__controls {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 1rem;
+        margin: 0.5rem 0;
+        flex-wrap: wrap;
+        &--align {
+            align-items: center;
+            margin: 0;
+        }
+        &--center {
+            text-align: center;
+        }
         &--child {
             margin-left: 2rem;
         }
         &--column {
             flex-direction: column;
         }
+        &--space-around {
+            justify-content: space-around;
+        }
     }
     &__control {
         &--full-width {
             width: 100%;
+        }
+        &--half {
+            max-width: 50%;
+        }
+        &--narrow {
+            width: 150px;
         }
     }
     &__dropdown-block {
@@ -29,7 +43,14 @@
         justify-content: space-between;
     }
     &__header {
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.3rem;
+        flex-wrap: wrap;
+        &--tall {
+            line-height: 1;
+        }
     }
     &__hint {
         font-size: small;
@@ -42,24 +63,31 @@
             white-space: nowrap;
         }
     }
-    &__swatch {
-        height: 20px;
-    }
     &__label {
+        text-align: center;
         display: flex;
         justify-content: center;
     }
-    &__spacer {
-        margin: 1rem 0;
-        position: relative !important;
-    }
-    &__threshold {
+    &__more-info {
         opacity: 0;
         // TODO: use angular animate to animate entire element in, fade and grow
         &--expand {
             opacity: 1;
             transition: opacity 2s;
         }
+    }
+    &__spacer {
+        margin: 1rem 0;
+        position: relative !important;
+    }
+    &__stacked-label {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+        margin: 2px;
+    }
+    &__swatch {
+        height: 20px;
     }
     // ngx-slider styles
     ::ng-deep {
@@ -78,9 +106,25 @@
             display: none;
         }
 
+        .ngx-slider-tick {
+            left: -10px;
+        }
+
+        .ngx-slider-ticks-values-under .ngx-slider-tick-value {
+            bottom: 20px;
+        }
+
         .ngx-slider-active {
             outline: none;
             border: 2px solid #5E9ED6;
         }
     }
+}
+
+.earth-dot {
+    position: absolute;
+    border: 2px solid black;
+    border-radius: 50%;
+    right: 27px;
+    top: 22px;
 }
