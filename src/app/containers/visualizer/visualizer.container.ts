@@ -88,7 +88,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
             this.pvView.setContainer( divRenderer );
             this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
             // jpeg quality, reduced to speed up interactions on slow connections
-            this.pvView.setInteractiveQuality( 25 );
+            this.pvView.setInteractiveQuality( 50 );
 
             window.addEventListener( 'resize', this.pvView.resize );
 
