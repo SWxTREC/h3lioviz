@@ -1,5 +1,3 @@
-@use '~lasp-base-app-snippets/styles/misc';
-@include misc.ignore-max-page-width;
 @import 'src/theme/theme-colors.scss';
 
 // TODO: add narrow and mobile styles (column)

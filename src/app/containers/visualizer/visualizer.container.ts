@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { filter, take } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
@@ -29,12 +30,15 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvServerStarted = false;
 
     constructor(
-        private _awsService: AwsService
+        private _awsService: AwsService,
+        private _scripts: LaspBaseAppSnippetsService
     ) {
         this._awsService.startUp();
     }
 
     ngOnInit() {
+        this._scripts.misc.ignoreMaxPageWidth( this );
+
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
         this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
