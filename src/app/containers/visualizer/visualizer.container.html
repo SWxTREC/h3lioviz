@@ -9,7 +9,7 @@
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz__split" [class.viz__fade]="!validConnection">
-    <as-split direction="horizontal">
+    <as-split direction="horizontal" (dragEnd)="dragEnd($event)">
         <as-split-area class="viz__panel" [size]="visualizerSplit[0]">
             <swt-control-panel [pvView]="pvView"></swt-control-panel>
         </as-split-area>

@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { SplitComponent } from 'angular-split';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { filter, take } from 'rxjs/operators';
@@ -22,9 +23,10 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    validConnection = false;
-    visualizerSplit: [number, number, number ] = [ 27, 45, 28 ];
+    initialVisualizerSplit: [number, number, number ] = [ 27, 73, 0 ];
     subscriptions: Subscription[] = [];
+    validConnection = false;
+    visualizerSplit: [number, number, number ];
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     pvServerStarted = false;
@@ -34,6 +36,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         private _scripts: LaspBaseAppSnippetsService
     ) {
         this._awsService.startUp();
+        this.visualizerSplit = JSON.parse(sessionStorage.getItem('visualizerSplit')) as [number, number, number] || this.initialVisualizerSplit;
     }
 
     ngOnInit() {
@@ -123,6 +126,10 @@ export class VisualizerComponent implements OnInit, OnDestroy {
                 this.errorMessage = 'Failed to connect to socket';
             }
         }, 1000 * 15);
+    }
+
+    dragEnd( event: any ) {
+        sessionStorage.setItem('visualizerSplit', JSON.stringify( event.sizes ));
     }
 
     getTimestep( timeIndex: number ) {
