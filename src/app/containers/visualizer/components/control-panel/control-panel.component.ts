@@ -63,7 +63,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         ceil: 100,
         combineLabels: (min, max) => min + ' to ' + max,
         step: 10,
-        animate: false
+        animate: false,
+        hideLimitLabels: true,
+        translate: (value: number): string => {
+            return value + '%';
+        }
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };

@@ -23,7 +23,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     timeTicks: number[] = [];
     errorMessage: string;
     validConnection = false;
-    visualizerSplit: [number, number] = [ 30, 70 ];
+    visualizerSplit: [number, number, number ] = [ 27, 45, 28 ];
     subscriptions: Subscription[] = [];
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];

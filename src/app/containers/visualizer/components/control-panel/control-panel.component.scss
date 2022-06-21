@@ -7,26 +7,19 @@
     &__controls {
         display: flex;
         justify-content: space-between;
-        margin: 0.5rem 0;
         flex-wrap: wrap;
-        &--align {
-            align-items: center;
-            margin: 0;
-        }
-        &--center {
-            text-align: center;
-        }
-        &--child {
-            margin-left: 2rem;
-        }
+        align-items: center;
+        width: 100%;
         &--column {
             flex-direction: column;
+            align-items: flex-start;
         }
         &--space-around {
             justify-content: space-around;
         }
     }
     &__control {
+        margin-bottom: 0.3rem;
         &--full-width {
             width: 100%;
         }
@@ -34,7 +27,7 @@
             max-width: 50%;
         }
         &--narrow {
-            width: 150px;
+            max-width: 150px;
         }
     }
     &__dropdown-block {
@@ -42,26 +35,16 @@
         align-items: center;
         justify-content: space-between;
     }
-    &__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.3rem;
-        flex-wrap: wrap;
-        &--tall {
-            line-height: 1;
-        }
-    }
     &__hint {
+        display: flex;
+        flex-direction: column;
+        margin-right: 1em;
+    }
+    &__hints {
         font-size: small;
         display: flex;
         line-height: 1.3;
-        small {
-            margin-right: 1em;
-        }
-        code {
-            white-space: nowrap;
-        }
+        flex-wrap: wrap;
     }
     &__label {
         text-align: center;
@@ -70,6 +53,7 @@
     }
     &__more-info {
         opacity: 0;
+        width: 100%;
         // TODO: use angular animate to animate entire element in, fade and grow
         &--expand {
             opacity: 1;
@@ -79,12 +63,6 @@
     &__spacer {
         margin: 1rem 0;
         position: relative !important;
-    }
-    &__stacked-label {
-        display: flex;
-        flex-direction: column;
-        line-height: 1;
-        margin: 2px;
     }
     &__swatch {
         height: 20px;
