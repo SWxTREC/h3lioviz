@@ -115,6 +115,16 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         defaultSubsetRange: [ -30, 0 ],
         entireRange: [ -100, 100 ],
         step: 5
+    },
+    dp: {
+        serverName: 'dp',
+        displayName: 'Cloud tracer (dp)',
+        units: '—',
+        defaultColorRange: [ 0.2, 0.9 ],
+        defaultColormap: COLORMAPS.plasma,
+        defaultSubsetRange: [ 0.2, 0.9 ],
+        entireRange: [ 0, 1 ],
+        step: 0.1
     }
 };
 
