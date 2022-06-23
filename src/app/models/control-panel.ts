@@ -129,7 +129,9 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
     lonStreamlines: false,
     numberOfContours: 3,
     opacity: [ 70, 100 ] as [ number, number ],
+    radialSlice: false,
     satellites: true,
+    satFieldlines: false,
     threshold: false,
     thresholdVariable: VARIABLE_CONFIG.density
 };
