@@ -18,11 +18,14 @@ import SmartConnect from 'wslink/src/SmartConnect';
 })
 export class VisualizerComponent implements OnInit, OnDestroy {
     @ViewChild('pvContent', { read: ElementRef }) pvContent: ElementRef;
+    dataEarth: any;
+    dataStereoA: any;
+    dataStereoB: any;
     loading = true;
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    initialVisualizerSplit: [number, number, number ] = [ 27, 73, 0 ];
+    initialVisualizerSplit: [number, number, number ] = [ 27, 43, 30 ];
     subscriptions: Subscription[] = [];
     validConnection = false;
     visualizerSplit: [number, number, number ];
@@ -105,6 +108,18 @@ export class VisualizerComponent implements OnInit, OnDestroy {
                 this.timeTicks = timeValues.map( value => Math.round(value));
                 this.loading = false;
                 session.call('pv.vcr.action', [ 'first' ]);
+            });
+            this.pvView.get().session.call( 'pv.enlil.get_satellite_data', [ 'earth'] ).then( (data: string) =>  {
+                this.dataEarth = JSON.parse(data);
+                console.log('earth', this.dataEarth);
+            });
+            this.pvView.get().session.call( 'pv.enlil.get_satellite_data', [ 'stereoa' ] ).then( (data: string) =>  {
+                this.dataStereoA = JSON.parse(data);
+                console.log('stereoA', this.dataStereoA);
+            });
+            this.pvView.get().session.call( 'pv.enlil.get_satellite_data', [ 'stereob'] ).then( (data: string) =>  {
+                this.dataStereoB = JSON.parse(data);
+                console.log('stereoB', this.dataStereoB);
             });
         });
 
