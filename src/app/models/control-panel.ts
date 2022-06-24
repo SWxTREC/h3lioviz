@@ -118,7 +118,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     },
     dp: {
         serverName: 'dp',
-        displayName: 'Cloud tracer (dp)',
+        displayName: 'Cloud tracer',
         units: '—',
         defaultColorRange: [ 0.2, 0.9 ],
         defaultColormap: COLORMAPS.plasma,
