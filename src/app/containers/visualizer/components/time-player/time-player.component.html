@@ -1,4 +1,4 @@
-<mat-card class="time-player">
+<div class="time-player">
     <strong>Datetime</strong>
     <div>{{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}</div>
     <mat-slider
@@ -23,4 +23,4 @@
         <mat-icon *ngIf="!playing">play_arrow</mat-icon>
         <mat-icon *ngIf="playing">pause</mat-icon>
     </div>
-</mat-card>
+</div>

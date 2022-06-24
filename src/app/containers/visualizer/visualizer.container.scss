@@ -33,7 +33,11 @@
         }
     }
     &__panel {
-        padding: 0.5rem;
+        background-color: white;
+        padding: 0.7rem;
+        &--full-width {
+            padding: 0;
+        }
     }
     &__pv {
         position: relative;
