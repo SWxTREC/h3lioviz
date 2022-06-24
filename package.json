@@ -51,7 +51,7 @@
     "eslint-plugin-jsdoc": "^38.1.6",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-unicorn": "^42.0.0",
-    "lasp-base-app-snippets": "^2.2.2",
+    "lasp-base-app-snippets": "^3.4.0",
     "lasp-cookie-consent": "^0.2.1",
     "lasp-footer": "^1.6.1",
     "lasp-nav": "^1.6.0",

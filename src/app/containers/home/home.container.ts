@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs';
 import { ProfileNavService } from 'src/app/services';
 
@@ -13,8 +14,10 @@ export class HomeComponent implements OnDestroy {
     subscriptions: Subscription[] = [];
 
     constructor(
-        public profileService: ProfileNavService
+        public profileService: ProfileNavService,
+        private _scripts: LaspBaseAppSnippetsService
     ) {
+        this._scripts.misc.ignoreMaxPageWidth( this );
         this.subscriptions.push( this.profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
             this.isLoggedIn = loginStatus;
         }));
