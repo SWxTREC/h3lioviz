@@ -12,8 +12,6 @@ import {
     UiOptionsService
 } from 'scicharts';
 
-import { environment } from 'src/environments/environment';
-
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
         seriesDisplayMode: SeriesDisplayMode.lines,
@@ -42,7 +40,7 @@ const DEFAULT_PLOT_OPTIONS = {
 
 const PLOTS = {
     'earth-density': {
-        url: `${environment.siteRootUrl}assets/data/evo.earth.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.earth.json`,
         name: 'Earth',
         rangeVariables: [
             'density',
@@ -57,7 +55,7 @@ const PLOTS = {
         domainVariables: [ 'time' ]
     },
     'stereoa-density': {
-        url: `${environment.siteRootUrl}assets/data/evo.stereoa.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereoa.json`,
         name: 'Stereo A',
         rangeVariables: [
             'density',
@@ -72,7 +70,7 @@ const PLOTS = {
         domainVariables: [ 'time' ]
     },
     'stereob-density': {
-        url: `${environment.siteRootUrl}assets/data/evo.stereob.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereob.json`,
         name: 'Stereo B',
         rangeVariables: [
             'density',
@@ -87,7 +85,7 @@ const PLOTS = {
         domainVariables: [ 'time' ]
     },
     'earth-velocity': {
-        url: `${environment.siteRootUrl}assets/data/evo.earth.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.earth.json`,
         name: 'Earth',
         rangeVariables: [
             'density',
@@ -102,7 +100,7 @@ const PLOTS = {
         domainVariables: [ 'time' ]
     },
     'stereoa-velocity': {
-        url: `${environment.siteRootUrl}assets/data/evo.stereoa.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereoa.json`,
         name: 'Stereo A',
         rangeVariables: [
             'density',
@@ -117,7 +115,7 @@ const PLOTS = {
         domainVariables: [ 'time' ]
     },
     'stereob-velocity': {
-        url: `${environment.siteRootUrl}assets/data/evo.stereob.json`,
+        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereob.json`,
         name: 'Stereo B',
         rangeVariables: [
             'density',
@@ -166,7 +164,7 @@ export class PlotsComponent implements OnInit {
         // this is needed to show values in the legend
         this._plotsService.enableCrosshairSync();
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
-        this._uiOptionsService.setPlotGrid( 2, 1 );
+        this._uiOptionsService.setPlotGrid( 3, 1 );
     }
 
     ngOnInit(): void {
