@@ -6,9 +6,9 @@ describe('PlotsComponent', () => {
     let component: PlotsComponent;
     let fixture: ComponentFixture<PlotsComponent>;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [PlotsComponent]
+            declarations: [ PlotsComponent ]
         })
             .compileComponents();
     });

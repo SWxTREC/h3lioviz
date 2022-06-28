@@ -5,6 +5,7 @@
 /docs
 /tmp
 /out-tsc
+/src/assets/data
 
 # dependencies
 /node_modules
