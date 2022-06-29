@@ -162,7 +162,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(CONTROL_PANEL_DEFAULT_VALUES);
             this.controlPanel.setValue( initialFormValues );
-            this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+            this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
         }
     }
 
@@ -214,7 +214,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push( this.controlPanel.controls.colorVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColorVariable => {
                 this.colorVariableServerName = newColorVariable.serverName;
-                this.session.call('pv.enlil.colorby', [ this.colorVariableServerName ]);
+                this.session.call('pv.h3lioviz.colorby', [ this.colorVariableServerName ]);
                 this.controlPanel.controls.colormap.setValue( this.userColormaps[ this.colorVariableServerName ] );
                 this.controlPanel.controls.opacity.setValue( this.userOpacities[ this.colorVariableServerName ] );
                 const variableColorRange = this.userColorRanges[ this.colorVariableServerName ];
@@ -231,7 +231,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.subscriptions.push( this.controlPanel.controls.colormap.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColormapObject => {
                 this.userColormaps[ this.colorVariableServerName ] = clone(newColormapObject);
-                this.session.call('pv.enlil.set_colormap', [ this.colorVariableServerName, newColormapObject.serverName ]);
+                this.session.call('pv.h3lioviz.set_colormap', [ this.colorVariableServerName, newColormapObject.serverName ]);
             }));
         // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
         this.subscriptions.push( this.controlPanel.controls.numberOfContours.valueChanges
@@ -256,9 +256,10 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
                 const opacityLow: number = newOpacityRange[0] / 100;
                 const opacityHigh: number = newOpacityRange[1] / 100;
                 if ( this.colorVariableServerName[ 0 ] === 'b' ) {
-                    this.session.call( 'pv.enlil.set_opacity', [ this.colorVariableServerName, [ opacityHigh, opacityLow, opacityHigh ] ] );
+                    this.session.call('pv.h3lioviz.set_opacity', [ this.colorVariableServerName,
+                        [ opacityHigh, opacityLow, opacityHigh ] ]);
                 } else {
-                    this.session.call( 'pv.enlil.set_opacity', [ this.colorVariableServerName, [ opacityLow, opacityHigh ] ] );
+                    this.session.call( 'pv.h3lioviz.set_opacity', [ this.colorVariableServerName, [ opacityLow, opacityHigh ] ] );
                 }
             }));
         // subscribe to THRESHOLD VARIABLE changes and reset threshold slider options, threshold range, and 'set_threshold'
@@ -278,12 +279,12 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
     }
 
     snapTo( view: string ) {
-        this.session.call( 'pv.enlil.snap_to_view', [ view ] );
+        this.session.call( 'pv.h3lioviz.snap_to_view', [ view ] );
         this.renderDebouncer.next();
     }
 
     scaleColorRange() {
-        this.session.call( 'pv.enlil.get_variable_range', [ this.colorVariableServerName ]).then( range => {
+        this.session.call( 'pv.h3lioviz.get_variable_range', [ this.colorVariableServerName ]).then( range => {
             this.updateColorRange( { value: range[0], highValue: range[1], pointerType: undefined });
         });
     }
@@ -308,7 +309,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         this.colorRange = [ event.value, event.highValue ];
         this.userColorRanges[ this.colorVariableServerName ] = clone(this.colorRange);
-        this.session.call('pv.enlil.set_range', [ this.colorVariableServerName, this.colorRange ] );
+        this.session.call('pv.h3lioviz.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }
 
@@ -337,7 +338,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         };
         this.contourOptions = newOptions;
 
-        this.session.call('pv.enlil.set_contours', [ contourVariable.serverName, this.contourArray ]);
+        this.session.call('pv.h3lioviz.set_contours', [ contourVariable.serverName, this.contourArray ]);
         this.renderDebouncer.next();
     }
 
@@ -350,7 +351,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         // format value
         const formattedValidValue: string = parseFloat( validInputValue.toString() ).toFixed(1);
         this.lonSliceAngle = formattedValidValue;
-        this.session.call('pv.enlil.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+        this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
         this.renderDebouncer.next();
     }
 
@@ -359,7 +360,7 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         const newRange: [ number, number ] = [ event.value, event.highValue ];
         this.thresholdRange = clone(newRange);
         this.userThresholdRanges[ thresholdVariableServerName ] = clone(newRange);
-        this.session.call('pv.enlil.set_threshold', [ thresholdVariableServerName, this.thresholdRange ] );
+        this.session.call('pv.h3lioviz.set_threshold', [ thresholdVariableServerName, this.thresholdRange ] );
         this.renderDebouncer.next();
     }
 
@@ -367,11 +368,11 @@ export class ControlPanelComponent implements OnChanges, OnDestroy {
         Object.keys( controlStates ).forEach( controlName => {
             if ( controlName === 'satellites' ) {
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                this.session.call( 'pv.enlil.toggle_satellites', [ state ] );
+                this.session.call( 'pv.h3lioviz.toggle_satellites', [ state ] );
             } else if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                this.session.call( 'pv.enlil.visibility', [ name, state ] );
+                this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
             }
         });
     }
