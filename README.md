@@ -1,21 +1,21 @@
-# ENLIL
+# H3lioViz
 
-Deployed site: https://enlil.swx-trec.com
+Deployed site: <https://h3lioviz.swx-trec.com>
 
-This is a frontend visualizing the ENLIL 3d model.
+This is a frontend for visualizing 3D heliosphere model output.
 
 ## Contacts
 
 * **Product Owner:**
-	Greg Lucas, greg.lucas@lasp.colorado.edu
+    Greg Lucas, greg.lucas@lasp.colorado.edu
 * **Experienced Devs:**
     Front end: Jennifer Knuth, jennifer.knuth@lasp.colorado.edu
-	Back end: Greg Lucas, greg.lucase@lasp.coloardo.edu
+    Back end: Greg Lucas, greg.lucase@lasp.coloardo.edu
 
 ## Relevant JIRA Project(s)
 
 * [SWT](http://mods-jira.lasp.colorado.edu:8080/browse/SWT/): Main project for the
-	Space Weather Model Staging Platform codebase.
+    Space Weather Model Staging Platform codebase.
 
 ## Related Projects
 
@@ -23,7 +23,7 @@ NA
 
 ## Production URLs
 
-https://enlil.swx-trec.com
+<https://h3lioviz.swx-trec.com>
 
 ## Necessary Permissions
 
@@ -31,21 +31,21 @@ Access to AWS S3 console is currently required to deploy.
 
 ## Architecture
 
-This is a visualizer for the ENLIL 3d model built with Angular.
+This is a visualizer for the 3D heliosphere model built with Angular.
 
-## Running ENLIL Locally
+## Running H3lioViz Locally
 
 See 'Development server' below.
 
 ### Project Dependencies
 
-A backend with the ENLIL paraview server is required.
+A backend with the H3lioViz paraview server is required.
 
 `npm run start:dev` or `npm run start:prod` to use the production backend deployed to AWS.
 
-`npm start` is the local development environment and will require a local backend. The 'dev' deploy can be found at enlil.dev.swx-trec.com
+`npm start` is the local development environment and will require a local backend. The 'dev' deploy can be found at <https://h3lioviz.dev.swx-trec.com>
 
-To test with a local paraview server, follow the README instructions in the enlil-3d-server repo https://github.com/SWxTREC/enlil-3d-server for running a local docker container containing the backend and some relevant data.
+To test with a local paraview server, follow the README instructions in the h3lioviz-server repo <https://github.com/SWxTREC/h3lioviz-server> for running a local docker container containing the backend and some relevant data.
 
 ### Development server
 
@@ -87,13 +87,15 @@ Cleaning up old images is also a good idea from time to time. To clean up your u
 
 When you are ready to push your image, contact the web team infrastructure group for credentials and instructions on how to log in. Once this is complete you can run `./docker-publish.sh` to publish your image to the server.
 
-## Deploy ENLIL
-Merges to the `dev` branch will automatically be deployed to enlil.dev.swx-trec.com. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
+## Deploy H3lioViz
+
+Merges to the `dev` branch will automatically be deployed to <https://h3lioviz.dev.swx-trec.com>. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
 
 Be sure to `npm run lint && npm test` before merging to the `dev` branch.
 
 ### Version and release
-Once enlil.dev.swx-trec.com is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
+
+Once <https://h3lioviz.dev.swx-trec.com> is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
 
 This will:
 
@@ -119,6 +121,6 @@ This will:
 * Make a copy of `docs/index.html` and name it `docs/404.html` (for some reason the angular instructions say to do this)
 * Take the current build of `/docs` from the current branch and push it up to the remote `gh-pages` branch were it will be served
 
-After a few minutes, you will see the changes at the GitHub-hosted site https://swxtrec.github.io/enlil.
+After a few minutes, you will see the changes at the GitHub-hosted site https://swxtrec.github.io/h3lioviz.
 
 You can run this script from any branch, but the site should reflect the content of the current main branch. -->

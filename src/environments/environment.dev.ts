@@ -8,7 +8,7 @@ if ( siteRootUrl.substr(-1) !== '/' ) {
 
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com/enlil',
+        api: 'https://apigw.dev.swx-trec.com/h3lioviz',
         cognito: {
             appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
             region: 'us-west-2',

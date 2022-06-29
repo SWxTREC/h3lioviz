@@ -1,5 +1,5 @@
 {
-  "name": "enlil",
+  "name": "h3lioviz",
   "version": "0.11.1",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "start:prod": "ng serve --prod",
     "start:dev": "ng serve --configuration production,dev",
     "build": "ng build",
-    "build:pages": "ng build --prod --output-path docs --base-href=/enlil/",
+    "build:pages": "ng build --prod --output-path docs --base-href=/h3lioviz/",
     "build:prod": "ng build --prod",
     "build:dev": "ng build --configuration production,dev",
     "deploy": "npm run build:pages && cp docs/index.html docs/404.html && gh-pages -d docs",

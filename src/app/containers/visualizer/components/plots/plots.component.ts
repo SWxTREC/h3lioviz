@@ -131,7 +131,7 @@ const PLOTS = {
     }
 };
 
-// set the UI features for H3lio viz
+// set the UI features for H3lioViz
 const H3LIO_PRESET: IUiFeatures = {
     featureList: DEFAULT_UI_OPTIONS.features.featureList,
     toolbar: false,
