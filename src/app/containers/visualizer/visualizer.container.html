@@ -14,6 +14,7 @@
             <swt-control-panel [pvView]="pvView"></swt-control-panel>
         </as-split-area>
         <as-split-area class="viz__panel viz__panel--full-width" [size]="visualizerSplit[1]">
+            <swt-plots></swt-plots>
             <swt-time-player *ngIf="timeTicks[0]" [pvView]="pvView" [timeTicks]="timeTicks" (updateTime)="getTimestep($event)"></swt-time-player>
             <div class="viz__pv-container">
                 <div *ngIf="loading" class="viz__loading">
@@ -21,9 +22,6 @@
                 </div>
                 <div #pvContent class="viz__pv"></div>
             </div>
-        </as-split-area>
-        <as-split-area class="viz__panel viz__panel--full-width" [size]="visualizerSplit[2]">
-            <swt-plots></swt-plots>
         </as-split-area>
     </as-split>
 </div>

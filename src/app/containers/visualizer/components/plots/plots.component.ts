@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { debounceTime } from 'rxjs/operators';
 import {
     AnalogAxisRangeType,
     AxisFormat,
@@ -11,6 +12,7 @@ import {
     SeriesDisplayMode,
     UiOptionsService
 } from 'scicharts';
+import { CONTROL_PANEL_DEFAULT_VALUES } from 'src/app/models';
 
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
@@ -38,97 +40,13 @@ const DEFAULT_PLOT_OPTIONS = {
     }
 };
 
-const PLOTS = {
-    'earth-density': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.earth.json`,
-        name: 'Earth',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'density' ],
-        domainVariables: [ 'time' ]
-    },
-    'stereoa-density': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereoa.json`,
-        name: 'Stereo A',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'density' ],
-        domainVariables: [ 'time' ]
-    },
-    'stereob-density': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereob.json`,
-        name: 'Stereo B',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'density' ],
-        domainVariables: [ 'time' ]
-    },
-    'earth-velocity': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.earth.json`,
-        name: 'Earth',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'velocity' ],
-        domainVariables: [ 'time' ]
-    },
-    'stereoa-velocity': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereoa.json`,
-        name: 'Stereo A',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'velocity' ],
-        domainVariables: [ 'time' ]
-    },
-    'stereob-velocity': {
-        url: `https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/evo.stereob.json`,
-        name: 'Stereo B',
-        rangeVariables: [
-            'density',
-            'velocity',
-            'pressure',
-            'temperature',
-            'bx',
-            'by',
-            'bz'
-        ],
-        selectedRangeVariables: [ 'velocity' ],
-        domainVariables: [ 'time' ]
-    }
+const dataUrl =
+    'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/';
+
+const SATELLITE_NAMES = {
+    earth: 'Earth',
+    stereoa: 'Stereo A',
+    stereob: 'Stereo B'
 };
 
 // set the UI features for H3lio viz
@@ -156,6 +74,8 @@ const H3LIO_PRESET: IUiFeatures = {
     styleUrls: [ './plots.component.scss' ]
 })
 export class PlotsComponent implements OnInit {
+    variable = CONTROL_PANEL_DEFAULT_VALUES.colorVariable.serverName;
+    plotRange: [ number, number ] = [ 1635278400000, 1635883423000 ];
 
     constructor(
         private _plotsService: PlotsService,
@@ -165,42 +85,74 @@ export class PlotsComponent implements OnInit {
         this._plotsService.enableCrosshairSync();
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
+        // subscribe to changes in the plots to determine if a new variable is selected
+        this._plotsService.getPlots$().pipe(
+            debounceTime(300)
+        ).subscribe( plots => {
+            if ( plots.length ) {
+                const selectedRangeVariables = plots.reduce( ( aggregator, plot ) => {
+                    plot.datasets.forEach( dataset => {
+                        dataset.selectedRangeVariables.forEach( variable => {
+                            aggregator[variable] = 0;
+                        });
+                    });
+                    return aggregator;
+
+                }, {});
+                const selectedRangeVariablesList = Object.keys(selectedRangeVariables);
+                // find a variable that is not the same as the old variable
+                // if a new variable (if changed), create a new synced plot group with that variable
+                const newVariable = selectedRangeVariablesList.find( variable => variable !== this.variable );
+                if ( newVariable && this.variable !== newVariable ) {
+                    this.variable = newVariable;
+                    this.getSolarWindData( this.variable );
+                }
+            }
+        });
+    }
+    
+    ngOnInit(): void {
+        // initialize to the default variable
+        this.getSolarWindData( this.variable );
     }
 
-    ngOnInit(): void {
+    createPlotGroup( variable: string )  {
+        const plotGroup = [];
+        [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
+            const newDataset = {
+                title: SATELLITE_NAMES[satellite],
+                url: dataUrl + `evo.${satellite}.json`,
+                name: SATELLITE_NAMES[satellite],
+                rangeVariables: [
+                    'density',
+                    'velocity',
+                    'pressure',
+                    'temperature',
+                    'bx',
+                    'by',
+                    'bz'
+                ],
+                selectedRangeVariables: [ variable ],
+                domainVariables: [ 'time' ]
+            };
+            plotGroup.push( newDataset )
+        });
+        return plotGroup;
+    }
+
+    getSolarWindData( groupVariable: string ) {
         // reset the plot list
         this._plotsService.setPlots([]);
-        this.getSolarWindData();
-    }
-
-    getSolarWindData() {
-        const densityPlot: IPlot = {
+        const plotGroup = this.createPlotGroup( groupVariable );
+        const swPlot: IPlot = {
             collapsed: false,
-            datasets: [
-                PLOTS[ 'stereoa-density' ],
-                PLOTS[ 'earth-density' ],
-                PLOTS[ 'stereob-density' ]
-            ],
+            datasets: plotGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
-                start: 1635278400000,
-                end: 1635883423000
+                start: this.plotRange[0],
+                end: this.plotRange[1]
             }
         };
-        const velocityPlot: IPlot = {
-            collapsed: false,
-            datasets: [
-                PLOTS[ 'stereoa-velocity' ],
-                PLOTS[ 'earth-velocity' ],
-                PLOTS[ 'stereob-velocity' ]
-            ],
-            initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
-            range: {
-                start: 1635278400000,
-                end: 1635883423000
-            }
-        };
-        this._plotsService.addPlot( densityPlot );
-        this._plotsService.addPlot( velocityPlot );
+        this._plotsService.addPlot( swPlot );
     }
 }
