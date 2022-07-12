@@ -85,7 +85,7 @@ export class PlotsComponent implements OnInit {
         this._plotsService.enableCrosshairSync();
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
-        // subscribe to changes in the plots to determine if a new variable is selected
+        // subscribe to changes in the plots to determine if a new variable is selected/deselected
         this._plotsService.getPlots$().pipe(
             debounceTime(300)
         ).subscribe( plots => {
@@ -97,14 +97,18 @@ export class PlotsComponent implements OnInit {
                         });
                     });
                     return aggregator;
-
                 }, {});
                 const selectedRangeVariablesList = Object.keys(selectedRangeVariables);
                 // find a variable that is not the same as the old variable
                 // if a new variable (if changed), create a new synced plot group with that variable
                 const newVariable = selectedRangeVariablesList.find( variable => variable !== this.variable );
-                if ( newVariable && this.variable !== newVariable ) {
+                if ( newVariable ) {
                     this.variable = newVariable;
+                    this.getSolarWindData( this.variable );
+                }
+                // for now, make sure there are always 3 datasets in the plot for the user (datasets can be hidden
+                // from the plot in ways other than removing, and right now, there is no way to get a dataset back)
+                if ( plots[0].datasets.length < 3 ) {
                     this.getSolarWindData( this.variable );
                 }
             }
