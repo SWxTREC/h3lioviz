@@ -1,5 +1,4 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { SplitComponent } from 'angular-split';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { filter, take } from 'rxjs/operators';
@@ -23,7 +22,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    initialVisualizerSplit: [number, number, number ] = [ 27, 73, 0 ];
+    initialVisualizerSplit: [number, number, number ] = [ 24, 43, 33 ];
     subscriptions: Subscription[] = [];
     validConnection = false;
     visualizerSplit: [number, number, number ];

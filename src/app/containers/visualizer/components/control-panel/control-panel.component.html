@@ -1,8 +1,10 @@
-<mat-card class="control-panel">
+<div class="control-panel">
     <mat-card-title>
         Control Panel
     </mat-card-title>
-    <strong>Snap to view</strong>
+    <div>
+        <strong>Snap to view</strong>
+    </div>
     <div class="control-panel__controls">
         <button mat-raised-button class="control-panel__control" color="primary" (click)="snapTo('ecliptic')">ecliptic</button>
         <button mat-raised-button class="control-panel__control" color="primary" (click)="snapTo('meridional')">meridional</button>
@@ -140,4 +142,4 @@
             <strong>Opacity gradient </strong>
             <ngx-slider [options]="opacityOptions" formControlName="opacity"></ngx-slider>
     </form>
-</mat-card>
+</div>

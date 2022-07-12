@@ -4,9 +4,10 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
 import { MomentModule } from 'ngx-moment';
+import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
-import { ControlPanelComponent, TimePlayerComponent } from './components';
+import { ControlPanelComponent, PlotsComponent, TimePlayerComponent } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -14,6 +15,7 @@ import { VisualizerComponent } from './visualizer.container';
     imports: [
         CommonModule,
         ComponentsModule,
+        ChartModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,
@@ -24,6 +26,7 @@ import { VisualizerComponent } from './visualizer.container';
     declarations: [
         VisualizerComponent,
         ControlPanelComponent,
+        PlotsComponent,
         TimePlayerComponent
     ]
 })
