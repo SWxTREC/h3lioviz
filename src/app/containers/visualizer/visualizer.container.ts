@@ -22,7 +22,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    initialVisualizerSplit: [number, number ] = [ 24, 76 ];
+    initialVisualizerSplit: [number, number ] = [ 35, 65 ];
     subscriptions: Subscription[] = [];
     validConnection = false;
     visualizerSplit: [number, number ];
