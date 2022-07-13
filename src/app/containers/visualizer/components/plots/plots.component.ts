@@ -139,7 +139,7 @@ export class PlotsComponent implements OnInit {
                 selectedRangeVariables: [ variable ],
                 domainVariables: [ 'time' ]
             };
-            plotGroup.push( newDataset )
+            plotGroup.push( newDataset );
         });
         return plotGroup;
     }
