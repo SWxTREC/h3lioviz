@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { filter, take } from 'rxjs/operators';
 import { AwsService } from 'src/app/services';
@@ -21,20 +22,25 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    validConnection = false;
-    visualizerSplit: [number, number] = [ 30, 70 ];
+    initialVisualizerSplit: [number, number ] = [ 35, 65 ];
     subscriptions: Subscription[] = [];
+    validConnection = false;
+    visualizerSplit: [number, number ];
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     pvServerStarted = false;
 
     constructor(
-        private _awsService: AwsService
+        private _awsService: AwsService,
+        private _scripts: LaspBaseAppSnippetsService
     ) {
         this._awsService.startUp();
+        this.visualizerSplit = JSON.parse(sessionStorage.getItem('visualizerSplit')) as [number, number] || this.initialVisualizerSplit;
     }
 
     ngOnInit() {
+        this._scripts.misc.ignoreMaxPageWidth( this );
+
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
         this.subscriptions.push( this._awsService.pvServerStarted$.pipe(
@@ -87,7 +93,8 @@ export class VisualizerComponent implements OnInit, OnDestroy {
             this.pvView = remoteView;
             this.pvView.setContainer( divRenderer );
             this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
-            this.pvView.setInteractiveQuality( 100 ); // jpeg quality
+            // jpeg quality, reduced to speed up interactions on slow connections
+            this.pvView.setInteractiveQuality( 50 );
 
             window.addEventListener( 'resize', this.pvView.resize );
 
@@ -118,6 +125,10 @@ export class VisualizerComponent implements OnInit, OnDestroy {
                 this.errorMessage = 'Failed to connect to socket';
             }
         }, 1000 * 15);
+    }
+
+    dragEnd( event: any ) {
+        sessionStorage.setItem('visualizerSplit', JSON.stringify( event.sizes ));
     }
 
     getTimestep( timeIndex: number ) {
