@@ -22,10 +22,10 @@ export class VisualizerComponent implements OnInit, OnDestroy {
     pvView: any;
     timeTicks: number[] = [];
     errorMessage: string;
-    initialVisualizerSplit: [number, number, number ] = [ 24, 43, 33 ];
+    initialVisualizerSplit: [number, number ] = [ 35, 65 ];
     subscriptions: Subscription[] = [];
     validConnection = false;
-    visualizerSplit: [number, number, number ];
+    visualizerSplit: [number, number ];
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     pvServerStarted = false;
@@ -35,7 +35,7 @@ export class VisualizerComponent implements OnInit, OnDestroy {
         private _scripts: LaspBaseAppSnippetsService
     ) {
         this._awsService.startUp();
-        this.visualizerSplit = JSON.parse(sessionStorage.getItem('visualizerSplit')) as [number, number, number] || this.initialVisualizerSplit;
+        this.visualizerSplit = JSON.parse(sessionStorage.getItem('visualizerSplit')) as [number, number] || this.initialVisualizerSplit;
     }
 
     ngOnInit() {
