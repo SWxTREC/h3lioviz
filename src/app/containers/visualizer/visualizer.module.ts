@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
 import { MomentModule } from 'ngx-moment';
-import { ChartModule } from 'scicharts';
+import { ChartModule, GridComponent } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import { ControlPanelComponent, PlotsComponent, TimePlayerComponent } from './components';
@@ -24,10 +24,11 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
-        VisualizerComponent,
         ControlPanelComponent,
+        GridComponent,
         PlotsComponent,
-        TimePlayerComponent
+        TimePlayerComponent,
+        VisualizerComponent
     ]
 })
 export class VisualizerModule { }
