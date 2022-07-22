@@ -25,14 +25,15 @@ export class WebsocketService {
     constructor(
         private _awsService: AwsService
     ) {
+        // the AwsService is triggered to start connecting once the visualizer page is loaded
         this._awsService.pvServerStarted$.pipe(
             filter( started => started === true),
             take( 1 )
         ).subscribe( started => {
             this.pvServerStarted$.next( started );
+            // once server is started, socket will persist for entire application until closed by inactivity
             if ( this.validConnection$.value === false && started === true ) {
-                // add setTimeout to skip a beat and avoid the expressionChanged error with AfterViewInit
-                setTimeout(() => this.connectToSocket());
+                this.connectToSocket();
             }
         });
     }
@@ -59,15 +60,15 @@ export class WebsocketService {
         clientToConnect.onConnectionReady( validClient => {
             this.errorMessage$.next(null);
             const session = validClient.getConnection().getSession();
-            
             const viewStream = validClient.getImageStream().createViewStream( -1 );
             const remoteView = vtkRemoteView.newInstance({ session, viewStream });
             this.pvView = remoteView;
             this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
             // jpeg quality, reduced to speed up interactions on slow connections
             this.pvView.setInteractiveQuality( 50 );
+            // default to mouse zoom
             this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
-            // only validate connection once pvView is initialized
+            // validate connection after pvView is initialized
             this.validConnection$.next( true );
         });
         
@@ -75,18 +76,19 @@ export class WebsocketService {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        clientToConnect.connect(config).then( () => {
+        clientToConnect.connect( config ).then( () => {
             // if connection fails, add error message
-            if (!clientToConnect.isConnected()) {
-                this.errorMessage$.next('Failed to connect to socket');
+            if ( !clientToConnect.isConnected() ) {
+                this.errorMessage$.next( 'Failed to connect to socket' );
             }
         });
 
         // if the socket doesn't connect after a delay, show an error
+        const connectionDelay = 1000 * 20;
         setTimeout( () => {
-            if (!clientToConnect.isConnected()) {
+            if ( !clientToConnect.isConnected() ) {
                 this.errorMessage$.next('Failed to connect to socket');
             }
-        }, 1000 * 20);
+        }, connectionDelay );
     }
 }

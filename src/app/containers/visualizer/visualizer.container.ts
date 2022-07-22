@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { filter } from 'rxjs/operators';
 import { AwsService, WebsocketService } from 'src/app/services';
 
 @Component({
@@ -57,20 +56,22 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        this.subscriptions.push( this._websocket.validConnection$
-        .pipe( filter( validConnection => validConnection === true ) ).subscribe( validConnection => {
+        this.subscriptions.push( this._websocket.validConnection$.subscribe( validConnection => {
             this.validConnection = validConnection;
-            const divRenderer = this.pvContent.nativeElement;
-            // pvView has been initialized
+            // pvView will be undefined if no validConnection and defined and initialized if validConnection
             this.pvView = this._websocket.pvView;
-            window.addEventListener( 'resize', this.pvView.resize );
-            this.pvView.setContainer( divRenderer );
-            this.pvView.get().session.call('pv.time.index.set', [ 0 ]);
-            this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
-                this.timeTicks = timeValues.map( value => Math.round( value ) );
-                this.loading = false;
-                this.pvView.get().session.call('pv.vcr.action', [ 'first' ]);
-            });
+            if ( this.validConnection ) {
+                const divRenderer = this.pvContent.nativeElement;
+                window.addEventListener( 'resize', this.pvView.resize );
+                this.pvView.setContainer( divRenderer );
+                // TODO: store time index and don't reset to 0
+                // this.pvView.get().session.call('pv.time.index.set', [ 0 ]);
+                this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
+                    this.timeTicks = timeValues.map( value => Math.round( value ) );
+                    this.loading = false;
+                    this.pvView.get().session.call('pv.vcr.action', [ 'first' ]);
+                });
+            }
         }));
     }
 
