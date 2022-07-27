@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { GridComponent } from 'scicharts';
 
 import { PlotsComponent } from './plots.component';
 
@@ -8,7 +9,7 @@ describe('PlotsComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ PlotsComponent ]
+            declarations: [ PlotsComponent, GridComponent ]
         })
             .compileComponents();
     });

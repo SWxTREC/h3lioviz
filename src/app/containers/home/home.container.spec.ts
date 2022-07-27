@@ -9,7 +9,9 @@ import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.container';
 
 describe('HomeComponent', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let httpClient: HttpClient;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let httpTestingController: HttpTestingController;
 
     let component: HomeComponent;
@@ -31,9 +33,7 @@ describe('HomeComponent', () => {
                 ProfileNavService
             ]
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpClient = TestBed.inject(HttpClient);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpTestingController = TestBed.inject(HttpTestingController);
     });
 

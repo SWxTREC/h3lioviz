@@ -8,7 +8,9 @@ import { ProfileNavService } from '..';
 import { AwsService } from './aws.service';
 
 describe('AwsService', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let httpClient: HttpClient;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let httpTestingController: HttpTestingController;
     let service: AwsService;
 
@@ -20,9 +22,7 @@ describe('AwsService', () => {
             ],
             providers: [ ProfileNavService ]
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpClient = TestBed.inject(HttpClient);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         httpTestingController = TestBed.inject(HttpTestingController);
 
         service = TestBed.inject(AwsService);

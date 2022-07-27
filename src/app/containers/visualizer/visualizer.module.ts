@@ -24,10 +24,10 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
-        VisualizerComponent,
         ControlPanelComponent,
         PlotsComponent,
-        TimePlayerComponent
+        TimePlayerComponent,
+        VisualizerComponent
     ]
 })
 export class VisualizerModule { }
