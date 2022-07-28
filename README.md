@@ -1,6 +1,6 @@
 # H3lioViz
 
-Deployed site: <https://h3lioviz.swx-trec.com>
+Deployed site: <https://swx-trec.com/h3lioviz>
 
 This is a frontend for visualizing 3D heliosphere model output.
 
@@ -23,7 +23,7 @@ NA
 
 ## Production URLs
 
-<https://h3lioviz.swx-trec.com>
+<https://swx-trec.com/h3lioviz>
 
 ## Necessary Permissions
 
@@ -43,7 +43,7 @@ A backend with the H3lioViz paraview server is required.
 
 `npm run start:dev` or `npm run start:prod` to use the production backend deployed to AWS.
 
-`npm start` is the local development environment and will require a local backend. The 'dev' deploy can be found at <https://h3lioviz.dev.swx-trec.com>
+`npm start` is the local development environment and will require a local backend. The 'dev' deploy can be found at <https://dev.swx-trec.com/h3lioviz>
 
 To test with a local paraview server, follow the README instructions in the h3lioviz-server repo <https://github.com/SWxTREC/h3lioviz-server> for running a local docker container containing the backend and some relevant data.
 
@@ -89,13 +89,13 @@ When you are ready to push your image, contact the web team infrastructure group
 
 ## Deploy H3lioViz
 
-Merges to the `dev` branch will automatically be deployed to <https://h3lioviz.dev.swx-trec.com>. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
+Merges to the `dev` branch will automatically be deployed to <https://dev.swx-trec.com/h3lioviz>. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
 
 Be sure to `npm run lint && npm test` before merging to the `dev` branch.
 
 ### Version and release
 
-Once <https://h3lioviz.dev.swx-trec.com> is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
+Once <https://dev.swx-trec.com/h3lioviz> is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
 
 This will:
 
