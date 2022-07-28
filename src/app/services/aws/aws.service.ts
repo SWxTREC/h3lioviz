@@ -70,7 +70,7 @@ export class AwsService {
 
     startEc2(): Observable<string> {
         // StartEC2Instances.py lambda link
-        return this._http.get( this.awsUrl + '/BrianTestStartEC2', { responseType: 'text' });
+        return this._http.get( this.awsUrl + '/ec2start', { responseType: 'text' });
     }
 
     startUp() {
