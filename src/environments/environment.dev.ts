@@ -8,13 +8,13 @@ if ( siteRootUrl.substr(-1) !== '/' ) {
 
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com/enlil',
+        api: 'https://apigw.dev.swx-trec.com/h3lioviz',
         cognito: {
-            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
-            region: 'us-west-2',
-            userPoolId: 'm1uXvZDys',
-            loginPage: 'https://dev-swx-trec.auth.us-west-2.amazoncognito.com',
-            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
+            appClientId: '7tefs84hbme9m5etvg34h1hen',
+            region: 'us-east-1',
+            userPoolId: '1aA5ZzW8s',
+            loginPage: 'https://dev-swx-trec.auth.us-east-1.amazoncognito.com',
+            identityPoolId: 'c6ff4d3a-226d-4a14-bcac-c32e8f2a7c84'
         }
     },
     production: true,
