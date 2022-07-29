@@ -16,6 +16,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     errorMessage: string;
     initialVisualizerSplit: [number, number ] = [ 35, 65 ];
     subscriptions: Subscription[] = [];
+    timeIndex: number;
     validConnection = this._websocket.validConnection$.value;
     visualizerSplit: [number, number ];
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
@@ -64,12 +65,17 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 const divRenderer = this.pvContent.nativeElement;
                 window.addEventListener( 'resize', this.pvView.resize );
                 this.pvView.setContainer( divRenderer );
-                // TODO: store time index and don't reset to 0
-                // this.pvView.get().session.call('pv.time.index.set', [ 0 ]);
+                // check for a stored time index
+                const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
                 this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
                     this.timeTicks = timeValues.map( value => Math.round( value ) );
-                    this.loading = false;
-                    this.pvView.get().session.call('pv.vcr.action', [ 'first' ]);
+                    if ( timeIndex ) {
+                        this.timeIndex = timeIndex;
+                        this.setTimestep( timeIndex );
+                    } else {
+                        this.timeIndex = 0;
+                        this.setTimestep( 0 );
+                    }
                 });
             }
         }));
@@ -83,10 +89,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         sessionStorage.setItem('visualizerSplit', JSON.stringify( event.sizes ));
     }
 
-    getTimestep( timeIndex: number ) {
+    setTimestep( timeIndex: number ) {
         this.loading = true;
-        const session = this.pvView.get().session;
-        session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
     refresh() {

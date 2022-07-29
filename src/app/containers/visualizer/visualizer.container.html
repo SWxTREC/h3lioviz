@@ -20,7 +20,7 @@
                 </div>
                 <div #pvContent class="viz__pv"></div>
             </div>
-            <swt-time-player *ngIf="timeTicks[0]" [pvView]="pvView" [timeTicks]="timeTicks" (updateTime)="getTimestep($event)"></swt-time-player>
+            <swt-time-player *ngIf="timeTicks.length" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
             <swt-plots></swt-plots>
         </as-split-area>
     </as-split>
