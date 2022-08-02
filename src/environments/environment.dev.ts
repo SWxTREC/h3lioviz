@@ -1,4 +1,4 @@
-import { version } from '../../package.json';
+import { name, version } from '../../package.json';
 
 let siteRootUrl = window.location.origin;
 
@@ -7,9 +7,14 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 
+// ensure that the root URL in prod ends with the name of the app
+if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
+    siteRootUrl += name + '/';
+}
+
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com/h3lioviz',
+        api: 'https://apigw.dev.swx-trec.com',
         cognito: {
             appClientId: '7tefs84hbme9m5etvg34h1hen',
             region: 'us-east-1',
