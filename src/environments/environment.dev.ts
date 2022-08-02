@@ -7,8 +7,8 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 
-// ensure that the root URL in prod ends with the name of the app
-if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
+// if not on localhost, ensure that the root URL in ends with the name of the app
+if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
     siteRootUrl += name + '/';
 }
 
