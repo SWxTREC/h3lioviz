@@ -9,6 +9,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class TimePlayerComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
+    @Input() timeIndex: number;
     @Input() timeTicks: number[];
     @Output() updateTime = new EventEmitter();
 
@@ -20,7 +21,6 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     timestepDebouncer: Subject<number> = new Subject<number>();
 
     subscriptions: Subscription[] = [];
-    timeIndex = 0;
 
     constructor() {
         this.subscriptions.push(
@@ -38,8 +38,8 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                     // stop when the pause button is pressed
                     this.session.call( 'pv.time.index.set', [ this.timeIndex ] );
                 }
-            }
-            ));
+            })
+        );
     }
 
     ngOnChanges(): void {
@@ -50,6 +50,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        sessionStorage.setItem('timeIndex', JSON.stringify(this.timeIndex) );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
