@@ -103,7 +103,7 @@ export class ProfileNavService extends LaspNavService {
             + `?client_id=${environment.aws.cognito.appClientId}`
             + `&response_type=code`
             + `&scope=openid profile email phone aws.cognito.signin.user.admin`
-            + `&redirect_uri=${environment.siteRootUrl}`
+            + `&redirect_uri=${environment.siteRootUrl}h3lioviz/`
             + `&state=${loginNonce}`;
     }
 
