@@ -54,7 +54,7 @@ export class ProfileNavService extends LaspNavService {
                 this._http.post(
                     `${environment.aws.cognito.loginPage}/oauth2/token`,
                     `grant_type=authorization_code`
-                        + `&redirect_uri=${environment.siteRootUrl}`
+                        + `&redirect_uri=${environment.siteRootUrl}index.html`
                         + `&code=${params.code}`
                         + `&client_id=${environment.aws.cognito.appClientId}`,
                     {
@@ -103,7 +103,7 @@ export class ProfileNavService extends LaspNavService {
             + `?client_id=${environment.aws.cognito.appClientId}`
             + `&response_type=code`
             + `&scope=openid profile email phone aws.cognito.signin.user.admin`
-            + `&redirect_uri=${environment.siteRootUrl}`
+            + `&redirect_uri=${environment.siteRootUrl}index.html`
             + `&state=${loginNonce}`;
     }
 
