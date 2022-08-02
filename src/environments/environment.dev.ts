@@ -14,7 +14,7 @@ if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== 
 
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com',
+        api: 'https://apigw.dev.swx-trec.com/h3lioviz',
         cognito: {
             appClientId: '7tefs84hbme9m5etvg34h1hen',
             region: 'us-east-1',
