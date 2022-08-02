@@ -1,8 +1,9 @@
 import { version } from '../../package.json';
 
 let siteRootUrl = window.location.origin;
+
 // ensure that the root URL ends with a slash
-if ( siteRootUrl.substr(-1) !== '/' ) {
+if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 

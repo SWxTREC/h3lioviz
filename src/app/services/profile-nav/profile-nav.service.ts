@@ -33,7 +33,7 @@ export class ProfileNavService extends LaspNavService {
         // This will also resolve if it verifies that the user is not logged in, and is not in the process of logging in
         this.finishedInitialLogin = new Promise( resolve => {
             const params: any = {};
-            window.location.search.substr( 1 ).split( '&' ).forEach( keyval => {
+            window.location.search.slice( 1 ).split( '&' ).forEach( keyval => {
                 const keyvalSplit = keyval.split( '=' );
                 params[keyvalSplit[0]] = keyvalSplit[1];
             });
@@ -103,7 +103,7 @@ export class ProfileNavService extends LaspNavService {
             + `?client_id=${environment.aws.cognito.appClientId}`
             + `&response_type=code`
             + `&scope=openid profile email phone aws.cognito.signin.user.admin`
-            + `&redirect_uri=${environment.siteRootUrl}h3lioviz/`
+            + `&redirect_uri=${environment.siteRootUrl}`
             + `&state=${loginNonce}`;
     }
 
