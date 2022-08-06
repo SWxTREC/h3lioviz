@@ -69,9 +69,9 @@
     "scicharts": "^5.1.1",
     "shader-loader": "^1.3.1",
     "tslib": "^2.0.0",
-    "vtk.js": "^17.5.0",
+    "vtk.js": "^25.6.0",
     "worker-loader": "^3.0.8",
-    "wslink": "^0.1.15",
+    "wslink": "^1.6.6",
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
