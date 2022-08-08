@@ -1,4 +1,4 @@
-import { name, version } from '../../package.json';
+import packageInfo from '../../package.json';
 
 let siteRootUrl = window.location.origin;
 // ensure that the root URL ends with a slash
@@ -6,7 +6,7 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 // ensure that the root URL in prod ends with the name of the app
-if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
+if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== packageInfo.name ) {
     siteRootUrl += name + '/';
 }
 
@@ -23,7 +23,7 @@ export const environment = {
     },
     production: true,
     siteRootUrl: siteRootUrl,
-    version: version
+    version: packageInfo.version
 };
 
 export const environmentConfig = {

@@ -3,7 +3,7 @@
 @import 'theme/theme-colors.scss';
 @import 'theme/theme-lasp.scss';
 
-@import '~lasp-base-app-snippets/styles/global.scss';
+@import 'node_modules/lasp-base-app-snippets/styles/global.scss';
 @include all((
     'primary-color': $color-primary,
     'primary-contrast-color': $color-primary-contrast,
