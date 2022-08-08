@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@use '~@angular/material' as mat;
 @import 'theme/theme-colors.scss';
 @import 'theme/theme-lasp.scss';
 
@@ -11,8 +12,8 @@
     'success-color': $color-success,
     'background-color': #53576D,
 
-    'link-color': mat-color( $primary, 200 ),
-    'heading-color': mat-color( $primary, 500 )
+    'link-color': mat.get-color-from-palette( $primary, 200 ),
+    'heading-color': mat.get-color-from-palette( $primary, 500 )
 ));
 
 // you can add color variables from other libraries/name-spaces here as well

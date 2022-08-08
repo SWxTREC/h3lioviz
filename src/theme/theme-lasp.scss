@@ -1,13 +1,13 @@
-@import '~@angular/material/theming';
+@use '~@angular/material' as mat;
 @import './theme-palette';
 
-@include mat-core();
+@include mat.core();
 
-$theme: mat-light-theme( $primary, $accent, $warn );
-$theme-dark: mat-dark-theme( $primary-dark, $accent-dark, $warn-dark );
+$theme: mat.define-light-theme( $primary, $accent, $warn );
+$theme-dark: mat.define-dark-theme( $primary-dark, $accent-dark, $warn-dark );
 
-@include angular-material-theme( $theme );
+@include mat.all-component-themes( $theme );
 
 .lasp-dark-theme {
-    @include angular-material-theme( $theme-dark );
+    @include mat.all-component-themes( $theme-dark );
 }
