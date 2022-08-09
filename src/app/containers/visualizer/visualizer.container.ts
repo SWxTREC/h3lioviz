@@ -95,6 +95,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     refresh() {
-        window.location.reload();
+        window.location.reload(true);
     }
 }
