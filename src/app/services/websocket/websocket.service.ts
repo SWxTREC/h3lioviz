@@ -3,10 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { environmentConfig } from 'src/environments/environment';
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
-import vtkRemoteView, {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    connectImageStream
-} from 'vtk.js/Sources/Rendering/Misc/RemoteView';
+import vtkRemoteView from 'vtk.js/Sources/Rendering/Misc/RemoteView';
 
 import SmartConnect from 'wslink/src/SmartConnect';
 
@@ -61,8 +58,9 @@ export class WebsocketService {
             this.errorMessage$.next(null);
             const session = validClient.getConnection().getSession();
             const viewStream = validClient.getImageStream().createViewStream( -1 );
-            const remoteView = vtkRemoteView.newInstance({ session, viewStream });
+            const remoteView = vtkRemoteView.newInstance({ viewStream });
             this.pvView = remoteView;
+            this.pvView.setSession(session);
             this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
             // jpeg quality, reduced to speed up interactions on slow connections
             this.pvView.setInteractiveQuality( 50 );
