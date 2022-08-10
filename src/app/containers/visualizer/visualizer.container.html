@@ -11,6 +11,7 @@
 <div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split direction="horizontal" (dragEnd)="dragEnd($event)">
         <as-split-area class="viz__panel viz__panel--full-width" [size]="visualizerSplit[1]">
+            <swt-layer-menu class="viz__menu" [pvView]="pvView"></swt-layer-menu>
             <div class="viz__pv-container">
                 <div *ngIf="loading" class="viz__loading">
                     <mat-spinner color="accent" diameter="40"></mat-spinner>
@@ -20,7 +21,6 @@
             <swt-time-player *ngIf="timeTicks.length" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
         </as-split-area>
         <as-split-area class="viz__panel" [size]="visualizerSplit[0]">
-            <swt-control-panel [pvView]="pvView"></swt-control-panel>
             <swt-plots></swt-plots>
         </as-split-area>
     </as-split>

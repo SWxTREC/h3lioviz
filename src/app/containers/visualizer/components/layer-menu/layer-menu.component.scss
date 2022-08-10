@@ -1,0 +1,18 @@
+.menu {
+	&__form {
+		display: flex;
+		flex-direction: column;
+		padding: 1rem;
+	}
+	&__icon {
+		background-color: transparentize(black, .4);
+		border-radius: 0;
+		color: white;
+	}
+	&__more-info {
+		width: 500px;
+	}
+	&__units {
+		color: gray;
+	}
+}

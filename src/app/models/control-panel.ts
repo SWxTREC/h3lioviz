@@ -146,6 +146,19 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
     thresholdVariable: VARIABLE_CONFIG.density
 };
 
+export const LAYER_MENU_DEFAULT_VALUES = {
+    contourVariable: VARIABLE_CONFIG.velocity,
+    cme: false,
+    cmeContours: false,
+    latSlice: true,
+    lonSlice: false,
+    lonStreamlines: false,
+    numberOfContours: 3,
+    radialSlice: false,
+    satellites: true,
+    satFieldlines: false
+};
+
 export const INITIAL_TICK_STEP =
     // the difference between the high value and the low value, divided by numberOfContours - 1
     ( CONTROL_PANEL_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] -

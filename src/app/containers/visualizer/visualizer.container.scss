@@ -32,7 +32,13 @@
             align-items: center;
         }
     }
+    &__menu {
+        position: absolute;
+        right: 0%;
+        z-index: 2;
+    }
     &__panel {
+        position: relative;
         background-color: white;
         padding: 0.7rem;
         &--full-width {

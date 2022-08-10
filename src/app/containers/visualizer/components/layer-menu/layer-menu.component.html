@@ -1,0 +1,75 @@
+<button mat-icon-button class="menu__icon" [matMenuTriggerFor]="visibilityMenu" aria-label="layers menu button">
+    <mat-icon>layers</mat-icon>
+</button>
+<form [formGroup]="layerMenu">
+    <mat-menu #visibilityMenu="matMenu" xPosition="before">
+        <div sciStopClick class="menu__form">
+            <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="cmeContours">
+                Contour surface 
+                <span class="menu__units">
+                    ({{layerMenu.value.contourVariable.displayName}})
+                </span>
+              <button *ngIf="layerMenu.value.cmeContours" mat-menu-item [matMenuTriggerFor]="contourMenu"></button>
+    
+            </mat-checkbox>
+            <mat-checkbox color="primary" formControlName="lonSlice">
+                Latitudinal slice
+                <span *ngIf="layerMenu.value.lonSlice">{{ lonSliceAngle !== '0' ? 'at ' + lonSliceAngle + '&deg;' : '' }}</span>
+                <button *ngIf="layerMenu.value.lonSlice" mat-menu-item [matMenuTriggerFor]="latMenu"></button>
+            </mat-checkbox>
+            <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="satFieldlines">Satellite fieldlines</mat-checkbox>
+            <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
+        </div>
+    </mat-menu>
+    <mat-menu #contourMenu xPosition="after">
+        <div class="menu__more-info" [class.menu__more-info--expand]="layerMenu.value.contourVariable">
+            <ng-container >
+                <mat-form-field>
+                    <mat-label>Contour variable</mat-label>
+                    <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
+                        <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
+                            {{ variable.value.displayName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div>
+                    <strong>Range of {{ layerMenu.value.contourVariable.displayName }}</strong>
+                    <small innerHTML=" ({{layerMenu.value.contourVariable.units}})"></small>
+                </div>
+                <ngx-slider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="updateContourRange($event)"></ngx-slider>
+                <div>
+                    <strong>Contour surface values</strong>
+                    <div>
+                        {{ contourArray | json }}
+                    </div>
+                </div>
+                <mat-form-field>
+                    <mat-label>Number of contours</mat-label>
+                    <input matInput type="number" min="2" max="10" formControlName="numberOfContours">
+                </mat-form-field>
+            </ng-container>
+        </div>
+    </mat-menu>
+    <mat-menu #latMenu xPosition="after">
+        <div *ngIf="layerMenu.value.lonSlice" class="menu__more-info" [class.menu__more-info--expand]="showAngleAdjust">
+            <ng-container *ngIf="showAngleAdjust">
+                <div>
+                    <mat-form-field>
+                        <mat-label>Angle of ecliptic slice (&deg;)</mat-label>
+                        <input matInput type="number" [min]="lonSliceOptions.validRange[0]" [max]="lonSliceOptions.validRange[1]" [value]="lonSliceAngle" [step]="lonSliceOptions.stepSize" (change)="updateLonSliceAngle($event)">
+                        <mat-hint>From {{ lonSliceOptions.validRange[1] }} to {{ lonSliceOptions.validRange[0] }}</mat-hint>
+                    </mat-form-field>
+                    <div class="menu__relative-container">
+                        <div class="earth-dot"></div>
+                        <mat-slider min="-100" max="100" disabled="true" value="0" [style.transform]="'rotate(' + -lonSliceAngle + 'deg)'"></mat-slider>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+    </mat-menu>
+</form>
