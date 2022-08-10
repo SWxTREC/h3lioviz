@@ -45,7 +45,8 @@
     }
     &__pv-container {
         position: relative;
-        width: 100%;
+        // height of screen minus header and timeplayer
+        width: calc(100vh - 145px);
     }
     &__split {
         position: relative;

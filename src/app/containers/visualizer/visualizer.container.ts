@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
+import { LaspNavService } from 'lasp-nav';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AwsService, WebsocketService } from 'src/app/services';
 
@@ -25,9 +26,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     constructor(
         private _awsService: AwsService,
+        private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
+        this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.visualizerSplit = JSON.parse(
             sessionStorage.getItem( 'visualizerSplit' )
@@ -82,6 +85,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        this._laspNavService.setAlwaysSticky( false );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
