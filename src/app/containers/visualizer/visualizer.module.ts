@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
+import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
 import { MomentModule } from 'ngx-moment';
 import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
@@ -16,6 +17,7 @@ import { VisualizerComponent } from './visualizer.container';
         CommonModule,
         ComponentsModule,
         ChartModule,
+        LaspEnhancedNgxSliderModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,

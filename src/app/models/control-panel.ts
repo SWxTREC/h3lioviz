@@ -147,6 +147,7 @@ export const CONTROL_PANEL_DEFAULT_VALUES = {
 };
 
 export const LAYER_MENU_DEFAULT_VALUES = {
+    contourArea: 'all',
     contourVariable: VARIABLE_CONFIG.velocity,
     cme: false,
     cmeContours: false,

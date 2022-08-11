@@ -1,11 +1,39 @@
+@import 'src/theme/theme-colors.scss';
+
 .menu {
+	&__toggle-button {
+		height: 2rem;
+		align-items: center;
+		.mat-button-toggle {
+			width: 4em;
+		}
+		.mat-button-toggle-checked {
+			background-color: $color-primary;
+			&.mat-button-toggle-appearance-standard {
+				color: white;
+			}
+		}
+	}
+	&__close {
+		align-self: flex-end;
+		position: absolute;
+		top: 0.5rem;
+	}
+	&__control {
+		margin-right: 1rem;
+		&--inline {
+			display: inline;
+		}
+	}
+	&__fill {
+		flex: 1 1 auto;
+	}
 	&__form {
 		display: flex;
 		flex-direction: column;
-	}
-	&__control {
-		&--inline {
-			display: inline;
+		&--visibility {
+			// stabilize the width so it doesn't jump around
+			width: 320px;
 		}
 	}
 	&__icon {
@@ -13,8 +41,9 @@
 		border-radius: 0;
 		color: white;
 	}
-	&__more-info {
-		width: 350px;
+	&__row {
+		display: flex;
+		align-items: center;
 	}
 	&__value {
 		color: silver;

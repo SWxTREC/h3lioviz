@@ -25,7 +25,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         combineLabels: (min, max) => min + ' to ' + max,
         step: this.defaultContourVariable.step,
         animate: false,
-        showTicksValues: true,
+        showTicksValues: false,
         tickStep: INITIAL_TICK_STEP,
         ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
@@ -140,7 +140,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
     }
-    
+
     updateContourRange( event: ChangeContext ) {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
         const newRange: [ number, number ] = [ event.value, event.highValue ];

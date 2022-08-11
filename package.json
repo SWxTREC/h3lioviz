@@ -55,6 +55,7 @@
     "highcharts": "^10.1.0",
     "lasp-base-app-snippets": "^3.4.0",
     "lasp-cookie-consent": "^0.2.1",
+    "lasp-enhanced-ngx-slider": "^1.0.0",
     "lasp-footer": "^1.6.1",
     "lasp-nav": "^1.6.0",
     "lasp-range-slider": "^3.6.1",
