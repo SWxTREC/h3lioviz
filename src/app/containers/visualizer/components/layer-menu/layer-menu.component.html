@@ -7,16 +7,16 @@
             <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
             <mat-checkbox color="primary" formControlName="cmeContours">
                 Contour surface 
-                <span class="menu__units">
-                    ({{layerMenu.value.contourVariable.displayName}})
+                <span class="menu__value">
+                    ({{layerMenu.value.contourVariable?.displayName}})
                 </span>
-              <button *ngIf="layerMenu.value.cmeContours" mat-menu-item [matMenuTriggerFor]="contourMenu"></button>
+              <span *ngIf="layerMenu.value.cmeContours" mat-menu-item class="menu__control menu__control--inline" [matMenuTriggerFor]="contourMenu"></span>
     
             </mat-checkbox>
             <mat-checkbox color="primary" formControlName="lonSlice">
                 Latitudinal slice
                 <span *ngIf="layerMenu.value.lonSlice">{{ lonSliceAngle !== '0' ? 'at ' + lonSliceAngle + '&deg;' : '' }}</span>
-                <button *ngIf="layerMenu.value.lonSlice" mat-menu-item [matMenuTriggerFor]="latMenu"></button>
+                <span *ngIf="layerMenu.value.lonSlice" mat-menu-item class="menu__control menu__control--inline" [matMenuTriggerFor]="latMenu"></span>
             </mat-checkbox>
             <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
             <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
@@ -26,7 +26,7 @@
         </div>
     </mat-menu>
     <mat-menu #contourMenu xPosition="after">
-        <div class="menu__more-info" [class.menu__more-info--expand]="layerMenu.value.contourVariable">
+        <div class="menu__more-info">
             <ng-container >
                 <mat-form-field>
                     <mat-label>Contour variable</mat-label>
@@ -54,8 +54,8 @@
             </ng-container>
         </div>
     </mat-menu>
-    <mat-menu #latMenu xPosition="after">
-        <div *ngIf="layerMenu.value.lonSlice" class="menu__more-info" [class.menu__more-info--expand]="showAngleAdjust">
+    <mat-menu #latMenu class="menu__panel" xPosition="after">
+        <div *ngIf="layerMenu.value.lonSlice" class="menu__more-info">
             <ng-container *ngIf="showAngleAdjust">
                 <div>
                     <mat-form-field>

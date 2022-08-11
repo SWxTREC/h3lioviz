@@ -2,7 +2,11 @@
 	&__form {
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
+	}
+	&__control {
+		&--inline {
+			display: inline;
+		}
 	}
 	&__icon {
 		background-color: transparentize(black, .4);
@@ -10,9 +14,9 @@
 		color: white;
 	}
 	&__more-info {
-		width: 500px;
+		width: 350px;
 	}
-	&__units {
-		color: gray;
+	&__value {
+		color: silver;
 	}
 }
