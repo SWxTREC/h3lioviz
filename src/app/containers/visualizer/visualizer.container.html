@@ -9,18 +9,18 @@
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz__split" [class.viz__fade]="!validConnection">
-    <as-split direction="horizontal" (dragEnd)="dragEnd($event)">
-        <as-split-area class="viz__panel viz__panel--full-width" [size]="visualizerSplit[1]">
+    <as-split unit="pixel" direction="horizontal" (dragEnd)="dragEnd($event)">
+        <as-split-area class="viz__panel viz__panel--full-width" [size]="vizSize" [minSize]="vizMin" [maxSize]="vizMax">
             <swt-layer-menu class="viz__menu" [pvView]="pvView"></swt-layer-menu>
-            <div class="viz__pv-container">
+            <div>
                 <div *ngIf="loading" class="viz__loading">
                     <mat-spinner color="accent" diameter="40"></mat-spinner>
                 </div>
-                <div #pvContent class="viz__pv"></div>
+                <div #pvContent class="viz__pv" [style.height]="vizMax + 'px'" [style.width]="vizMax + 'px'"></div>
             </div>
             <swt-time-player *ngIf="timeTicks.length" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
         </as-split-area>
-        <as-split-area class="viz__panel" [size]="visualizerSplit[0]">
+        <as-split-area class="viz__panel" [size]="$any('*')">
             <swt-plots></swt-plots>
         </as-split-area>
     </as-split>
