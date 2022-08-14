@@ -1,6 +1,6 @@
 @import 'src/theme/theme-colors.scss';
 
-.menu {
+.layer-menu {
 	&__toggle-button {
 		height: 2rem;
 		align-items: center;
@@ -14,20 +14,6 @@
 			}
 		}
 	}
-	&__close {
-		align-self: flex-end;
-		position: absolute;
-		top: 0.5rem;
-	}
-	&__control {
-		margin-right: 1rem;
-		&--inline {
-			display: inline;
-		}
-	}
-	&__fill {
-		flex: 1 1 auto;
-	}
 	&__form {
 		display: flex;
 		flex-direction: column;
@@ -35,15 +21,6 @@
 			// stabilize the width so it doesn't jump around
 			width: 320px;
 		}
-	}
-	&__icon {
-		background-color: transparentize(black, .4);
-		border-radius: 0;
-		color: white;
-	}
-	&__row {
-		display: flex;
-		align-items: center;
 	}
 	&__value {
 		color: silver;

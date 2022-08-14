@@ -1,0 +1,26 @@
+.menu {
+	&__control {
+		&--row {
+			margin-right: 1rem;
+		}
+		&--col {
+			margin-bottom: 1rem;
+		}
+		&--inline {
+			display: inline;
+		}
+	}
+	&__fill {
+		flex: 1 1 auto;
+	}
+	&__icon {
+		background-color: transparentize(black, .4);
+		border-radius: 0;
+		color: white;
+	}
+	&__row {
+		display: flex;
+		align-items: center;
+	}
+
+}

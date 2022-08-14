@@ -9,7 +9,7 @@ import { INITIAL_TICK_STEP, IVariableInfo, LAYER_MENU_DEFAULT_VALUES, VARIABLE_C
 @Component({
     selector: 'swt-layer-menu',
     templateUrl: './layer-menu.component.html',
-    styleUrls: [ './layer-menu.component.scss' ]
+    styleUrls: [ '../menu.scss', './layer-menu.component.scss' ]
 })
 export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
     @Input() pvView: any;
@@ -48,8 +48,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         Object.keys(LAYER_MENU_DEFAULT_VALUES).forEach( controlName => {
             this.layerMenu.addControl(controlName, new FormControl( LAYER_MENU_DEFAULT_VALUES[controlName]));
         });
-        // create user objects from session storage if it exists, or from defaults
-        // contours
+        // get user contourRanges from session storage if it exists, or from defaults
         if ( sessionStorage.getItem('contourRanges')) {
             this.userContourRanges = JSON.parse(sessionStorage.getItem('contourRanges'));
         } else {
@@ -57,13 +56,12 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 this.userContourRanges[variable] = VARIABLE_CONFIG[variable].defaultSubsetRange;
             });
         }
-        // lonSliceAngle
-        if ( sessionStorage.getItem('lonSliceAngle')) {
-            this.lonSliceAngle = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
-        } else {
-            this.lonSliceAngle = parseFloat('0').toFixed(1);
-        }
-
+        // // lonSliceAngle
+        // if ( sessionStorage.getItem('lonSliceAngle')) {
+        //     this.lonSliceAngle = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
+        // } else {
+        //     this.lonSliceAngle = parseFloat('0').toFixed(1);
+        // }
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
@@ -84,7 +82,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('layerMenu'))) || clone(LAYER_MENU_DEFAULT_VALUES);
             this.layerMenu.setValue( initialFormValues );
-            this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+            // this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
         }
     }
 
@@ -108,7 +106,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
     saveUserSettings(): void {
         sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
         sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
-        sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngle ));
+        // sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngle ));
     }
 
     setFormSubscriptions() {
@@ -139,6 +137,24 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 this.updateContourRange( { value: newContourRange[0], highValue: newContourRange[1], pointerType: undefined });
             })
         );
+        // subscribe to CONTOUR AREA changes and call update contour function
+        this.subscriptions.push( this.layerMenu.controls.contourArea.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
+                this.updateContourRange( { value: this.contourRange[0], highValue: this.contourRange[1], pointerType: undefined });
+            })
+        );
+        // subscribe to LON SLICE TYPE changes and render appropriately
+        this.subscriptions.push( this.layerMenu.controls.lonSliceType.valueChanges
+            .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
+                if ( newLonSliceType === 'Solar-equator' ) {
+                    this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', 0 ] );
+                } else {
+                    // TODO: either get the angle of Earth from the backend or add a function to roate to angle of earth on backend
+                    const angleOfEarth = 7.5;
+                    this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', angleOfEarth ] );
+                }
+            })
+        );
     }
 
     updateContourRange( event: ChangeContext ) {
@@ -165,21 +181,19 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             ticksArray: step ? trimmedArray : null
         };
         this.contourOptions = newOptions;
-
-        this.session.call('pv.h3lioviz.set_contours', [ contourVariable.serverName, this.contourArray ]);
-        this.renderDebouncer.next();
-    }
-
-    updateLonSliceAngle( event: any ) {
-        const value = event.target.value;
-        // get the valid range for the angle
-        const validRange: number[] = this.lonSliceOptions.validRange;
-        // limit to valid range
-        const validInputValue: number = value < 0 ? Math.max( validRange[0], value) : Math.min( validRange[1], value);
-        // format value
-        const formattedValidValue: string = parseFloat( validInputValue.toString() ).toFixed(1);
-        this.lonSliceAngle = formattedValidValue;
-        this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+        // determine which area to render in contours
+        // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
+        if ( this.layerMenu.value.contourArea === 'cme' ) {
+            // set the values for the cme
+            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
+            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+            this.session.call('pv.h3lioviz.set_contours', [ contourVariable.serverName, this.contourArray ]);
+        } else {
+            // set the values for the entire area
+            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+            this.session.call('pv.h3lioviz.set_threshold', [ contourVariable.serverName, this.contourArray ] );
+        }
         this.renderDebouncer.next();
     }
 
