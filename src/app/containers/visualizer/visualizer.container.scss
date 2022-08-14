@@ -6,6 +6,10 @@
 }
 
 .viz {
+    &__container {
+        position: relative;
+        z-index: 1;
+    }
     &__error {
         display: flex;
         align-items: center;
@@ -16,6 +20,10 @@
         // disable mouse interactions
         pointer-events: none;
     }
+    &__hints {
+        position: absolute;
+        bottom: 0;
+    }
     &__icon {
         color: $color-primary;
     }
@@ -24,7 +32,6 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 2;
         &--disconnect {
             color: transparentize(black, 0.3);
             display: flex;
@@ -32,10 +39,17 @@
             align-items: center;
         }
     }
-    &__menu {
+    &__menus {
+        display: flex;
+        flex-direction: column;
         position: absolute;
-        right: 0%;
-        z-index: 2;
+        right: 0;
+        z-index: 1;
+    }
+    &__overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
     }
     &__panel {
         position: relative;
@@ -47,12 +61,6 @@
     }
     &__pv {
         position: relative;
-        z-index: 1
-    }
-    &__pv-container {
-        position: relative;
-        // height of screen minus header and timeplayer
-        height: calc(100vh - 125px);
     }
     &__split {
         position: relative;

@@ -8,7 +8,7 @@ import { MomentModule } from 'ngx-moment';
 import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
-import { ControlPanelComponent, LayerMenuComponent, PlotsComponent, TimePlayerComponent } from './components';
+import { ControlPanelComponent, HintsComponent, LayerMenuComponent, PlotsComponent, TimePlayerComponent } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -27,6 +27,7 @@ import { VisualizerComponent } from './visualizer.container';
     ],
     declarations: [
         ControlPanelComponent,
+        HintsComponent,
         LayerMenuComponent,
         PlotsComponent,
         TimePlayerComponent,
