@@ -56,12 +56,6 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 this.userContourRanges[variable] = VARIABLE_CONFIG[variable].defaultSubsetRange;
             });
         }
-        // // lonSliceAngle
-        // if ( sessionStorage.getItem('lonSliceAngle')) {
-        //     this.lonSliceAngle = JSON.parse(sessionStorage.getItem('lonSliceAngle'));
-        // } else {
-        //     this.lonSliceAngle = parseFloat('0').toFixed(1);
-        // }
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
