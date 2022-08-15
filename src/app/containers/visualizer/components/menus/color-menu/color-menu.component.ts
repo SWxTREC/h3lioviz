@@ -8,7 +8,6 @@ import { debounceTime } from 'rxjs/operators';
 import {
     COLOR_MENU_DEFAULT_VALUES,
     COLORMAPS,
-    CONTROL_PANEL_DEFAULT_VALUES,
     IVariableInfo,
     VARIABLE_CONFIG
 } from 'src/app/models';
@@ -21,7 +20,7 @@ import {
 export class ColorMenuComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
 
-    defaultColorVariable: IVariableInfo = CONTROL_PANEL_DEFAULT_VALUES.colorVariable;
+    defaultColorVariable: IVariableInfo = COLOR_MENU_DEFAULT_VALUES.colorVariable;
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
     colorForm: FormGroup = new FormGroup({});
@@ -81,7 +80,7 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
             this.userOpacities = JSON.parse(sessionStorage.getItem('opacities'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userOpacities[variable] = CONTROL_PANEL_DEFAULT_VALUES.opacity;
+                this.userOpacities[variable] = COLOR_MENU_DEFAULT_VALUES.opacity;
             });
         }
       

@@ -10,7 +10,6 @@ import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import {
     ColorMenuComponent,
-    ControlPanelComponent,
     HintsComponent,
     LayerMenuComponent,
     OrientationMenuComponent,
@@ -36,7 +35,6 @@ import { VisualizerComponent } from './visualizer.container';
     ],
     declarations: [
         ColorMenuComponent,
-        ControlPanelComponent,
         HintsComponent,
         LayerMenuComponent,
         OrientationMenuComponent,
