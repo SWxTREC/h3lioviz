@@ -8,7 +8,7 @@
     <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
-<div class="viz__split" [class.viz__fade]="false">
+<div class="viz__split" [class.viz__fade]="!validConnection">
     <as-split unit="pixel" direction="horizontal" (dragEnd)="dragEnd($event)">
         <as-split-area class="viz__panel viz__panel--full-width" [size]="vizSize" [minSize]="vizMin" [maxSize]="vizMax">
             <div class="viz__container" >
@@ -30,7 +30,7 @@
             <swt-time-player *ngIf="timeTicks.length" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
         </as-split-area>
         <as-split-area class="viz__panel" [size]="$any('*')">
-            <swt-plots></swt-plots>
+            <swt-plots *ngIf="timeTicks.length" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
         </as-split-area>
     </as-split>
 </div>
