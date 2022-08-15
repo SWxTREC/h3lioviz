@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrientationMenuComponent } from './orientation-menu.component';
+import { ZoomMenuComponent } from './zoom-menu.component';
 
-describe('OrientationMenuComponent', () => {
-    let component: OrientationMenuComponent;
-    let fixture: ComponentFixture<OrientationMenuComponent>;
+describe('ZoomMenuComponent', () => {
+    let component: ZoomMenuComponent;
+    let fixture: ComponentFixture<ZoomMenuComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ OrientationMenuComponent ]
+            declarations: [ ZoomMenuComponent ]
         })
     .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(OrientationMenuComponent);
+        fixture = TestBed.createComponent(ZoomMenuComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -15,7 +15,8 @@ import {
     LayerMenuComponent,
     OrientationMenuComponent,
     PlotsComponent,
-    TimePlayerComponent
+    TimePlayerComponent,
+    ZoomMenuComponent
 } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
@@ -41,7 +42,8 @@ import { VisualizerComponent } from './visualizer.container';
         OrientationMenuComponent,
         PlotsComponent,
         TimePlayerComponent,
-        VisualizerComponent
+        VisualizerComponent,
+        ZoomMenuComponent
     ]
 })
 export class VisualizerModule { }
