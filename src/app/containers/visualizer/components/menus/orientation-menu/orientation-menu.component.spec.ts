@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/modules';
 
 import { OrientationMenuComponent } from './orientation-menu.component';
 
@@ -8,7 +9,8 @@ describe('OrientationMenuComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ OrientationMenuComponent ]
+            declarations: [ OrientationMenuComponent ],
+            imports: [ MaterialModule ]
         })
     .compileComponents();
     });

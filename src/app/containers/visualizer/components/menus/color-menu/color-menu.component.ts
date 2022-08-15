@@ -162,8 +162,8 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
             }));
         // subscribe to OPACITY slider set user opacity per color variable and 'set_opacity'
         this.subscriptions.push( this.colorForm.controls.opacity.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( () => {
-                const newOpacityRange: [ number, number ] = this.colorForm.value.opacity;
+            .pipe( debounceTime( 300 ) ).subscribe( ( opacity ) => {
+                const newOpacityRange: [ number, number ] = opacity;
                 this.userOpacities[this.colorVariableServerName] = clone(newOpacityRange);
                 const opacityLow: number = newOpacityRange[0] / 100;
                 const opacityHigh: number = newOpacityRange[1] / 100;
@@ -193,5 +193,4 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
         this.pvView.get().session.call('pv.h3lioviz.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }
-
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MaterialModule } from 'src/app/modules';
 
 import { ZoomMenuComponent } from './zoom-menu.component';
 
@@ -8,7 +9,8 @@ describe('ZoomMenuComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ ZoomMenuComponent ]
+            declarations: [ ZoomMenuComponent ],
+            imports: [ MaterialModule ]
         })
     .compileComponents();
     });

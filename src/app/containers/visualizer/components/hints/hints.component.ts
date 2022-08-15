@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { KEYBOARD_SHORTCUTS } from 'src/app/models';
 
 @Component({
@@ -6,12 +6,6 @@ import { KEYBOARD_SHORTCUTS } from 'src/app/models';
     templateUrl: './hints.component.html',
     styleUrls: [ './hints.component.scss' ]
 })
-export class HintsComponent implements OnInit {
+export class HintsComponent {
     keyboardShortcuts = KEYBOARD_SHORTCUTS;
-
-    constructor() { }
-
-    ngOnInit(): void {
-    }
-
 }

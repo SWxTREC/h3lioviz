@@ -15,6 +15,7 @@ import { AuthGuard } from './guards/auth-guard.service';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
 import { AwsService, ProfileNavService } from './services';
+
 @NgModule({
     declarations: [
         AppComponent

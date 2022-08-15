@@ -42,6 +42,6 @@
         <ngx-slider laspEnhancedNgxSlider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
         <mat-divider class="menu__spacer"></mat-divider>
         <strong>Opacity gradient </strong>
-        <ngx-slider laspEnhancedNgxSlider [options]="opacityOptions" formControlName="opacity"></ngx-slider>
+        <ngx-slider laspEnhancedNgxSlider [options]="opacityOptions" ngDefaultControl formControlName="opacity"></ngx-slider>
 	</form>
 </mat-menu>
