@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
@@ -7,7 +7,7 @@ import { debounceTime } from 'rxjs/operators';
     templateUrl: './orientation-menu.component.html',
     styleUrls: [ '../menu.scss', './orientation-menu.component.scss' ]
 })
-export class OrientationMenuComponent implements OnInit {
+export class OrientationMenuComponent implements OnDestroy {
     @Input() pvView: any;
     renderDebouncer: Subject<string> = new Subject<string>();
     subscriptions: Subscription[] = [];
@@ -24,7 +24,8 @@ export class OrientationMenuComponent implements OnInit {
         );
     }
 
-    ngOnInit(): void {
+    ngOnDestroy(): void {
+        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
     snapTo( view: string ) {

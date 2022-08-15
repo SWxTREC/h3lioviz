@@ -21,6 +21,13 @@
 	&__row {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
+		&--margin {
+			margin-bottom: 0.5rem;
+		}
 	}
-
+    &__spacer {
+        margin: 1rem 0;
+        position: relative !important;
+    }
 }

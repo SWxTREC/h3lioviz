@@ -9,6 +9,7 @@ import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import {
+    ColorMenuComponent,
     ControlPanelComponent,
     HintsComponent,
     LayerMenuComponent,
@@ -33,6 +34,7 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
+        ColorMenuComponent,
         ControlPanelComponent,
         HintsComponent,
         LayerMenuComponent,

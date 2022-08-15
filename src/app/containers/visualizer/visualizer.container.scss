@@ -20,6 +20,9 @@
         // disable mouse interactions
         pointer-events: none;
     }
+	&__fill {
+		flex: 1 1 auto;
+	}
     &__hints {
         position: absolute;
         bottom: 0;
@@ -47,6 +50,9 @@
         z-index: 1;
         height: 100%;
         justify-content: space-between;
+        *:not(:last-child) {
+            margin-bottom: 0.25rem;
+        }
     }
     &__overlay {
         position: absolute;

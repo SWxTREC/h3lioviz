@@ -1,3 +1,4 @@
+export * from './menus/color-menu/color-menu.component';
 export * from './control-panel/control-panel.component';
 export * from './hints/hints.component';
 export * from './menus/layer-menu/layer-menu.component';

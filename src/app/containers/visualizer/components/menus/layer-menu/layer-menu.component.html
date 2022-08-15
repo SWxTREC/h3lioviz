@@ -1,4 +1,4 @@
-<button mat-icon-button class="menu__icon" #layerTrigger="matMenuTrigger" [matMenuTriggerFor]="visibilityMenu" aria-label="layers menu button">
+<button mat-icon-button matTooltip="Select visible layers" class="menu__icon" #layerTrigger="matMenuTrigger" [matMenuTriggerFor]="visibilityMenu" aria-label="layers menu button">
     <mat-icon>layers</mat-icon>
 </button>
 <form [formGroup]="layerMenu">
@@ -7,10 +7,13 @@
             <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
             <div class="menu__row">
                 <mat-checkbox color="primary" class="menu__control menu__control--row" formControlName="cmeContours">
-                    Contour surface
+                    {{ layerMenu.value.contourArea === 'cme' ? 'CME C' : 'C'}}ontour surface<span *ngIf="layerMenu.value.numberOfContours !== 1">s</span>:
                 </mat-checkbox>
+                <div>
+                    {{layerMenu.value.numberOfContours}}&nbsp;
+                </div>
                 <div class="layer-menu__value">
-                    ({{layerMenu.value.contourVariable?.displayName + ', ' + layerMenu.value.contourArea}})
+                    ({{layerMenu.value.contourVariable?.displayName}})
                 </div>
                 <div class="menu__fill"></div>
                 <div mat-menu-item sciStopClick #contourTrigger="matMenuTrigger" [matMenuTriggerFor]="contourMenu" (click)="contourTrigger.toggleMenu()"></div>
