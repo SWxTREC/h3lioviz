@@ -19,6 +19,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     playerHeight = 81;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
+    splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
     timeTicks: number[] = [];
@@ -31,7 +32,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     @HostListener( 'window:resize')
     onResize() {
-        this.vizMax = this.getVizMax();
+        this.setVizMax();
         // after window resize ensure vizSize is not greater than new vizMax
         this.vizSize = Math.min( this.vizSize, this.vizMax);
         sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
@@ -45,7 +46,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
-        this.vizMax = this.getVizMax();
+        this.setVizMax();
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
@@ -102,9 +103,19 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    getVizMax() {
-        // get max height of visualization, window height minus header plus player
-        return window.innerHeight - ( this.headerHeight + this.playerHeight );
+    setVizMax() {
+        // get max dimension of visualization
+        const width: number = window.innerWidth;
+        const height: number = window.innerHeight;
+        const landscape: boolean = width > height;
+        // set splitDirection and vizMax
+        if ( landscape ) {
+            this.splitDirection = 'horizontal';
+            this.vizMax = height - (  this.headerHeight + this.playerHeight );
+        } else {
+            this.splitDirection = 'vertical';
+            this.vizMax = width;
+        }
     }
 
     dragEnd( event: any ) {

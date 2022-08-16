@@ -62,6 +62,9 @@
         &--full-width {
             padding: 0;
         }
+        &--scroll {
+            overflow: scroll;
+        }
     }
     &__pv {
         position: relative;
