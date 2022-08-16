@@ -3,7 +3,7 @@
 </button>
 <mat-menu #orientationMenu xPosition="before">
 	<h3>Snap to view:</h3> 
-    <button mat-button class="menu__control menu__control--col" (click)="snapTo('ecliptic')">ecliptic</button>
-    <button mat-button class="menu__control menu__control--col" (click)="snapTo('meridional')">meridional</button>
-    <button mat-button class="menu__control menu__control--col" (click)="snapTo('initial')">oblique</button>
+    <div mat-menu-item (click)="snapTo('ecliptic')">Ecliptic</div>
+    <div mat-menu-item (click)="snapTo('meridional')">Meridional</div>
+    <div mat-menu-item (click)="snapTo('initial')">Oblique</div>
 </mat-menu>
