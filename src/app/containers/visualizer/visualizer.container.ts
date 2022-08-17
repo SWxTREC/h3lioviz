@@ -2,7 +2,12 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { AwsService, WebsocketService } from 'src/app/services';
+import { AwsService, FooterService, WebsocketService } from 'src/app/services';
+import { environment } from 'src/environments/environment';
+
+// change these values if the height of the header, footer, or player changes
+const headerFooterHeight = 44 + 28;
+const playerHeight = 81;
 
 @Component({
     selector: 'swt-visualizer',
@@ -12,11 +17,9 @@ import { AwsService, WebsocketService } from 'src/app/services';
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
+    componentMaxHeight: number;
     errorMessage: string;
     loading = true;
-    // change these values if the height of the header or player changes
-    headerHeight = 44;
-    playerHeight = 81;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
@@ -24,6 +27,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     timeIndex: number;
     timeTicks: number[] = [];
     validConnection = this._websocket.validConnection$.value;
+    version = environment.version;
     vizMax: number;
     vizMin = 300;
     vizSize: number;
@@ -32,21 +36,20 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     @HostListener( 'window:resize')
     onResize() {
-        this.setVizMax();
-        // after window resize ensure vizSize is not greater than new vizMax
-        this.vizSize = Math.min( this.vizSize, this.vizMax);
-        sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
+        this.setMaxHeights();
         // pvView.resize
         this.pvView?.resize();
     }
 
     constructor(
+        public footerService: FooterService,
         private _awsService: AwsService,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
-        this.setVizMax();
+        footerService.showGlobalFooter = false;
+        this.setMaxHeights();
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
@@ -100,22 +103,27 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy() {
         this._laspNavService.setAlwaysSticky( false );
+        this.footerService.showGlobalFooter = true;
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    setVizMax() {
+    setMaxHeights() {
         // get max dimension of visualization
         const width: number = window.innerWidth;
         const height: number = window.innerHeight;
         const landscape: boolean = width > height;
+        this.componentMaxHeight = height - headerFooterHeight;
         // set splitDirection and vizMax
         if ( landscape ) {
             this.splitDirection = 'horizontal';
-            this.vizMax = height - (  this.headerHeight + this.playerHeight );
+            this.vizMax = this.componentMaxHeight - (playerHeight);
         } else {
             this.splitDirection = 'vertical';
             this.vizMax = width;
         }
+        // ensure vizSize is not greater than vizMax
+        this.vizSize = Math.min( this.vizSize, this.vizMax);
+        sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
     }
 
     dragEnd( event: any ) {
