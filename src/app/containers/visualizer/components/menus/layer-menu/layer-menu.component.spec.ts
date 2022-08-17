@@ -2,28 +2,29 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'src/app/modules/material.module';
+import { MaterialModule } from 'src/app/modules';
 
-import { ControlPanelComponent } from './control-panel.component';
+import { LayerMenuComponent } from './layer-menu.component';
 
-describe('ControlPanelComponent', () => {
-    let component: ControlPanelComponent;
-    let fixture: ComponentFixture<ControlPanelComponent>;
+describe('LayerMenuComponent', () => {
+    let component: LayerMenuComponent;
+    let fixture: ComponentFixture<LayerMenuComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
+            declarations: [ LayerMenuComponent ],
             imports: [
                 BrowserAnimationsModule,
-                MaterialModule,
                 NgxSliderModule,
+                MaterialModule,
                 ReactiveFormsModule
-            ],
-            declarations: [ ControlPanelComponent ]
-        }).compileComponents();
+            ]
+        })
+    .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ControlPanelComponent);
+        fixture = TestBed.createComponent(LayerMenuComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
