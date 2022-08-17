@@ -87,6 +87,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.pvView.setContainer( divRenderer );
                 // check for a stored time index
                 const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
+                // Use the following lines to get the run catalog from the server, then copy to assets
+                // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
+                //     console.log({ runs });
+                // });
                 this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
                     this.timeTicks = timeValues.map( value => Math.round( value ) );
                     if ( timeIndex ) {

@@ -20,9 +20,6 @@
         // disable mouse interactions
         pointer-events: none;
     }
-	&__fill {
-		flex: 1 1 auto;
-	}
     &__hints {
         position: absolute;
         bottom: 0;

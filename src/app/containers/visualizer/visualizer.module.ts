@@ -15,6 +15,7 @@ import {
     LayerMenuComponent,
     OrientationMenuComponent,
     PlotsComponent,
+    RunSelectorComponent,
     TimePlayerComponent,
     ZoomMenuComponent
 } from './components';
@@ -41,6 +42,7 @@ import { VisualizerComponent } from './visualizer.container';
         LayerMenuComponent,
         OrientationMenuComponent,
         PlotsComponent,
+        RunSelectorComponent,
         TimePlayerComponent,
         VisualizerComponent,
         ZoomMenuComponent
