@@ -28,7 +28,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
-    showButton: boolean;
+    showButton = true;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -66,7 +66,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         // get the last run id, if there is one, from sessionStorage
-        const runId = sessionStorage.getItem('runId');
+        const runId = JSON.parse( sessionStorage.getItem( 'runId' ) );
         this.runId$.next( runId );
         if ( !this.runId$.value ) {
             this.openDialog();
@@ -74,7 +74,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.subscriptions.push(
             this.runId$.pipe( distinctUntilChanged() ).subscribe( id => {
-                sessionStorage.setItem( 'runId', id );
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
                     this.loadModel();
@@ -151,7 +150,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         }).catch( error => {
             // show error message and start over
             this.validConnection = false;
-            this.errorMessage = error.data.exception + ' ' + this.runId$.value;
+            this.errorMessage = ( error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value ;
             sessionStorage.removeItem('runId');
         });
     }
@@ -167,6 +166,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe(result => {
             this.runId$.next(result);
             this.showButton = true;
+            sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
         });
     }
 
@@ -196,6 +196,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        sessionStorage.setItem('timeIndex', JSON.stringify(this.timeIndex) );
     }
 
     refresh() {

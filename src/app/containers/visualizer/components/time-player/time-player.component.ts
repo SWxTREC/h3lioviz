@@ -50,7 +50,6 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        sessionStorage.setItem('timeIndex', JSON.stringify(this.timeIndex) );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
