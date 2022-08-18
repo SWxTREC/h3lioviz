@@ -1,9 +1,14 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
+import { BehaviorSubject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { AwsService, FooterService, WebsocketService } from 'src/app/services';
 import { environment } from 'src/environments/environment';
+
+import { RunSelectorComponent } from './components';
 
 // change these values if the height of the header, footer, or player changes
 const headerFooterHeight = 44 + 28;
@@ -22,6 +27,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     loading = true;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
+    runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
+    showButton: boolean;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -42,6 +49,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     constructor(
+        public dialog: MatDialog,
         public footerService: FooterService,
         private _awsService: AwsService,
         private _laspNavService: LaspNavService,
@@ -57,6 +65,22 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
+        // get the last run id, if there is one, from sessionStorage
+        const runId = sessionStorage.getItem('runId');
+        this.runId$.next( runId );
+        if ( !this.runId$.value ) {
+            this.openDialog();
+        }
+
+        this.subscriptions.push(
+            this.runId$.pipe( distinctUntilChanged() ).subscribe( id => {
+                sessionStorage.setItem( 'runId', id );
+                // if runId is selected and valid connection, load run data
+                if ( id != null && this.validConnection ) {
+                    this.loadModel();
+                }
+            })
+        );
 
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[ Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
@@ -85,22 +109,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             if ( this.validConnection ) {
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
-                // check for a stored time index
-                const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
                 // Use the following lines to get the run catalog from the server, then copy to assets
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
                 //     console.log({ runs });
                 // });
-                this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
-                    this.timeTicks = timeValues.map( value => Math.round( value ) );
-                    if ( timeIndex ) {
-                        this.timeIndex = timeIndex;
-                        this.setTimestep( timeIndex );
-                    } else {
-                        this.timeIndex = 0;
-                        this.setTimestep( 0 );
-                    }
-                });
+                // websocket is connected, if runId, load run data
+                if ( this.runId$.value ) {
+                    this.loadModel();
+                }
             }
         }));
     }
@@ -109,6 +125,53 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky( false );
         this.footerService.showGlobalFooter = true;
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    }
+
+    getTimeTicks() {
+        // check for a stored time index
+        // TODO: don't check for stored time index if new run, either that, or connect a time index to its run id
+        const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
+        this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
+            this.timeTicks = timeValues.map( value => Math.round( value ) );
+            if ( timeIndex ) {
+                this.timeIndex = timeIndex;
+                this.setTimestep( timeIndex );
+            } else {
+                this.timeIndex = 0;
+                this.setTimestep( 0 );
+            }
+        });
+    }
+
+    // called only when both pvView and runId$.value are true
+    loadModel() {
+        // get run
+        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
+            this.getTimeTicks();
+        }).catch( error => {
+            // show error message and start over
+            this.validConnection = false;
+            this.errorMessage = error.data.exception + ' ' + this.runId$.value;
+            sessionStorage.removeItem('runId');
+        });
+    }
+
+    openDialog(): void {
+        this.showButton = false;
+        const dialogRef = this.dialog.open(RunSelectorComponent, {
+            data: { runId: this.runId$.value },
+            disableClose: this.runId$.value == null,
+            autoFocus: false
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            this.runId$.next(result);
+            this.showButton = true;
+        });
+    }
+
+    dragEnd( event: any ) {
+        sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
     }
 
     setMaxHeights() {
@@ -128,10 +191,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // ensure vizSize is not greater than vizMax
         this.vizSize = Math.min( this.vizSize, this.vizMax);
         sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
-    }
-
-    dragEnd( event: any ) {
-        sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
     }
 
     setTimestep( timeIndex: number ) {
