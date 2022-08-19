@@ -19,11 +19,14 @@ export class RunSelectorDialogComponent implements OnInit {
     
     ngOnInit(): void {
         this.previousSelection = this.data.runId;
-        this.data.runId = this.data.runId || this.data.catalog[0]['run_id'];
     }
 
     onCancel(): void {
         this.dialogRef.close();
+    }
+
+    updateRunId( value: string ) {
+        this.data.runId = value;
     }
 }
 

@@ -14,12 +14,6 @@
         display: flex;
         align-items: center;
     }
-    &__fab {
-        position: absolute;
-        bottom: 3rem;
-        right: 1rem;
-        z-index: 2;
-    }
     &__fade {
         // note: percentages for opacity do not work on Firefox
         opacity: 0.2;
@@ -69,6 +63,16 @@
     }
     &__pv {
         position: relative;
+        &--empty {
+            background: radial-gradient(white, gray);
+        }
+    }
+    &__row {
+        display: flex;
+        align-items: center;
+        > *:not(last) {
+            margin-right: 0.5rem;
+        }
     }
     &__split {
         position: relative;

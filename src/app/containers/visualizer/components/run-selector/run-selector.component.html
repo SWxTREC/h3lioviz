@@ -1,7 +1,8 @@
-{{runId}}
 <mat-form-field>
-	<mat-label>Options</mat-label>
+	<mat-label>Catalog</mat-label>
 	<mat-select [value]="runId" (selectionChange)="updateSelection($event)">
-		<mat-option *ngFor="let run of catalog" [value]="run['run_id']">{{run['rundate_cal']}}</mat-option>
+		<mat-option *ngFor="let run of catalog" [value]="run['run_id']">
+			{{run['rundate_cal']}}
+		</mat-option>
 	</mat-select>
 </mat-form-field>

@@ -23,13 +23,13 @@ const playerHeight = 81;
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
+    catalog: IModelMetadata[];
     componentMaxHeight: number;
     errorMessage: string;
     loading = true;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
-    showButton = true;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -41,7 +41,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     vizSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
-    catalog: IModelMetadata[];
 
     @HostListener( 'window:resize')
     onResize() {
@@ -64,28 +63,29 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
-
-        
     }
     
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         // get the last run id, if there is one, from sessionStorage
-        const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || undefined;
+        const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || null;
         this.updateRunId( savedRunId );
 
-        this._catalogService.catalog$.subscribe( catalog => {
-            this.catalog = catalog;
-            // if waiting for web socket, open the dialog so the user has something to do
-            if ( catalog && !this.validConnection ) {
-                this.openDialog();
-            }
-        });
+        this.subscriptions.push(
+            this._catalogService.catalog$.subscribe( catalog => {
+                this.catalog = catalog;
+                // if waiting for web socket, open the dialog so the user has something to do
+                if ( this.catalog && !this.validConnection ) {
+                    this.openDialog();
+                }
+            })
+        );
 
         this.subscriptions.push(
-            this.runId$.pipe( distinctUntilChanged() ).subscribe( id => {
+            this.runId$.pipe(
+                distinctUntilChanged()
+            ).subscribe( id => {
                 sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
-
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
                     this.loadModel();
@@ -108,7 +108,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // show error messages for a failed websocket connection
         this.subscriptions.push(
-            this._websocket.errorMessage$.subscribe( errorMessage => this.errorMessage = errorMessage )
+            this._websocket.errorMessage$.subscribe( errorMessage => {
+                this.errorMessage = errorMessage;
+                if ( errorMessage != null ) {
+                    // close the dialog if the socket does not connect
+                    this.dialog.closeAll();
+                }
+            })
         );
     }
 
@@ -118,16 +124,17 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
             this.pvView = this._websocket.pvView;
             if ( this.validConnection ) {
+                this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
+
                 // Until there is a catalog endpoint, use the following lines to get the run
                 // catalog from the server, then copy to assets/catalog
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
                 //     console.log({ runs });
                 // });
                 // websocket is connected, if runId, load run data
-                if ( this.runId$.value ) {
-                    this.dialog.closeAll();
+                if ( this.runId$.value != null ) {
                     this.loadModel();
                 }
             }
@@ -162,24 +169,18 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
             this.getTimeTicks();
         }).catch( (error: { data: { exception: string } }) => {
-            // show error message and start over
-            this.validConnection = false;
-            this.errorMessage = ( error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value ;
-            sessionStorage.removeItem('runId');
+            console.error(( error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value );
+            // remove bad runId and allow user to try again…
+            this.updateRunId( null );
         });
     }
 
     // only opens if no valid connection, to give the user a task while websocket is connecting
     openDialog(): void {
-        this.showButton = false;
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { runId: this.runId$.value, catalog: this.catalog },
-            disableClose: this.runId$.value == null,
-            autoFocus: false
+            data: { runId: this.runId$.value, catalog: this.catalog }
         });
-
         dialogRef.afterClosed().subscribe( result => {
-            console.log('dialog close result', result);
             if ( result ) {
                 this.updateRunId( result );
             }
