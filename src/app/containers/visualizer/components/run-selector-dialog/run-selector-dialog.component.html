@@ -1,0 +1,16 @@
+<ng-container>
+	<h1 mat-dialog-title>Select a run from the catalog</h1>
+	<div mat-dialog-content>
+		<mat-form-field>
+			<mat-label>Options</mat-label>
+			<mat-select [(ngModel)]="data.runId">
+				<mat-option *ngFor="let run of data.catalog" [value]="run['run_id']">{{run['rundate_cal']}}</mat-option>
+			</mat-select>
+		</mat-form-field>
+	</div>
+	curr: {{ data.runId }} prev: {{ previousSelection }}
+	<div mat-dialog-actions *ngIf="data.runId">
+	  <button mat-button [disabled]="previousSelection == null" (click)="onCancel()">Cancel</button>
+	  <button mat-button [mat-dialog-close]="data.runId" cdkFocusInitial>Select</button>
+	</div>
+</ng-container>
