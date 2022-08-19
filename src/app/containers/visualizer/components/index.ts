@@ -5,4 +5,5 @@ export * from './menus/orientation-menu/orientation-menu.component';
 export * from './menus/zoom-menu/zoom-menu.component';
 export * from './plots/plots.component';
 export * from './run-selector/run-selector.component';
+export * from './run-selector-dialog/run-selector-dialog.component';
 export * from './time-player/time-player.component';

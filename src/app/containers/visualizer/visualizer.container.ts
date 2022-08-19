@@ -5,10 +5,11 @@ import { LaspNavService } from 'lasp-nav';
 import { BehaviorSubject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { AwsService, FooterService, WebsocketService } from 'src/app/services';
+import { IModelMetadata } from 'src/app/models';
+import { AwsService, CatalogService, FooterService, WebsocketService } from 'src/app/services';
 import { environment } from 'src/environments/environment';
 
-import { RunSelectorComponent } from './components';
+import { RunSelectorDialogComponent } from './components';
 
 // change these values if the height of the header, footer, or player changes
 const headerFooterHeight = 44 + 28;
@@ -40,6 +41,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     vizSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
+    catalog: IModelMetadata[];
 
     @HostListener( 'window:resize')
     onResize() {
@@ -52,6 +54,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         public dialog: MatDialog,
         public footerService: FooterService,
         private _awsService: AwsService,
+        private _catalogService: CatalogService,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
@@ -61,19 +64,28 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
-    }
 
+        
+    }
+    
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         // get the last run id, if there is one, from sessionStorage
-        const runId = JSON.parse( sessionStorage.getItem( 'runId' ) );
-        this.runId$.next( runId );
-        if ( !this.runId$.value ) {
-            this.openDialog();
-        }
+        const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || undefined;
+        this.updateRunId( savedRunId );
+
+        this._catalogService.catalog$.subscribe( catalog => {
+            this.catalog = catalog;
+            // if waiting for web socket, open the dialog so the user has something to do
+            if ( catalog && !this.validConnection ) {
+                this.openDialog();
+            }
+        });
 
         this.subscriptions.push(
             this.runId$.pipe( distinctUntilChanged() ).subscribe( id => {
+                sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
+
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
                     this.loadModel();
@@ -108,12 +120,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             if ( this.validConnection ) {
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
-                // Use the following lines to get the run catalog from the server, then copy to assets
+                // Until there is a catalog endpoint, use the following lines to get the run
+                // catalog from the server, then copy to assets/catalog
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
                 //     console.log({ runs });
                 // });
                 // websocket is connected, if runId, load run data
                 if ( this.runId$.value ) {
+                    this.dialog.closeAll();
                     this.loadModel();
                 }
             }
@@ -147,7 +161,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // get run
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
             this.getTimeTicks();
-        }).catch( error => {
+        }).catch( (error: { data: { exception: string } }) => {
             // show error message and start over
             this.validConnection = false;
             this.errorMessage = ( error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value ;
@@ -155,18 +169,20 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         });
     }
 
+    // only opens if no valid connection, to give the user a task while websocket is connecting
     openDialog(): void {
         this.showButton = false;
-        const dialogRef = this.dialog.open(RunSelectorComponent, {
-            data: { runId: this.runId$.value },
+        const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
+            data: { runId: this.runId$.value, catalog: this.catalog },
             disableClose: this.runId$.value == null,
             autoFocus: false
         });
 
-        dialogRef.afterClosed().subscribe(result => {
-            this.runId$.next(result);
-            this.showButton = true;
-            sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
+        dialogRef.afterClosed().subscribe( result => {
+            console.log('dialog close result', result);
+            if ( result ) {
+                this.updateRunId( result );
+            }
         });
     }
 
@@ -201,5 +217,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     refresh() {
         window.location.reload(true);
+    }
+
+    updateRunId( runId: string ) {
+        this.runId$.next( runId );
     }
 }

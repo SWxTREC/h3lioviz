@@ -16,6 +16,7 @@ import {
     OrientationMenuComponent,
     PlotsComponent,
     RunSelectorComponent,
+    RunSelectorDialogComponent,
     TimePlayerComponent,
     ZoomMenuComponent
 } from './components';
@@ -44,6 +45,7 @@ import { VisualizerComponent } from './visualizer.container';
         OrientationMenuComponent,
         PlotsComponent,
         RunSelectorComponent,
+        RunSelectorDialogComponent,
         TimePlayerComponent,
         VisualizerComponent,
         ZoomMenuComponent
