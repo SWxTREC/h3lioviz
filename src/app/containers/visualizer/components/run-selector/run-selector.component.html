@@ -1,3 +1,6 @@
+<h2>
+	{{ runId ? 'Selected run:' : 'Select a run:'}}
+</h2>
 <mat-form-field>
 	<mat-label>Catalog</mat-label>
 	<mat-select [value]="runId" (selectionChange)="updateSelection($event)">

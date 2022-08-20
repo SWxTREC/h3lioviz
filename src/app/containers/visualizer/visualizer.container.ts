@@ -169,7 +169,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
             this.getTimeTicks();
         }).catch( (error: { data: { exception: string } }) => {
-            console.error(( error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value );
+            this.errorMessage = 'select another value, ' +
+                (error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value;
             // remove bad runId and allow user to try again…
             this.updateRunId( null );
         });
@@ -178,7 +179,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // only opens if no valid connection, to give the user a task while websocket is connecting
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { runId: this.runId$.value, catalog: this.catalog }
+            data: { runId: this.runId$.value, catalog: this.catalog },
+            width: '325px'
         });
         dialogRef.afterClosed().subscribe( result => {
             if ( result ) {

@@ -13,6 +13,9 @@
     &__error {
         display: flex;
         align-items: center;
+        &--warn {
+            color: $color-warn;
+        }
     }
     &__fade {
         // note: percentages for opacity do not work on Firefox
@@ -70,8 +73,10 @@
     &__row {
         display: flex;
         align-items: center;
-        > *:not(last) {
-            margin-right: 0.5rem;
+        ::ng-deep {
+            > *:not(last-child) {
+                margin-right: 0.5rem;
+            }
         }
     }
     &__split {
