@@ -129,7 +129,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.pvView.setContainer( divRenderer );
 
                 // Until there is a catalog endpoint, use the following lines to get the run
-                // catalog from the server, then copy to assets/catalog
+                // catalog from the server, then copy as JSON to assets/catalog
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
                 //     console.log({ runs });
                 // });
@@ -165,6 +165,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // called only when both pvView and runId$.value are true
     loadModel() {
+        this.errorMessage = undefined;
         // get run
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
             this.getTimeTicks();
