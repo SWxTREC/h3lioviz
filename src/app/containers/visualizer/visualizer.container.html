@@ -6,7 +6,7 @@
     <swt-server-status *ngIf="!errorMessage"></swt-server-status>
     <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
     <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
-    <mat-spinner *ngIf="!errorMessage && (runId$ | async)" color="primary" diameter="40"></mat-spinner>
+    <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
 <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
     <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
@@ -31,7 +31,7 @@
         <!-- for the weird $any, see https://github.com/angular-split/angular-split/issues/220 -->
         <as-split-area class="viz__panel" [size]="$any('*')" >
             <swt-run-selector class="viz__row" *ngIf="catalog && validConnection" [runId]="runId$ | async" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
-            <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }} </mat-hint>
+            <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
             <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
         </as-split-area>
     </as-split>

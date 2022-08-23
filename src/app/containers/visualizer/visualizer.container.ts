@@ -108,9 +108,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // show error messages for a failed websocket connection
         this.subscriptions.push(
-            this._websocket.errorMessage$.subscribe( errorMessage => {
-                this.errorMessage = errorMessage;
-                if ( errorMessage != null ) {
+            this._websocket.errorMessage$.subscribe( socketErrorMessage => {
+                this.errorMessage = socketErrorMessage;
+                if ( socketErrorMessage != null ) {
                     // close the dialog if the socket does not connect
                     this.dialog.closeAll();
                 }
@@ -124,6 +124,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
             this.pvView = this._websocket.pvView;
             if ( this.validConnection ) {
+                this.errorMessage = null;
                 this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
