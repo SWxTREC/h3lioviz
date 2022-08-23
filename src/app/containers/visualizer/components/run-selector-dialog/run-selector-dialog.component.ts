@@ -27,7 +27,6 @@ export class RunSelectorDialogComponent implements OnInit {
 
     updateRunId( value: string ) {
         this.data.runId = value;
-        this.previousSelection = undefined;
     }
 }
 

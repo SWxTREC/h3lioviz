@@ -25,7 +25,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
     catalog: IModelMetadata[];
     componentMaxHeight: number;
-    errorMessage: string = undefined;
+    errorMessage: string = null;
     loading = true;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
@@ -88,7 +88,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
-                    this.loadModel();
+                    this.loadModel( this.runId$.value );
                 }
             })
         );
@@ -131,12 +131,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // Until there is a catalog endpoint, use the following lines to get the run
                 // catalog from the server, then copy as JSON to assets/catalog
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
-                //     console.log({ runs });
                 // });
 
                 // websocket is connected, if runId, load run data
                 if ( this.runId$.value != null ) {
-                    this.loadModel();
+                    this.loadModel( this.runId$.value );
                 }
             }
         }));
@@ -148,31 +147,26 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    getTimeTicks() {
-        // check for a stored time index
-        // TODO: don't check for stored time index if new run, either that, or connect a time index to its run id
-        const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
+    getTimeTicks( runId: string ) {
+        // check for a stored time index for this runId
+        const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
+        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
+        this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            if ( timeIndex ) {
-                this.timeIndex = timeIndex;
-                this.setTimestep( timeIndex );
-            } else {
-                this.timeIndex = 0;
-                this.setTimestep( 0 );
-            }
+            this.setTimestep( timeIndex );
         });
     }
 
     // called only when both pvView and runId$.value are true
-    loadModel() {
-        this.errorMessage = undefined;
+    loadModel( runId: string ) {
+        this.errorMessage = null;
         // get run
-        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ this.runId$.value ] ).then( () => {
-            this.getTimeTicks();
+        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
+            this.getTimeTicks( runId );
         }).catch( (error: { data: { exception: string } }) => {
             this.errorMessage = 'select another value, ' +
-                (error.data ? error.data.exception + ' ': 'unknown error loading ') + this.runId$.value;
+                (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
             // remove bad runId and allow user to try again…
             this.updateRunId( null );
         });
@@ -217,7 +211,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
-        sessionStorage.setItem('timeIndex', JSON.stringify(this.timeIndex) );
+        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        userTimeIndexMap[ this.runId$.value ] = timeIndex;
+        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     refresh() {
