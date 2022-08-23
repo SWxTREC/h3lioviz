@@ -16,7 +16,11 @@ describe('PlotsComponent', () => {
                 PlotsComponent,
                 GridComponent
             ],
-            imports: [ BrowserAnimationsModule, MaterialModule, ReactiveFormsModule ]
+            imports: [
+                BrowserAnimationsModule,
+                MaterialModule,
+                ReactiveFormsModule
+            ]
 
         })
             .compileComponents();

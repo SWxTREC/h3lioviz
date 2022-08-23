@@ -25,7 +25,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
     catalog: IModelMetadata[];
     componentMaxHeight: number;
-    errorMessage: string;
+    errorMessage: string = undefined;
     loading = true;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
@@ -133,6 +133,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
                 //     console.log({ runs });
                 // });
+
                 // websocket is connected, if runId, load run data
                 if ( this.runId$.value != null ) {
                     this.loadModel();

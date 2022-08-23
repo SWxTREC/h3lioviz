@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { IModelMetadata } from 'src/app/models';
 
@@ -7,18 +7,12 @@ import { IModelMetadata } from 'src/app/models';
     templateUrl: './run-selector.component.html',
     styleUrls: [ './run-selector.component.scss' ]
 })
-export class RunSelectorComponent implements OnInit {
+export class RunSelectorComponent {
     @Input() catalog: IModelMetadata[];
     @Input() runId: string;
     @Output() updateRunId: EventEmitter<string> = new EventEmitter(undefined);
 
-    constructor() { }
-
-    ngOnInit(): void {
-    }
-
     updateSelection( event: MatSelectChange ) {
         this.updateRunId.emit( event.value );
     }
-
 }
