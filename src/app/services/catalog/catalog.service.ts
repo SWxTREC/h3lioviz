@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +20,6 @@ export class CatalogService {
     }
 
     getCatalog(): Observable<any> {
-        const baseUrl = window.location.origin as string;
-        return this._http.get(baseUrl + '/assets/catalog/runs.json');
+        return this._http.get( environment.catalogUrl );
     }
 }
