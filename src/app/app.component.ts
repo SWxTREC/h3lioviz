@@ -30,10 +30,17 @@ export class AppComponent {
         }
     ];
 
+    orgLogos: IImageLink[] = [
+        {
+            src: 'https://swx-trec.com/swx-trec-assets/general/swx-trec-logo-white.png',
+            href: 'https://www.colorado.edu/spaceweather/'
+        }
+    ];
+
     partnerLogos: IImageLink[] = [
         {
-            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png',
-            href: 'https://lasp.colorado.edu'
+            href: 'https://lasp.colorado.edu',
+            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png'
         }
     ];
 
