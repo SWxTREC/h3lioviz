@@ -11,8 +11,6 @@ import {
 
 import { environment } from '../environments/environment';
 
-import { FooterService } from './services';
-
 /** Entry Component */
 @Component({
     selector: 'swt-root',
@@ -51,12 +49,16 @@ export class AppComponent {
 
     versions: IVersion[] = [
         {
+            link: 'https://colorado.edu/spaceweather',
+            productName: 'SWx TREC',
+            version: ''
+        },
+        {
             version: environment.version
         }
     ];
 
     constructor(
-        public footerService: FooterService,
         private _snippets: LaspBaseAppSnippetsService
     ) {
         this._snippets.appComponent.allExcept([ this._snippets.appComponent.setupGoogleAnalytics ]);

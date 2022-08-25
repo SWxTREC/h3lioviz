@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { IModelMetadata } from 'src/app/models';
-import { AwsService, CatalogService, FooterService, WebsocketService } from 'src/app/services';
+import { AwsService, CatalogService, WebsocketService } from 'src/app/services';
 import { environment } from 'src/environments/environment';
 
 import { RunSelectorDialogComponent } from './components';
@@ -51,14 +51,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     constructor(
         public dialog: MatDialog,
-        public footerService: FooterService,
         private _awsService: AwsService,
         private _catalogService: CatalogService,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
-        footerService.showGlobalFooter = false;
         this.setMaxHeights();
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
@@ -144,7 +142,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy() {
         this._laspNavService.setAlwaysSticky( false );
-        this.footerService.showGlobalFooter = true;
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
