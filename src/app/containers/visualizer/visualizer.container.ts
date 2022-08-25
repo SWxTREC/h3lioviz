@@ -126,12 +126,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
-
-                // Until there is a catalog endpoint, use the following lines to get the run
-                // catalog from the server, then copy as JSON to assets/catalog
-                // this.pvView.get().session.call( 'pv.h3lioviz.get_available_runs' ).then( runs => {
-                // });
-
                 // websocket is connected, if runId, load run data
                 if ( this.runId$.value != null ) {
                     this.loadModel( this.runId$.value );
