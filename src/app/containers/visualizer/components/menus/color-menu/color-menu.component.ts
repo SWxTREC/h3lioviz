@@ -131,9 +131,8 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
         // subscribe to any form change
         this.subscriptions.push( this.colorForm.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
-                // this.updateVisibilityControls( newFormValues );
                 // this will render every time any named control in the form is updated
-                // the threshold range, color range, and contour range are tracked outside of the form and are updated and rendered manually
+                // the color range is tracked outside of the form in updateColorRange
                 this.renderDebouncer.next();
             }));
         // subscribe to COLOR VARIABLE changes, color variable is tied to colormap (form subscription via setValue for server),
@@ -173,7 +172,8 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
                 } else {
                     this.session.call( 'pv.h3lioviz.set_opacity', [ this.colorVariableServerName, [ opacityLow, opacityHigh ] ] );
                 }
-            }));
+            })
+        );
     }
 
     scaleColorRange() {

@@ -71,7 +71,7 @@
                 <strong>Range of {{ layerMenu.value.contourVariable.displayName }}</strong>
                 <small innerHTML=" ({{layerMenu.value.contourVariable.units}})"></small>
             </div>
-            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="updateContourRange($event)"></ngx-slider>
+            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
             <div>
                 <strong>Contour surface values</strong>
                 <div>
