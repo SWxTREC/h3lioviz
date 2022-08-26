@@ -64,8 +64,6 @@ export class WebsocketService {
             this.pvView.setInteractiveRatio( 1 ); // the scaled image compared to the client's view resolution
             // jpeg quality, reduced to speed up interactions on slow connections
             this.pvView.setInteractiveQuality( 50 );
-            // default to mouse zoom
-            this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
             // validate connection after pvView is initialized
             this.validConnection$.next( true );
         });

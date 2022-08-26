@@ -5,7 +5,7 @@
 	<div class="menu__control menu__control--center">
 		<div mat-menu-item sciStopClick class="menu__row menu__row--margin">
 			Mouse&nbsp;zoom&nbsp;{{ zoomState ? 'on' : 'off' }}&nbsp;&nbsp;
-			<mat-slide-toggle checked (click)="toggleZoom()" color="primary"></mat-slide-toggle>
+			<mat-slide-toggle [checked]="zoomState" (change)="toggleZoom()" color="primary"></mat-slide-toggle>
 		</div>
 		<button mat-raised-button sciStopClick (click)="resetZoom()">reset zoom</button>
 	</div>
