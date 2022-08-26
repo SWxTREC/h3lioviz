@@ -1,0 +1,9 @@
+<button mat-icon-button matTooltip="Snap to view" class="menu__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
+    <mat-icon>language</mat-icon>
+</button>
+<mat-menu #orientationMenu xPosition="before">
+	<h3>Snap to view:</h3> 
+    <div mat-menu-item (click)="snapTo('ecliptic')">Ecliptic</div>
+    <div mat-menu-item (click)="snapTo('meridional')">Meridional</div>
+    <div mat-menu-item (click)="snapTo('initial')">Oblique</div>
+</mat-menu>

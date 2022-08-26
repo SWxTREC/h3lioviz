@@ -1,0 +1,33 @@
+.menu {
+	&__control {
+		&--row {
+			margin-right: 1rem;
+		}
+		&--col {
+			margin-bottom: 1rem;
+		}
+		&--center {
+			text-align: center;
+		}
+	}
+	&__fill {
+		flex: 1 1 auto;
+	}
+	&__icon {
+		background-color: transparentize(black, 0.7);
+		border-radius: 0;
+		color: white;
+	}
+	&__row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		&--margin {
+			margin-bottom: 0.5rem;
+		}
+	}
+    &__spacer {
+        margin: 1rem 0;
+        position: relative !important;
+    }
+}

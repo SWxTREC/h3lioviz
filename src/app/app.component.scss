@@ -1,2 +1,6 @@
 @import 'node_modules/lasp-base-app-snippets/styles/app-component.scss';
 @include all();
+
+lasp-footer.hide-global-footer {
+    display: none;
+}

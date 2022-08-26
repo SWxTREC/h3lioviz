@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GridComponent } from 'scicharts';
+import { MaterialModule } from 'src/app/modules';
 
 import { PlotsComponent } from './plots.component';
 
@@ -9,7 +12,12 @@ describe('PlotsComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ PlotsComponent, GridComponent ]
+            declarations: [
+                PlotsComponent,
+                GridComponent
+            ],
+            imports: [ BrowserAnimationsModule, MaterialModule, ReactiveFormsModule ]
+
         })
             .compileComponents();
     });

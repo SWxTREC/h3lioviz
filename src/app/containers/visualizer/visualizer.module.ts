@@ -3,11 +3,21 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
+import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
+import { LaspFooterModule } from 'lasp-footer';
 import { MomentModule } from 'ngx-moment';
 import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
-import { ControlPanelComponent, PlotsComponent, TimePlayerComponent } from './components';
+import {
+    ColorMenuComponent,
+    HintsComponent,
+    LayerMenuComponent,
+    OrientationMenuComponent,
+    PlotsComponent,
+    TimePlayerComponent,
+    ZoomMenuComponent
+} from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -16,6 +26,8 @@ import { VisualizerComponent } from './visualizer.container';
         CommonModule,
         ComponentsModule,
         ChartModule,
+        LaspEnhancedNgxSliderModule,
+        LaspFooterModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,
@@ -24,10 +36,14 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
-        ControlPanelComponent,
+        ColorMenuComponent,
+        HintsComponent,
+        LayerMenuComponent,
+        OrientationMenuComponent,
         PlotsComponent,
         TimePlayerComponent,
-        VisualizerComponent
+        VisualizerComponent,
+        ZoomMenuComponent
     ]
 })
 export class VisualizerModule { }
