@@ -24,7 +24,7 @@ export class ZoomMenuComponent implements OnChanges {
     resetZoom() {
         this.pvView.get().viewStream.resetCamera();
     }
-    
+
     setZoom() {
         sessionStorage.setItem('zoomState', JSON.stringify(this.zoomState) );
         if ( this.zoomState && this.pvView ) {

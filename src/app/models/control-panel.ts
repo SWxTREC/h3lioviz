@@ -131,7 +131,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
 export const COLOR_MENU_DEFAULT_VALUES = {
     colorVariable: VARIABLE_CONFIG.velocity,
     colormap: VARIABLE_CONFIG.velocity.defaultColormap,
-    opacity: [ 70, 100 ] as [ number, number ]
+    opacity: [ 60, 80 ] as [ number, number ]
 };
 
 export const LAYER_MENU_DEFAULT_VALUES = {
