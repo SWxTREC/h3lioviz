@@ -155,9 +155,8 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         );
     }
 
-    updateContourRange( contourRange: [number, number] ) {
+    updateContourRange( newRange: [number, number] ) {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
-        const newRange: [ number, number ] = contourRange;
         const numberOfContours = this.layerMenu.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
         this.contourRange = clone( newRange );
