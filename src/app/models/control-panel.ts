@@ -135,7 +135,7 @@ export const COLOR_MENU_DEFAULT_VALUES = {
 };
 
 export const LAYER_MENU_DEFAULT_VALUES = {
-    contourArea: 'all',
+    contourArea: 'cme',
     contourVariable: VARIABLE_CONFIG.velocity,
     cme: false,
     cmeContours: false,
