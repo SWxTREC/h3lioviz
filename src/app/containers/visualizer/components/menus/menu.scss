@@ -18,6 +18,28 @@
 		border-radius: 0;
 		color: white;
 	}
+	&__checkbox {
+		width: 100%;
+		&--trigger {
+			display: flex;
+		}
+		::ng-deep {
+			// make the label fill the entire menu-item line, so entire line is clickable
+			.mat-checkbox {
+				width: 100%;
+				.mat-checkbox-layout {
+					width: 100%;
+				};
+				.mat-checkbox-label {
+					width: 100%;
+				};
+			}
+			// remove the ripple from the menu items that contain a checkbox
+			.mat-ripple.mat-menu-ripple {
+				display: none;
+			}
+		}
+	}
 	&__row {
 		display: flex;
 		align-items: center;
