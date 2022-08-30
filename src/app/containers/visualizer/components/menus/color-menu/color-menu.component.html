@@ -3,7 +3,7 @@
 </button>
 <mat-menu #colorMenu xPosition="before">
 	<form sciStopClick class="color-menu" [formGroup]="colorForm">
-        <div class="menu__row">
+        <div class="menu__row menu__row--wrap">
             <mat-form-field class="menu__control menu__control--row">
                 <mat-label>Color variable</mat-label>
                 <mat-select [compareWith]="compareObjectNames" formControlName="colorVariable">

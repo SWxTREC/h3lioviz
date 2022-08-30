@@ -48,6 +48,7 @@ body > * > .page-content > *:not(router-outlet) {
 .ngx-slider[laspEnhancedNgxSlider]{
     @include custom-slider( $color-primary );
     .ngx-slider-tick {
+        pointer-events: none;
         margin-left: 4px;
         &.ngx-slider-selected {
             background-color: $color-accent;

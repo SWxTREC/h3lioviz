@@ -48,9 +48,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		flex-wrap: wrap;
 		&--margin {
 			margin-bottom: 0.5rem;
+		}
+		&--wrap {
+			flex-wrap: wrap;
 		}
 	}
     &__spacer {
