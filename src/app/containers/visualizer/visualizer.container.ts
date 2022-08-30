@@ -33,7 +33,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
-    timeTicks: number[] = [];
+    timeTicks: number[];
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
     vizMax: number;
@@ -61,13 +61,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
+        this.timeTicks = JSON.parse(sessionStorage.getItem('timeTicks')) || [];
     }
     
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         // get the last run id, if there is one, from sessionStorage
         const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || null;
-        this.updateRunId( savedRunId );
+        this.runId$.next( savedRunId );
 
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
@@ -83,10 +84,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.runId$.pipe(
                 distinctUntilChanged()
             ).subscribe( id => {
-                sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
-                    this.loadModel( this.runId$.value );
+                    this.loadModel( id );
                 }
             })
         );
@@ -136,14 +136,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy() {
         this._laspNavService.setAlwaysSticky( false );
+        this.saveSettings();
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    getTimeTicks( runId: string ) {
-        // check for a stored time index for this runId
-        const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
-        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
-        this.timeIndex = timeIndex;
+    getTimeTicks( timeIndex: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
             this.setTimestep( timeIndex );
@@ -153,15 +150,24 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // called only when both pvView and runId$.value are true
     loadModel( runId: string ) {
         this.errorMessage = null;
-        // get run
-        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
-            this.getTimeTicks( runId );
-        }).catch( (error: { data: { exception: string } }) => {
-            this.errorMessage = 'select another value, ' +
-                (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
-            // remove bad runId and allow user to try again…
-            this.updateRunId( null );
-        });
+        // check for a stored time index for this runId, default to 0
+        const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
+        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
+
+        // if there are timeTicks, then the model has already been loaded, skip to set timeIndex
+        if ( this.timeTicks.length ) {
+            this.setTimestep( timeIndex );
+        } else {
+            // load new model run
+            this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
+                this.getTimeTicks( timeIndex );
+            }).catch( (error: { data: { exception: string } }) => {
+                this.errorMessage = 'select another value, ' +
+                    (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
+                // remove bad runId and allow user to try again…
+                this.updateRunId( null );
+            });
+        }
     }
 
     // only opens if no valid connection, to give the user a task while websocket is connecting
@@ -179,6 +185,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     dragEnd( event: any ) {
         sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
+    }
+
+    saveSettings() {
+        sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
+        sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
+        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
+        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     setMaxHeights() {
@@ -202,10 +216,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     setTimestep( timeIndex: number ) {
         this.loading = true;
+        this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
-        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
-        userTimeIndexMap[ this.runId$.value ] = timeIndex;
-        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     refresh() {
@@ -213,6 +225,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     updateRunId( runId: string ) {
+        // reset timeTicks to trigger new model load
+        this.timeTicks = [];
         this.runId$.next( runId );
     }
 }
