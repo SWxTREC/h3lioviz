@@ -9,8 +9,8 @@
             </div>
             <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
                 <mat-checkbox color="primary" class="menu__control" formControlName="cmeContours">
-                    {{ layerMenu.value.contourArea === 'cme' ? 'CME c' : 'C'}}ontour surface<span *ngIf="layerMenu.value.numberOfContours !== 1">s</span>:
-                    <span>{{layerMenu.value.numberOfContours}}&nbsp;</span><span class="layer-menu__value">({{layerMenu.value.contourVariable?.displayName}})</span>
+                    Contour surfaces
+                    <span class="layer-menu__value">({{layerMenu.value.contourVariable?.displayName}})</span>
                 </mat-checkbox>
                 <div mat-menu-item #contourTrigger="matMenuTrigger" [matMenuTriggerFor]="contourMenu"></div>
             </div>
