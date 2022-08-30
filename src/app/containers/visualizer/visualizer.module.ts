@@ -1,7 +1,7 @@
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
 import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
 import { LaspFooterModule } from 'lasp-footer';
@@ -15,6 +15,8 @@ import {
     LayerMenuComponent,
     OrientationMenuComponent,
     PlotsComponent,
+    RunSelectorComponent,
+    RunSelectorDialogComponent,
     TimePlayerComponent,
     ZoomMenuComponent
 } from './components';
@@ -26,6 +28,7 @@ import { VisualizerComponent } from './visualizer.container';
         CommonModule,
         ComponentsModule,
         ChartModule,
+        FormsModule,
         LaspEnhancedNgxSliderModule,
         LaspFooterModule,
         MaterialModule,
@@ -41,6 +44,8 @@ import { VisualizerComponent } from './visualizer.container';
         LayerMenuComponent,
         OrientationMenuComponent,
         PlotsComponent,
+        RunSelectorComponent,
+        RunSelectorDialogComponent,
         TimePlayerComponent,
         VisualizerComponent,
         ZoomMenuComponent

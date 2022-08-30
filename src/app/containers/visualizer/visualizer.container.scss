@@ -13,6 +13,9 @@
     &__error {
         display: flex;
         align-items: center;
+        &--warn {
+            color: $color-warn;
+        }
     }
     &__fade {
         // note: percentages for opacity do not work on Firefox
@@ -20,9 +23,6 @@
         // disable mouse interactions
         pointer-events: none;
     }
-	&__fill {
-		flex: 1 1 auto;
-	}
     &__hints {
         position: absolute;
         bottom: 0;
@@ -44,7 +44,6 @@
         position: absolute;
         right: 0;
         z-index: 1;
-        height: 100%;
         justify-content: space-between;
         > * {
             margin-top: 0.25rem;
@@ -66,6 +65,18 @@
     }
     &__pv {
         position: relative;
+        &--empty {
+            background: radial-gradient(white, gray);
+        }
+    }
+    &__row {
+        display: flex;
+        align-items: center;
+        ::ng-deep {
+            > *:not(last-child) {
+                margin-right: 0.5rem;
+            }
+        }
     }
     &__split {
         position: relative;

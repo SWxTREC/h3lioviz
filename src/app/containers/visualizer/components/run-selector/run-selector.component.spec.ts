@@ -1,33 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GridComponent } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
-import { PlotsComponent } from './plots.component';
+import { RunSelectorComponent } from './run-selector.component';
 
-describe('PlotsComponent', () => {
-    let component: PlotsComponent;
-    let fixture: ComponentFixture<PlotsComponent>;
+describe('RunSelectorComponent', () => {
+    let component: RunSelectorComponent;
+    let fixture: ComponentFixture<RunSelectorComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
             declarations: [
-                PlotsComponent,
-                GridComponent
+                RunSelectorComponent
             ],
             imports: [
                 BrowserAnimationsModule,
-                MaterialModule,
-                ReactiveFormsModule
+                MaterialModule
             ]
-
         })
-            .compileComponents();
+    .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(PlotsComponent);
+        fixture = TestBed.createComponent(RunSelectorComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
