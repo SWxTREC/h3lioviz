@@ -19,6 +19,7 @@
                     "options": {
                         "allowedCommonJsDependencies": [
                             "aws-sdk",
+                            "globalthis",
                             "highcharts",
                             "lodash",
                             "moment",

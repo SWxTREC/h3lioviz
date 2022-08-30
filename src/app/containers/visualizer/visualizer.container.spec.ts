@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AngularSplitModule } from 'angular-split';
+import { LaspFooterModule } from 'lasp-footer';
 import { MomentModule } from 'ngx-moment';
 import { GridComponent } from 'scicharts';
 import { ComponentsModule } from 'src/app/modules';
@@ -38,7 +39,6 @@ describe('VisualizerComponent', () => {
                 TimePlayerComponent,
                 VisualizerComponent,
                 ZoomMenuComponent
-
             ],
             imports: [
                 AngularSplitModule,
@@ -47,6 +47,7 @@ describe('VisualizerComponent', () => {
                 HttpClientTestingModule,
                 RouterTestingModule,
                 ReactiveFormsModule,
+                LaspFooterModule,
                 MaterialModule,
                 MomentModule,
                 NgxSliderModule

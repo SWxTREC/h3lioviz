@@ -21,6 +21,7 @@ export const environment = {
             identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
+    catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
     production: true,
     siteRootUrl: siteRootUrl,
     version: packageInfo.version

@@ -1,9 +1,15 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
+import { BehaviorSubject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { AwsService, FooterService, WebsocketService } from 'src/app/services';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { IModelMetadata } from 'src/app/models';
+import { AwsService, CatalogService, FooterService, WebsocketService } from 'src/app/services';
 import { environment } from 'src/environments/environment';
+
+import { RunSelectorDialogComponent } from './components';
 
 // change these values if the height of the header, footer, or player changes
 const headerFooterHeight = 44 + 28;
@@ -17,11 +23,13 @@ const playerHeight = 81;
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
+    catalog: IModelMetadata[];
     componentMaxHeight: number;
-    errorMessage: string;
+    errorMessage: string = null;
     loading = true;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
+    runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -42,8 +50,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     constructor(
+        public dialog: MatDialog,
         public footerService: FooterService,
         private _awsService: AwsService,
+        private _catalogService: CatalogService,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
@@ -54,9 +64,34 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._awsService.startUp();
         this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
     }
-
+    
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
+        // get the last run id, if there is one, from sessionStorage
+        const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || null;
+        this.updateRunId( savedRunId );
+
+        this.subscriptions.push(
+            this._catalogService.catalog$.subscribe( catalog => {
+                this.catalog = catalog;
+                // if waiting for web socket, open the dialog so the user has something to do
+                if ( this.catalog && !this.validConnection ) {
+                    this.openDialog();
+                }
+            })
+        );
+
+        this.subscriptions.push(
+            this.runId$.pipe(
+                distinctUntilChanged()
+            ).subscribe( id => {
+                sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
+                // if runId is selected and valid connection, load run data
+                if ( id != null && this.validConnection ) {
+                    this.loadModel( this.runId$.value );
+                }
+            })
+        );
 
         const waitingMessageInterval = setInterval(() =>
             this.waitingMessage = this.waitingMessages[ Math.floor( Math.random() * ( this.waitingMessages.length ) ) ], 6000);
@@ -73,7 +108,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // show error messages for a failed websocket connection
         this.subscriptions.push(
-            this._websocket.errorMessage$.subscribe( errorMessage => this.errorMessage = errorMessage )
+            this._websocket.errorMessage$.subscribe( socketErrorMessage => {
+                this.errorMessage = socketErrorMessage;
+                if ( socketErrorMessage != null ) {
+                    // close the dialog if the socket does not connect
+                    this.dialog.closeAll();
+                }
+            })
         );
     }
 
@@ -83,20 +124,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
             this.pvView = this._websocket.pvView;
             if ( this.validConnection ) {
+                this.errorMessage = null;
+                this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
-                // check for a stored time index
-                const timeIndex: number = JSON.parse(sessionStorage.getItem('timeIndex'));
-                this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
-                    this.timeTicks = timeValues.map( value => Math.round( value ) );
-                    if ( timeIndex ) {
-                        this.timeIndex = timeIndex;
-                        this.setTimestep( timeIndex );
-                    } else {
-                        this.timeIndex = 0;
-                        this.setTimestep( 0 );
-                    }
-                });
+                // websocket is connected, if runId, load run data
+                if ( this.runId$.value != null ) {
+                    this.loadModel( this.runId$.value );
+                }
             }
         }));
     }
@@ -105,6 +140,48 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky( false );
         this.footerService.showGlobalFooter = true;
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    }
+
+    getTimeTicks( runId: string ) {
+        // check for a stored time index for this runId
+        const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
+        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
+        this.timeIndex = timeIndex;
+        this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
+            this.timeTicks = timeValues.map( value => Math.round( value ) );
+            this.setTimestep( timeIndex );
+        });
+    }
+
+    // called only when both pvView and runId$.value are true
+    loadModel( runId: string ) {
+        this.errorMessage = null;
+        // get run
+        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
+            this.getTimeTicks( runId );
+        }).catch( (error: { data: { exception: string } }) => {
+            this.errorMessage = 'select another value, ' +
+                (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
+            // remove bad runId and allow user to try again…
+            this.updateRunId( null );
+        });
+    }
+
+    // only opens if no valid connection, to give the user a task while websocket is connecting
+    openDialog(): void {
+        const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
+            data: { runId: this.runId$.value, catalog: this.catalog },
+            width: '325px'
+        });
+        dialogRef.afterClosed().subscribe( result => {
+            if ( result ) {
+                this.updateRunId( result );
+            }
+        });
+    }
+
+    dragEnd( event: any ) {
+        sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
     }
 
     setMaxHeights() {
@@ -126,16 +203,19 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
     }
 
-    dragEnd( event: any ) {
-        sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
-    }
-
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        userTimeIndexMap[ this.runId$.value ] = timeIndex;
+        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     refresh() {
         window.location.reload();
+    }
+
+    updateRunId( runId: string ) {
+        this.runId$.next( runId );
     }
 }
