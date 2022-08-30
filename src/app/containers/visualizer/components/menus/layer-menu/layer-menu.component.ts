@@ -173,7 +173,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             combineLabels: (min, max) => min + ' to ' + max,
             step: contourVariable.step,
             animate: false,
-            showTicksValues: !!step,
+            showTicksValues: false,
             tickStep: step ?? null,
             ticksArray: step ? trimmedArray : null
         };

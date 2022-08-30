@@ -43,3 +43,14 @@
 body > * > .page-content > *:not(router-outlet) {
     padding: 0;
 }
+
+
+.ngx-slider[laspEnhancedNgxSlider]{
+    @include custom-slider( $color-primary );
+    .ngx-slider-tick {
+        margin-left: 4px;
+        &.ngx-slider-selected {
+            background-color: $color-accent;
+        }
+    }
+}
