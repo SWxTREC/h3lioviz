@@ -21,19 +21,26 @@
 			display: flex;
 		}
 		::ng-deep {
-			// make the label fill the entire menu-item line, so entire line is clickable
+			// make the label fill the entire menu-item line, so entire shaded area is clickable
 			.mat-checkbox {
 				width: 100%;
 				.mat-checkbox-layout {
 					width: 100%;
+					padding-left: 16px;
 				};
 				.mat-checkbox-label {
 					width: 100%;
+					line-height: 48px;
 				};
 			}
 			// remove the ripple from the menu items that contain a checkbox
 			.mat-ripple.mat-menu-ripple {
 				display: none;
+			}
+		}
+		&.mat-menu-item {
+			::ng-deep {
+				padding: 0;
 			}
 		}
 	}
