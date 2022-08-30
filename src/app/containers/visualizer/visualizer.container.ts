@@ -158,7 +158,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         if ( this.timeTicks.length ) {
             this.setTimestep( timeIndex );
         } else {
-            // load new model run
+            // load new model run and get time ticks (slow)
             this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
                 this.getTimeTicks( timeIndex );
             }).catch( (error: { data: { exception: string } }) => {
