@@ -28,6 +28,6 @@ export const KEYBOARD_SHORTCUTS: IKeyboard[] = [
     },
     {
         action: 'Zoom',
-        instruction: 'ctrl+left-click'
+        instruction: 'ctrl+right-click'
     }
 ];

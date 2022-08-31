@@ -97,10 +97,14 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         return step;
     }
 
+    contourRangeChange( event: ChangeContext ) {
+        this.updateContourRange( [ event.value, event.highValue ] );
+        this.renderDebouncer.next();
+    }
+
     saveUserSettings(): void {
         sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
         sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
-        // sessionStorage.setItem('lonSliceAngle', JSON.stringify( this.lonSliceAngle ));
     }
 
     setFormSubscriptions() {
@@ -110,7 +114,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             .subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
                 // this will render every time any named control in the form is updated
-                // the contour range is tracked outside of the form and is updated and rendered manually
+                // the contour range is tracked outside of the form and is updated and rendered in contourRangeChange()
                 this.renderDebouncer.next();
             })
         );
@@ -119,7 +123,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             .pipe( debounceTime(300) ).subscribe( ( value: number ) => {
                 // TODO: better validation and include possibility of 0 and 1
                 if ( value > 1 ) {
-                    this.updateContourRange( { value: this.contourRange[0], highValue: this.contourRange[1], pointerType: undefined });
+                    this.updateContourRange( this.contourRange );
                 }
             })
         );
@@ -128,13 +132,13 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
                 const newContourRange = this.userContourRanges[ contourVariableServerName ];
-                this.updateContourRange( { value: newContourRange[0], highValue: newContourRange[1], pointerType: undefined });
+                this.updateContourRange( newContourRange );
             })
         );
         // subscribe to CONTOUR AREA changes and call update contour function
         this.subscriptions.push( this.layerMenu.controls.contourArea.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
-                this.updateContourRange( { value: this.contourRange[0], highValue: this.contourRange[1], pointerType: undefined });
+                this.updateContourRange( this.contourRange );
             })
         );
         // subscribe to LON SLICE TYPE changes and render appropriately
@@ -143,17 +147,16 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 if ( newLonSliceType === 'Solar-equator' ) {
                     this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', 0 ] );
                 } else {
-                    // TODO: either get the angle of Earth from the backend or add a function to roate to angle of earth on backend
-                    const angleOfEarth = 7.5;
+                    // TODO: either get the angle of Earth from the backend or add a function to rotate to angle of earth on backend
+                    const angleOfEarth = 7.5; // this is a guess
                     this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', angleOfEarth ] );
                 }
             })
         );
     }
 
-    updateContourRange( event: ChangeContext ) {
+    updateContourRange( newRange: [number, number] ) {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
-        const newRange: [ number, number ] = [ event.value, event.highValue ];
         const numberOfContours = this.layerMenu.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
         this.contourRange = clone( newRange );
@@ -170,25 +173,29 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             combineLabels: (min, max) => min + ' to ' + max,
             step: contourVariable.step,
             animate: false,
-            showTicksValues: !!step,
+            showTicksValues: false,
             tickStep: step ?? null,
             ticksArray: step ? trimmedArray : null
         };
         this.contourOptions = newOptions;
         // determine which area to render in contours
+        this.updateVisibilityByContourArea();
+    }
+
+    updateVisibilityByContourArea() {
+        const contourVariableName: IVariableInfo = this.layerMenu.value.contourVariable.serverName;
         // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
         if ( this.layerMenu.value.contourArea === 'cme' ) {
             // set the values for the cme
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
-            this.session.call('pv.h3lioviz.set_contours', [ contourVariable.serverName, this.contourArray ]);
+            this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
         } else {
             // set the values for the entire area
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
-            this.session.call('pv.h3lioviz.set_threshold', [ contourVariable.serverName, this.contourArray ] );
+            this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
         }
-        this.renderDebouncer.next();
     }
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
@@ -199,7 +206,18 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             } else if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
+                if ( controlName === 'cmeContours' ) {
+                    // tie the threshold state to the cmeContours state and area selected
+                    if ( state === 'on' ) {
+                        this.updateVisibilityByContourArea();
+                    } else {
+                        // turn both off
+                        this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
+                        this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', state ] );
+                    }
+                } else {
+                    this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
+                }
             }
         });
     }

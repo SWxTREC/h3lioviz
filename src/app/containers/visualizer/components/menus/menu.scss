@@ -6,9 +6,6 @@
 		&--col {
 			margin-bottom: 1rem;
 		}
-		&--center {
-			text-align: center;
-		}
 	}
 	&__fill {
 		flex: 1 1 auto;
@@ -18,12 +15,44 @@
 		border-radius: 0;
 		color: white;
 	}
+	&__checkbox {
+		width: 100%;
+		&--trigger {
+			display: flex;
+		}
+		::ng-deep {
+			// make the label fill the entire menu-item line, so entire shaded area is clickable
+			.mat-checkbox {
+				width: 100%;
+				.mat-checkbox-layout {
+					width: 100%;
+					padding-left: 16px;
+				};
+				.mat-checkbox-label {
+					width: 100%;
+					line-height: 48px;
+				};
+			}
+			// remove the ripple from the menu items that contain a checkbox
+			.mat-ripple.mat-menu-ripple {
+				display: none;
+			}
+		}
+		&.mat-menu-item {
+			::ng-deep {
+				padding: 0;
+			}
+		}
+	}
 	&__row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		&--margin {
 			margin-bottom: 0.5rem;
+		}
+		&--wrap {
+			flex-wrap: wrap;
 		}
 	}
     &__spacer {

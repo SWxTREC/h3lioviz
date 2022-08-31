@@ -11,11 +11,11 @@ export class ZoomMenuComponent implements OnChanges {
 
     constructor() {
         const storedZoomState = JSON.parse(sessionStorage.getItem('zoomState'));
-        this.zoomState = storedZoomState;
+        this.zoomState = storedZoomState || false;
     }
-
+    
     ngOnChanges() {
-        // set zoom pvView is defined
+        // set zoom once pvView is defined
         if ( this.pvView ) {
             this.setZoom();
         }
@@ -24,7 +24,7 @@ export class ZoomMenuComponent implements OnChanges {
     resetZoom() {
         this.pvView.get().viewStream.resetCamera();
     }
-    
+
     setZoom() {
         sessionStorage.setItem('zoomState', JSON.stringify(this.zoomState) );
         if ( this.zoomState && this.pvView ) {

@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 @import 'theme/theme-colors.scss';
 @import 'theme/theme-lasp.scss';
 
-@import '~lasp-base-app-snippets/styles/global.scss';
+@import 'node_modules/lasp-base-app-snippets/styles/global.scss';
 @include all((
     'primary-color': $color-primary,
     'primary-contrast-color': $color-primary-contrast,
@@ -11,8 +12,8 @@
     'success-color': $color-success,
     'background-color': #53576D,
 
-    'link-color': mat-color( $primary, 200 ),
-    'heading-color': mat-color( $primary, 500 )
+    'link-color': mat.get-color-from-palette( $primary, 200 ),
+    'heading-color': mat.get-color-from-palette( $primary, 500 )
 ));
 
 // you can add color variables from other libraries/name-spaces here as well
@@ -42,4 +43,16 @@
 
 body > * > .page-content > *:not(router-outlet) {
     padding: 0;
+}
+
+
+.ngx-slider[laspEnhancedNgxSlider]{
+    @include custom-slider( $color-primary );
+    .ngx-slider-tick {
+        pointer-events: none;
+        margin-left: 4px;
+        &.ngx-slider-selected {
+            background-color: $color-accent;
+        }
+    }
 }
