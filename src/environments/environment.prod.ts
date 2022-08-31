@@ -1,4 +1,4 @@
-import packageInfo from '../../package.json';
+import { name, version } from '../../package.json';
 
 let siteRootUrl = window.location.origin;
 // ensure that the root URL ends with a slash
@@ -6,7 +6,7 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 // ensure that the root URL in prod ends with the name of the app
-if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== packageInfo.name ) {
+if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
     siteRootUrl += name + '/';
 }
 
@@ -24,7 +24,7 @@ export const environment = {
     catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
     production: true,
     siteRootUrl: siteRootUrl,
-    version: packageInfo.version
+    version: version
 };
 
 export const environmentConfig = {
