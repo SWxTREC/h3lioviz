@@ -14,7 +14,7 @@ This is a frontend for visualizing 3D heliosphere model output.
 
 ## Relevant JIRA Project(s)
 
-* [SWT](http://mods-jira.lasp.colorado.edu:8080/browse/SWT/): Main project for the
+* [SWT](https://jira.lasp.colorado.edu/projects/SWT/): Main project for the
     Space Weather Model Staging Platform codebase.
 
 ## Related Projects
