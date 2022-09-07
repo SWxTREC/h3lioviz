@@ -7,7 +7,7 @@
  */
 import 'zone.js/dist/zone-error';  // Included with Angular CLI.
 
-import { version } from '../../package.json';
+import packageInfo from '../../package.json';
 
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
@@ -34,7 +34,7 @@ export const environment = {
     catalogUrl: 'http://localhost:4200/assets/catalog/runs.json',
     production: false,
     siteRootUrl: siteRootUrl,
-    version: version
+    version: packageInfo.version
 };
 
 export const environmentConfig = {
