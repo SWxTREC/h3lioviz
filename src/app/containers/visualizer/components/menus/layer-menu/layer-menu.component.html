@@ -4,35 +4,38 @@
 <form [formGroup]="layerMenu">
     <mat-menu #visibilityMenu="matMenu" xPosition="before">
         <div sciStopClick class="layer-menu__form layer-menu__form--visibility">
-            <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
-            <div class="menu__row">
-                <mat-checkbox color="primary" class="menu__control menu__control--row" formControlName="cmeContours">
-                    {{ layerMenu.value.contourArea === 'cme' ? 'CME C' : 'C'}}ontour surface<span *ngIf="layerMenu.value.numberOfContours !== 1">s</span>:
-                </mat-checkbox>
-                <div>
-                    {{layerMenu.value.numberOfContours}}&nbsp;
-                </div>
-                <div class="layer-menu__value">
-                    ({{layerMenu.value.contourVariable?.displayName}})
-                </div>
-                <div class="menu__fill"></div>
-                <div mat-menu-item sciStopClick #contourTrigger="matMenuTrigger" [matMenuTriggerFor]="contourMenu" (click)="contourTrigger.toggleMenu()"></div>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
             </div>
-            <div  class="menu__row">
-                <mat-checkbox color="primary" class="menu__control menu__control--row" formControlName="lonSlice">
+            <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
+                <mat-checkbox color="primary" class="menu__control" formControlName="cmeContours">
+                    Contour surfaces
+                    <span class="layer-menu__value">({{layerMenu.value.contourVariable?.displayName}})</span>
+                </mat-checkbox>
+                <div mat-menu-item #contourTrigger="matMenuTrigger" [matMenuTriggerFor]="contourMenu"></div>
+            </div>
+            <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
+                <mat-checkbox color="primary" class="menu__control" formControlName="lonSlice">
                     Equatorial slice
+                    <span class="layer-menu__value">({{layerMenu.value.lonSliceType}})</span>
                 </mat-checkbox>
-                <div  class="layer-menu__value">
-                    ({{layerMenu.value.lonSliceType}})
-                </div>
-                <div class="menu__fill"></div>
-                <div mat-menu-item sciStopClick #lonTrigger="matMenuTrigger" [matMenuTriggerFor]="lonSliceMenu" (click)="lonTrigger.toggleMenu()"></div>
+                <div mat-menu-item #lonTrigger="matMenuTrigger" [matMenuTriggerFor]="lonSliceMenu"></div>
             </div>
-            <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
-            <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
-            <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
-            <mat-checkbox color="primary" formControlName="satFieldlines">Satellite fieldlines</mat-checkbox>
-            <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
+            </div>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
+            </div>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
+            </div>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="satFieldlines">Satellite fieldlines</mat-checkbox>
+            </div>
+            <div mat-menu-item class="menu__checkbox">
+                <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
+            </div>
         </div>
     </mat-menu>
     <mat-menu #contourMenu xPosition="after">
@@ -59,7 +62,7 @@
                 <strong>Range of {{ layerMenu.value.contourVariable.displayName }}</strong>
                 <small innerHTML=" ({{layerMenu.value.contourVariable.units}})"></small>
             </div>
-            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="updateContourRange($event)"></ngx-slider>
+            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
             <div>
                 <strong>Contour surface values</strong>
                 <div>
@@ -69,9 +72,11 @@
         </div>
     </mat-menu>
     <mat-menu #lonSliceMenu xPosition="after">
-        <mat-radio-group stopSciClick formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
-            <mat-radio-button class="menu__control menu__control--col" value="Ecliptic">Ecliptic</mat-radio-button>
-            <mat-radio-button value="Solar-equator">Solar equator</mat-radio-button>
-        </mat-radio-group>
+        <div sciStopClick>
+            <mat-radio-group formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
+                <mat-radio-button class="menu__control menu__control--col" value="Ecliptic">Ecliptic</mat-radio-button>
+                <mat-radio-button value="Solar-equator">Solar equator</mat-radio-button>
+            </mat-radio-group>
+        </div>
     </mat-menu>
 </form>

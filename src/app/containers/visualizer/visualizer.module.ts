@@ -4,7 +4,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
 import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
-import { LaspFooterModule } from 'lasp-footer';
 import { MomentModule } from 'ngx-moment';
 import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
@@ -30,7 +29,6 @@ import { VisualizerComponent } from './visualizer.container';
         ChartModule,
         FormsModule,
         LaspEnhancedNgxSliderModule,
-        LaspFooterModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,
