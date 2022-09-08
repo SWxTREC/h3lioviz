@@ -52,7 +52,7 @@
     "eslint-plugin-jsdoc": "^38.1.6",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-unicorn": "^42.0.0",
-    "highcharts": "^10.1.0",
+    "highcharts": "~10.0.0",
     "lasp-base-app-snippets": "^3.4.2",
     "lasp-cookie-consent": "^1.0.2",
     "lasp-enhanced-ngx-slider": "^1.0.2",
