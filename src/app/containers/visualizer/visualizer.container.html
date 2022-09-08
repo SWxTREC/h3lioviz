@@ -10,7 +10,7 @@
 </div>
 <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
     <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
-        <as-split-area class="viz__panel viz__panel--full-width" [size]="vizSize" [maxSize]="vizMax">
+        <as-split-area class="viz__panel viz__panel--full-width" [size]="vizDimensions[0]">
             <div class="viz__container" >
                 <div class="viz__overlay">
                     <div class="viz__menus">
@@ -24,7 +24,7 @@
                         <mat-spinner color="accent" diameter="40"></mat-spinner>
                     </div>
                 </div>
-                <div #pvContent class="viz__pv" [class.viz__pv--empty]="(runId$ | async) == null" [style.height]="vizMax + 'px'" [style.width]="vizMax + 'px'"></div>
+                <div #pvContent class="viz__pv" [class.viz__pv--empty]="(runId$ | async) == null" [style.height]="vizDimensions[1] + 'px'" [style.width]="vizDimensions[0] + 'px'"></div>
             </div>
             <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
         </as-split-area>

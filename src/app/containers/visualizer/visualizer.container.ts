@@ -36,17 +36,21 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     timeTicks: number[];
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
-    vizMax: number;
+    // [ width, height ], both can be changed on window resize, user can change width on drag
+    vizDimensions: number[] = [];
     vizMin = 300;
-    vizSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
 
     @HostListener( 'window:resize')
     onResize() {
-        this.setMaxHeights();
-        // pvView.resize
-        this.pvView?.resize();
+        // TODO: add a resize debouncer
+        // TODO: refine this instead of reinitializing dimensions
+        sessionStorage.removeItem( 'vizDimensions' );
+        if ( this.pvView ) {
+            this.setVizDimensions();
+            this.pvViewResize();
+        }
     }
 
     constructor(
@@ -57,10 +61,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
-        this.setMaxHeights();
+        this.setVizDimensions();
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
-        this.vizSize = JSON.parse( sessionStorage.getItem( 'vizSize' ) ) || this.vizMax;
         this.timeTicks = JSON.parse(sessionStorage.getItem('timeTicks')) || [];
     }
     
@@ -183,8 +186,20 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         });
     }
 
+    pvViewResize() {
+        this.loading = true;
+        this.pvView.get().session.call( 'viewport.size.update', [ -1, this.vizDimensions[0], this.vizDimensions[1] ] ).then( () => {
+            this.pvView.resize();
+            this.loading = false;
+        });
+    }
+
     dragEnd( event: any ) {
-        sessionStorage.setItem('vizSize', JSON.stringify( event.sizes[0] ));
+        this.loading = true;
+        const newSize = event.sizes[0];
+        this.vizDimensions[0] = newSize;
+        this.pvViewResize();
+        sessionStorage.setItem('vizDimensions', JSON.stringify( this.vizDimensions ));
     }
 
     saveSettings() {
@@ -195,23 +210,38 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
-    setMaxHeights() {
-        // get max dimension of visualization
-        const width: number = window.innerWidth;
-        const height: number = window.innerHeight;
-        const landscape: boolean = width > height;
-        this.componentMaxHeight = height - headerFooterHeight;
-        // set splitDirection and vizMax
-        if ( landscape ) {
+    setVizDimensions() {
+        // get max dimensions of visualization
+        const windowWidth: number = window.innerWidth;
+        const windowHeight: number = window.innerHeight;
+        const landscapeWindow: boolean = windowWidth > windowHeight;
+        this.componentMaxHeight = windowHeight - headerFooterHeight;
+        const maxHeight = this.componentMaxHeight - (playerHeight);
+        const storedDimensions = JSON.parse( sessionStorage.getItem( 'vizDimensions' ) );
+        // set splitDirection and dimensions
+        if ( landscapeWindow ) {
+            // height is limiting factor
             this.splitDirection = 'horizontal';
-            this.vizMax = this.componentMaxHeight - (playerHeight);
+            if ( storedDimensions ) {
+                // ensure new height is not greater than maxHeight for this window
+                this.vizDimensions[1] = Math.min( storedDimensions[1], maxHeight);
+            } else {
+                // initialize width to half of window and height to maxHeight
+                this.vizDimensions = [ windowWidth * 0.5, maxHeight ];
+            }
         } else {
+            // width is limiting factor
             this.splitDirection = 'vertical';
-            this.vizMax = width;
+            const maxWidth = windowWidth;
+            if ( storedDimensions ) {
+                // ensure new width is not greater than maxWidth for this window
+                this.vizDimensions[0] = Math.min( storedDimensions[0], maxWidth);
+            } else {
+                //  initialize to maxWidth and maxHeight for window
+                this.vizDimensions = [ maxWidth, maxHeight ];
+            }
         }
-        // ensure vizSize is not greater than vizMax
-        this.vizSize = Math.min( this.vizSize, this.vizMax);
-        sessionStorage.setItem('vizSize', JSON.stringify(this.vizSize));
+        sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
     }
 
     setTimestep( timeIndex: number ) {
