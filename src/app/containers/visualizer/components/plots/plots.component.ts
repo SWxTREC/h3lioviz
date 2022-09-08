@@ -14,6 +14,7 @@ import {
     UiOptionsService
 } from 'scicharts';
 import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS, VARIABLE_CONFIG } from 'src/app/models';
+import { environment } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
@@ -43,9 +44,6 @@ const DEFAULT_PLOT_OPTIONS = {
 // TODO: move these to environment files or more appropriate location
 const dataUrl =
     'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/';
-
-const latisUrl =
-    'https://lasp.colorado.edu/space-weather-portal/latis/dap/';
 
 const SATELLITE_NAMES = {
     earth: 'Earth',
@@ -78,7 +76,8 @@ const H3LIO_PRESET: IUiFeatures = {
     styleUrls: [ './plots.component.scss' ]
 })
 export class PlotsComponent implements OnInit {
-    @Input() timeRange: any;
+    @Input() timeRange: number[];
+    @Input() runId: string;
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
@@ -129,7 +128,7 @@ export class PlotsComponent implements OnInit {
         const datasetInfo = this.imageData[variable];
         const newDataset = {
             title: datasetInfo.displayName,
-            url: latisUrl + datasetInfo.id + '.jsond',
+            url: environment.latisUrl + datasetInfo.id + '.jsond',
             name: datasetInfo.displayName,
             rangeVariables: [
                 'url'

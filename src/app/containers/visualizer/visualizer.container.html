@@ -32,7 +32,7 @@
         <as-split-area class="viz__panel" [size]="$any('*')" >
             <swt-run-selector class="viz__row" *ngIf="catalog && validConnection" [runId]="runId$ | async" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
             <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
-            <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+            <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
         </as-split-area>
     </as-split>
 </div>

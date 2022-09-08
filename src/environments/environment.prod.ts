@@ -22,6 +22,9 @@ export const environment = {
         }
     },
     catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
+    // will there be a different endpoint for prod?
+    evolutionDataUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/getTimeSeries/',
+    latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
     version: version

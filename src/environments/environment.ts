@@ -32,6 +32,8 @@ export const environment = {
         }
     },
     catalogUrl: 'http://localhost:4200/assets/catalog/runs.json',
+    evolutionDataUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/getTimeSeries/',
+    latisUrl: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: false,
     siteRootUrl: siteRootUrl,
     version: version
