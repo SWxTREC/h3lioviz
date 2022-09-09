@@ -38,7 +38,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     timeTicks: number[];
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
-    // [ width, height ], both can be changed on window resize, user can change width on drag
+    // [ width, height ] for paraview resize, drag direction is variable so assign appropriately
     vizDimensions: number[] = [];
     vizMin = 300;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
@@ -185,7 +185,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // ensure new height is not greater than vizMaxHeight for this window
                 this.vizDimensions[1] = Math.min( storedDimensions[1], vizMaxHeight);
             } else {
-                // initialize width to half of window and height to vizMaxHeight
+                // initialize to defaultPanelWidth and vizMaxHeight
                 this.vizDimensions = [ defaultPanelWidth, vizMaxHeight ];
             }
             // for landscape, panelSize is width
@@ -250,7 +250,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.resizing = true;
             this.pvView.get().session.call( 'viewport.size.update', [ -1, this.vizDimensions[0], this.vizDimensions[1] ] ).then( () => {
                 this.pvView.resize();
-                // delay for render
+                // delay a beat to allow for render time
                 setTimeout(() => this.resizing = false, 500);
             });
         }
@@ -270,21 +270,25 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
     }
 
-    /* before storing vizDimensions, make sure both elements are valid numbers */
+    /* before storing vizDimensions, make sure there are two elements, each a valid number
+    * no value in storage forces a reinitialization to the defaults
+    */
     storeValidVizDimensions() {
-        this.vizDimensions.forEach( ( dimension: number | '*', index: number ) => {
-            if ( dimension === '*' || dimension == null ) {
-                // default to a reasonable size for window
-                if ( index === 0 ) {
-                    // width is not defined
-                    this.vizDimensions[index] = window.innerWidth * 0.5;
-                } else {
-                    // height is not defined
-                    this.vizDimensions[index] = (this.componentMaxHeight * 0.5) - playerHeight;
+        if ( this.vizDimensions.length === 2 ) {
+            this.vizDimensions.forEach( ( dimension: number | '*', index: number ) => {
+                if ( dimension === '*' || dimension == null ) {
+                    // default to a reasonable size for window
+                    if ( index === 0 ) {
+                        // width is not defined
+                        this.vizDimensions[index] = window.innerWidth * 0.5;
+                    } else {
+                        // height is not defined
+                        this.vizDimensions[index] = (this.componentMaxHeight * 0.5) - playerHeight;
+                    }
                 }
-            }
-        });
-        sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
+            });
+            sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
+        }
     }
 
     refresh() {
