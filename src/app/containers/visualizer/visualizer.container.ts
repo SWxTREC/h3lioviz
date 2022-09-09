@@ -27,8 +27,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     componentMaxHeight: number;
     errorMessage: string = null;
     loading = true;
+    panelSize: number;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
+    resizing = true;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
@@ -47,10 +49,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // TODO: add a resize debouncer
         // TODO: refine this instead of reinitializing dimensions
         sessionStorage.removeItem( 'vizDimensions' );
-        if ( this.pvView ) {
-            this.setVizDimensions();
-            this.pvViewResize();
-        }
+        this.initVizDimensions();
+        this.pvViewResize();
     }
 
     constructor(
@@ -61,13 +61,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
     ) {
-        this.setVizDimensions();
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.timeTicks = JSON.parse(sessionStorage.getItem('timeTicks')) || [];
     }
     
     ngOnInit() {
+        this.initVizDimensions();
         this._scripts.misc.ignoreMaxPageWidth( this );
         // get the last run id, if there is one, from sessionStorage
         const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || null;
@@ -124,6 +124,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.validConnection = validConnection;
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
             this.pvView = this._websocket.pvView;
+            this.pvViewResize();
             if ( this.validConnection ) {
                 this.errorMessage = null;
                 this.dialog.closeAll();
@@ -143,11 +144,69 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    dragEnd( event: any ) {
+        const newSize = event.sizes[0];
+        if ( this.splitDirection === 'horizontal' ) {
+            // landscape, new width
+            this.vizDimensions[0] = newSize;
+        } else {
+            // portrait, new height
+            this.vizDimensions[1] = newSize - playerHeight;
+        }
+        this.pvViewResize();
+        this.storeValidVizDimensions();
+    }
+
     getTimeTicks( timeIndex: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
             this.setTimestep( timeIndex );
         });
+    }
+
+    /* note window dimensions and keep track of viz dimensions
+    * panel size (height or width, depending on direction) is calculated from relevant viz dimension
+    */
+    initVizDimensions() {
+        const windowWidth: number = window.innerWidth;
+        const windowHeight: number = window.innerHeight;
+        const landscapeWindow: boolean = windowWidth > windowHeight;
+        // height of window whether landscape or portrait
+        this.componentMaxHeight = windowHeight - headerFooterHeight;
+        const storedDimensions = JSON.parse( sessionStorage.getItem( 'vizDimensions' ) );
+        // set splitDirection and dimensions
+        if ( landscapeWindow ) {
+            this.splitDirection = 'horizontal';
+            // height is limiting factor
+            const vizMaxHeight = this.componentMaxHeight - playerHeight;
+            const defaultPanelWidth = windowWidth * 0.5;
+            if ( storedDimensions ) {
+                this.vizDimensions = storedDimensions;
+                // ensure new height is not greater than vizMaxHeight for this window
+                this.vizDimensions[1] = Math.min( storedDimensions[1], vizMaxHeight);
+            } else {
+                // initialize width to half of window and height to vizMaxHeight
+                this.vizDimensions = [ defaultPanelWidth, vizMaxHeight ];
+            }
+            // for landscape, panelSize is width
+            this.panelSize = this.vizDimensions[0] ?? defaultPanelWidth;
+        } else {
+            this.splitDirection = 'vertical';
+            // width is limiting factor
+            const defaultVizHeight = (this.componentMaxHeight * 0.5) - playerHeight;
+            if ( storedDimensions ) {
+                this.vizDimensions = storedDimensions;
+                // ensure new width is not greater than maxWidth for this window
+                this.vizDimensions[0] = Math.min( storedDimensions[0], windowWidth);
+            } else {
+                // initialize to windowWidth and defaultVizHeight
+                this.vizDimensions = [ windowWidth, defaultVizHeight ];
+            }
+            // for portrait, panelSize is height plus playerHeight
+            this.panelSize = this.vizDimensions[1] ?
+                this.vizDimensions[1] + playerHeight : defaultVizHeight + playerHeight;
+        }
+        this.storeValidVizDimensions();
     }
 
     // called only when both pvView and runId$.value are true
@@ -187,19 +246,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     pvViewResize() {
-        this.loading = true;
-        this.pvView.get().session.call( 'viewport.size.update', [ -1, this.vizDimensions[0], this.vizDimensions[1] ] ).then( () => {
-            this.pvView.resize();
-            this.loading = false;
-        });
-    }
-
-    dragEnd( event: any ) {
-        this.loading = true;
-        const newSize = event.sizes[0];
-        this.vizDimensions[0] = newSize;
-        this.pvViewResize();
-        sessionStorage.setItem('vizDimensions', JSON.stringify( this.vizDimensions ));
+        if ( this.pvView ) {
+            this.resizing = true;
+            this.pvView.get().session.call( 'viewport.size.update', [ -1, this.vizDimensions[0], this.vizDimensions[1] ] ).then( () => {
+                this.pvView.resize();
+                // delay for render
+                setTimeout(() => this.resizing = false, 500);
+            });
+        }
     }
 
     saveSettings() {
@@ -210,44 +264,27 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
-    setVizDimensions() {
-        // get max dimensions of visualization
-        const windowWidth: number = window.innerWidth;
-        const windowHeight: number = window.innerHeight;
-        const landscapeWindow: boolean = windowWidth > windowHeight;
-        this.componentMaxHeight = windowHeight - headerFooterHeight;
-        const maxHeight = this.componentMaxHeight - (playerHeight);
-        const storedDimensions = JSON.parse( sessionStorage.getItem( 'vizDimensions' ) );
-        // set splitDirection and dimensions
-        if ( landscapeWindow ) {
-            // height is limiting factor
-            this.splitDirection = 'horizontal';
-            if ( storedDimensions ) {
-                // ensure new height is not greater than maxHeight for this window
-                this.vizDimensions[1] = Math.min( storedDimensions[1], maxHeight);
-            } else {
-                // initialize width to half of window and height to maxHeight
-                this.vizDimensions = [ windowWidth * 0.5, maxHeight ];
-            }
-        } else {
-            // width is limiting factor
-            this.splitDirection = 'vertical';
-            const maxWidth = windowWidth;
-            if ( storedDimensions ) {
-                // ensure new width is not greater than maxWidth for this window
-                this.vizDimensions[0] = Math.min( storedDimensions[0], maxWidth);
-            } else {
-                //  initialize to maxWidth and maxHeight for window
-                this.vizDimensions = [ maxWidth, maxHeight ];
-            }
-        }
-        sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
-    }
-
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+    }
+
+    /* before storing vizDimensions, make sure both elements are valid numbers */
+    storeValidVizDimensions() {
+        this.vizDimensions.forEach( ( dimension: number | '*', index: number ) => {
+            if ( dimension === '*' || dimension == null ) {
+                // default to a reasonable size for window
+                if ( index === 0 ) {
+                    // width is not defined
+                    this.vizDimensions[index] = window.innerWidth * 0.5;
+                } else {
+                    // height is not defined
+                    this.vizDimensions[index] = (this.componentMaxHeight * 0.5) - playerHeight;
+                }
+            }
+        });
+        sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
     }
 
     refresh() {

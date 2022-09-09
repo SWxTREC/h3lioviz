@@ -64,9 +64,16 @@
         }
     }
     &__pv {
+        opacity: 1;
+        filter: brightness(100%) blur(0);
         position: relative;
+        transition: filter 1s ease-out, opacity 500ms ease-out;
         &--empty {
             background: radial-gradient(white, gray);
+            opacity: 0.8;
+        }
+        &--resizing {
+            filter: brightness(80%) blur(4px);
         }
     }
     &__row {
