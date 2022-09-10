@@ -32,7 +32,8 @@ export const environment = {
         }
     },
     catalogUrl: 'http://localhost:4200/assets/catalog/runs.json',
-    evolutionDataUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/getTimeSeries/',
+    // eslint-disable-next-line max-len
+    evolutionDataUrl: 'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/',
     latisUrl: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: false,
     siteRootUrl: siteRootUrl,

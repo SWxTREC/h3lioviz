@@ -41,9 +41,6 @@ const DEFAULT_PLOT_OPTIONS = {
         useMultipleAxes: false
     }
 };
-// TODO: move these to environment files or more appropriate location
-const dataUrl =
-    'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/';
 
 const SATELLITE_NAMES = {
     earth: 'Earth',
@@ -84,8 +81,6 @@ export class PlotsComponent implements OnInit {
         image: new FormControl(),
         variable: new FormControl()
     });
-    // TODO: fix this and get actual data for new timeRange, right now, the fake data is only for below time range
-    plotRange: [ number, number ] = [ 1635278400000, 1635883423000 ];
     selectedVariable = COLOR_MENU_DEFAULT_VALUES.colorVariable.serverName;
     variableList: string[] = Object.keys(VARIABLE_CONFIG);
 
@@ -142,9 +137,10 @@ export class PlotsComponent implements OnInit {
     createPlotGroup( variable: string )  {
         const plotGroup = [];
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
+            const urlSuffix: string = environment.production ? `${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
             const newDataset = {
                 title: SATELLITE_NAMES[satellite],
-                url: dataUrl + `evo.${satellite}.json`,
+                url: environment.evolutionDataUrl + urlSuffix,
                 name: SATELLITE_NAMES[satellite],
                 rangeVariables: [
                     'density',
@@ -184,8 +180,8 @@ export class PlotsComponent implements OnInit {
             datasets: plotGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
-                start: this.plotRange[0],
-                end: this.plotRange[1]
+                start: this.timeRange[0] * 1000,
+                end: this.timeRange[1] * 1000
             }
         };
         this._plotsService.addPlot( swPlot );
