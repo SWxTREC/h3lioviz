@@ -46,10 +46,7 @@
         right: 0;
         z-index: 1;
         justify-content: space-between;
-        > * {
-            margin-top: 0.25rem;
-            margin-right: 0.25rem;
-        }
+        gap: 0.25rem;
     }
     &__overlay {
         position: absolute;
@@ -73,11 +70,7 @@
     &__row {
         display: flex;
         align-items: center;
-        ::ng-deep {
-            > *:not(last-child) {
-                margin-right: 0.5rem;
-            }
-        }
+        gap: 0.5rem;
     }
     &__split {
         position: relative;
