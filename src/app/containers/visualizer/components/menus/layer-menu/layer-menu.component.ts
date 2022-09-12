@@ -145,11 +145,9 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         this.subscriptions.push( this.layerMenu.controls.lonSliceType.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
                 if ( newLonSliceType === 'Solar-equator' ) {
-                    this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', 0 ] );
+                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'equator' ]);
                 } else {
-                    // TODO: either get the angle of Earth from the backend or add a function to rotate to angle of earth on backend
-                    const angleOfEarth = 7.5; // this is a guess
-                    this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', angleOfEarth ] );
+                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'ecliptic' ]);
                 }
             })
         );
