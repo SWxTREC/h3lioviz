@@ -2,7 +2,7 @@
     <mat-icon>layers</mat-icon>
 </button>
 <form [formGroup]="layerMenu">
-    <mat-menu #visibilityMenu="matMenu" xPosition="before">
+    <mat-menu #visibilityMenu="matMenu" xPosition="after">
         <div sciStopClick class="layer-menu__form layer-menu__form--visibility">
             <div mat-menu-item class="menu__checkbox">
                 <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
