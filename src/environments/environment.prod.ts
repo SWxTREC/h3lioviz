@@ -21,9 +21,8 @@ export const environment = {
             identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
-    catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
-    // will there be a different endpoint for prod?
-    evolutionDataUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/getTimeSeries/',
+    catalogUrl: 'https://apigw.prod.swx-trec.com/h3lioviz/availableRuns',
+    evolutionDataUrl: 'https://apigw.prod.swx-trec.com/h3lioviz/getTimeSeries/',
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
