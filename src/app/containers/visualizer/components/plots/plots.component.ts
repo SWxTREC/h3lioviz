@@ -14,6 +14,7 @@ import {
     UiOptionsService
 } from 'scicharts';
 import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS, VARIABLE_CONFIG } from 'src/app/models';
+import { environment } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
@@ -40,12 +41,6 @@ const DEFAULT_PLOT_OPTIONS = {
         useMultipleAxes: false
     }
 };
-// TODO: move these to environment files or more appropriate location
-const dataUrl =
-    'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/';
-
-const latisUrl =
-    'https://lasp.colorado.edu/space-weather-portal/latis/dap/';
 
 const SATELLITE_NAMES = {
     earth: 'Earth',
@@ -78,15 +73,14 @@ const H3LIO_PRESET: IUiFeatures = {
     styleUrls: [ './plots.component.scss' ]
 })
 export class PlotsComponent implements OnInit {
-    @Input() timeRange: any;
+    @Input() timeRange: number[];
+    @Input() runId: string;
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
         image: new FormControl(),
         variable: new FormControl()
     });
-    // TODO: fix this and get actual data for new timeRange, right now, the fake data is only for below time range
-    plotRange: [ number, number ] = [ 1635278400000, 1635883423000 ];
     selectedVariable = COLOR_MENU_DEFAULT_VALUES.colorVariable.serverName;
     variableList: string[] = Object.keys(VARIABLE_CONFIG);
 
@@ -129,7 +123,7 @@ export class PlotsComponent implements OnInit {
         const datasetInfo = this.imageData[variable];
         const newDataset = {
             title: datasetInfo.displayName,
-            url: latisUrl + datasetInfo.id + '.jsond',
+            url: environment.latisUrl + datasetInfo.id + '.jsond',
             name: datasetInfo.displayName,
             rangeVariables: [
                 'url'
@@ -143,9 +137,10 @@ export class PlotsComponent implements OnInit {
     createPlotGroup( variable: string )  {
         const plotGroup = [];
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
+            const urlSuffix: string = environment.production ? `${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
             const newDataset = {
                 title: SATELLITE_NAMES[satellite],
-                url: dataUrl + `evo.${satellite}.json`,
+                url: environment.evolutionDataUrl + urlSuffix,
                 name: SATELLITE_NAMES[satellite],
                 rangeVariables: [
                     'density',
@@ -185,8 +180,8 @@ export class PlotsComponent implements OnInit {
             datasets: plotGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
-                start: this.plotRange[0],
-                end: this.plotRange[1]
+                start: this.timeRange[0] * 1000,
+                end: this.timeRange[1] * 1000
             }
         };
         this._plotsService.addPlot( swPlot );
