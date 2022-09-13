@@ -39,7 +39,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
     // [ width, height ] for paraview resize, drag direction is variable so assign appropriately
-    vizDimensions: number[] = [];
+    vizDimensions: [ number, number ] = [ undefined, undefined ];
     vizMin = 300;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
