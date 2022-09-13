@@ -2,9 +2,9 @@ import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, 
 import { MatDialog } from '@angular/material/dialog';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IModelMetadata } from 'src/app/models';
 import { AwsService, CatalogService, WebsocketService } from 'src/app/services';
 import { environment } from 'src/environments/environment';
@@ -43,14 +43,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     vizMin = 300;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
+    windowResize$: Subject<void> = new Subject();
+
 
     @HostListener( 'window:resize')
     onResize() {
-        // TODO: add a resize debouncer
         // TODO: refine this instead of reinitializing dimensions
         sessionStorage.removeItem( 'vizDimensions' );
-        this.initVizDimensions();
-        this.pvViewResize();
+        this.windowResize$.next();
     }
 
     constructor(
@@ -64,6 +64,16 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
         this.timeTicks = JSON.parse(sessionStorage.getItem('timeTicks')) || [];
+
+        this.subscriptions.push(
+            this.windowResize$.pipe(
+                debounceTime( 300 )
+            ).subscribe(() => {
+                this.initVizDimensions();
+                this.pvViewResize();
+            })
+        );
+
     }
     
     ngOnInit() {
