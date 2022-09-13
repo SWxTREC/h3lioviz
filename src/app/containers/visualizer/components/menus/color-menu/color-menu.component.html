@@ -1,7 +1,7 @@
 <button mat-icon-button matTooltip="Color settings" class="menu__icon" #colorTrigger="matMenuTrigger" [matMenuTriggerFor]="colorMenu" aria-label="layers menu button">
     <mat-icon>palette</mat-icon>
 </button>
-<mat-menu #colorMenu xPosition="before">
+<mat-menu #colorMenu xPosition="after">
 	<form sciStopClick class="color-menu" [formGroup]="colorForm">
         <div class="menu__row menu__row--wrap">
             <mat-form-field class="menu__control menu__control--row">

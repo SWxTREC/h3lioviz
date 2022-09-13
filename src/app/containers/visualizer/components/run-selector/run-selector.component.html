@@ -5,7 +5,7 @@
 	<mat-label>Catalog</mat-label>
 	<mat-select [value]="runId" (selectionChange)="updateSelection($event)">
 		<mat-option *ngFor="let run of catalog" [value]="run['run_id']">
-			{{run['rundate_cal']}}
+			{{run['rundate_cal'] | amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
 		</mat-option>
 	</mat-select>
 </mat-form-field>
