@@ -1,7 +1,7 @@
 <button mat-icon-button matTooltip="Zoom options" class="menu__icon" #zoomTrigger="matMenuTrigger" [matMenuTriggerFor]="zoomMenu" aria-label="layers menu button">
     <mat-icon>{{ zoomState ? 'zoom_in' : 'zoom_out' }}</mat-icon>
 </button>
-<mat-menu class="zoom-menu" #zoomMenu xPosition="before">
+<mat-menu class="zoom-menu" #zoomMenu xPosition="after">
 	<mat-slide-toggle sciStopClick class="menu__control menu__control--col" [checked]="zoomState" (change)="toggleZoom()" color="primary">Mouse zoom</mat-slide-toggle>
 	<button sciStopClick mat-raised-button (click)="resetZoom()">reset zoom</button>
 </mat-menu>

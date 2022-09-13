@@ -2,7 +2,7 @@
     <mat-icon>layers</mat-icon>
 </button>
 <form [formGroup]="layerMenu">
-    <mat-menu #visibilityMenu="matMenu" xPosition="before">
+    <mat-menu #visibilityMenu="matMenu" xPosition="after">
         <div sciStopClick class="layer-menu__form layer-menu__form--visibility">
             <div mat-menu-item class="menu__checkbox">
                 <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
@@ -17,7 +17,7 @@
             <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
                 <mat-checkbox color="primary" class="menu__control" formControlName="lonSlice">
                     Equatorial slice
-                    <span class="layer-menu__value">({{layerMenu.value.lonSliceType}})</span>
+                    <span class="layer-menu__value">({{layerMenu.value.lonSliceType | titlecase}})</span>
                 </mat-checkbox>
                 <div mat-menu-item #lonTrigger="matMenuTrigger" [matMenuTriggerFor]="lonSliceMenu"></div>
             </div>
@@ -74,8 +74,8 @@
     <mat-menu #lonSliceMenu xPosition="after">
         <div sciStopClick>
             <mat-radio-group formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
-                <mat-radio-button class="menu__control menu__control--col" value="Ecliptic">Ecliptic</mat-radio-button>
-                <mat-radio-button value="Solar-equator">Solar equator</mat-radio-button>
+                <mat-radio-button class="menu__control menu__control--col" value="ecliptic">Ecliptic</mat-radio-button>
+                <mat-radio-button value="solar-equator">Solar equator</mat-radio-button>
             </mat-radio-group>
         </div>
     </mat-menu>
