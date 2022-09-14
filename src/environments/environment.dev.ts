@@ -1,22 +1,31 @@
-import { version } from '../../package.json';
+import { name, version } from '../../package.json';
 
 let siteRootUrl = window.location.origin;
+
 // ensure that the root URL ends with a slash
-if ( siteRootUrl.substr(-1) !== '/' ) {
+if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
+}
+
+// if not on localhost, ensure that the root URL in ends with the name of the app
+if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
+    siteRootUrl += name + '/';
 }
 
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com/enlil',
+        api: 'https://apigw.dev.swx-trec.com/h3lioviz',
         cognito: {
-            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
-            region: 'us-west-2',
-            userPoolId: 'm1uXvZDys',
-            loginPage: 'https://dev-swx-trec.auth.us-west-2.amazoncognito.com',
-            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
+            appClientId: '5itqpae8gseickjbemm5tprpef',
+            region: 'us-east-1',
+            userPoolId: 'Dgc4otkxZ',
+            loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
+            identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
+    catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
+    evolutionDataUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/getTimeSeries/',
+    latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
     version: version
@@ -24,5 +33,5 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.dev.swx-trec.com/paraview'
+    sessionManagerURL: 'https://paraview-web.dev.swx-trec.com/paraview/'
 };

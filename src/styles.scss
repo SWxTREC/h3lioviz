@@ -34,6 +34,24 @@
     color: $color-primary;
 }
 
+// TODO: figure out how to nest this in specific components
+.mat-menu-panel {
+	padding: 1rem;
+	max-width: fit-content !important;
+}
+
 body > * > .page-content > *:not(router-outlet) {
     padding: 0;
+}
+
+
+.ngx-slider[laspEnhancedNgxSlider]{
+    @include custom-slider( $color-primary );
+    .ngx-slider-tick {
+        pointer-events: none;
+        margin-left: 4px;
+        &.ngx-slider-selected {
+            background-color: $color-accent;
+        }
+    }
 }

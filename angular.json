@@ -19,11 +19,13 @@
                     "options": {
                         "allowedCommonJsDependencies": [
                             "aws-sdk",
+                            "highcharts",
                             "lodash",
                             "moment",
                             "moment-timezone",
                             "rxjs",
-                            "seedrandom"
+                            "seedrandom",
+                            "zone.js"
                         ],
 
                         "aot": true,

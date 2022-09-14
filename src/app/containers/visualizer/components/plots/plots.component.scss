@@ -1,6 +1,20 @@
-
+.plots {
+    &__controls {
+        > *:not(last) {
+            margin-right: 0.5rem;
+        }
+    }
+    &__header {
+        display: inline;
+    }
+}
 ::ng-deep {
     .expand-close-button {
         display: none;
+    }
+    .title {
+        .mat-icon {
+            display: none;
+        }
     }
 }

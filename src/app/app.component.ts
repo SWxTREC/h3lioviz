@@ -30,10 +30,17 @@ export class AppComponent {
         }
     ];
 
+    orgLogos: IImageLink[] = [
+        {
+            src: 'https://swx-trec.com/swx-trec-assets/general/swx-trec-logo-white.png',
+            href: 'https://www.colorado.edu/spaceweather/'
+        }
+    ];
+
     partnerLogos: IImageLink[] = [
         {
-            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png',
-            href: 'https://lasp.colorado.edu'
+            href: 'https://lasp.colorado.edu',
+            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png'
         }
     ];
 
@@ -49,11 +56,18 @@ export class AppComponent {
 
     versions: IVersion[] = [
         {
+            link: 'https://colorado.edu/spaceweather',
+            productName: 'SWx TREC',
+            version: ''
+        },
+        {
             version: environment.version
         }
     ];
 
-    constructor( private _snippets: LaspBaseAppSnippetsService ) {
+    constructor(
+        private _snippets: LaspBaseAppSnippetsService
+    ) {
         this._snippets.appComponent.allExcept([ this._snippets.appComponent.setupGoogleAnalytics ]);
     }
 }

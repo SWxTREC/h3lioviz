@@ -41,9 +41,10 @@ export class AwsService {
                 catchError( (error) => of(error) )
             )),
             switchMap( (pvStatus: {status: number}) => {
-                // status is 0 when server is not ready, 500 when it is ready
+                // status is 0 when server is not ready, 400 or 500 when it is ready
+                // (depending on the backend version deployed)
                 // a network error of 503 for stopping, 502 for starting, but those are passed through as errror='unknown' and status=0
-                if ( pvStatus.status === 500 ) {
+                if ( pvStatus.status === 500 || pvStatus.status === 400 ) {
                     // good to connect!
                     this.pvServerStarted$.next(true);
                     if ( this.startEc2Subscription ) {
@@ -70,7 +71,7 @@ export class AwsService {
 
     startEc2(): Observable<string> {
         // StartEC2Instances.py lambda link
-        return this._http.get( this.awsUrl + '/BrianTestStartEC2', { responseType: 'text' });
+        return this._http.get( this.awsUrl + '/ec2start', { responseType: 'text' });
     }
 
     startUp() {

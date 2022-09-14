@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import {
     AnalogAxisRangeType,
@@ -12,7 +13,8 @@ import {
     SeriesDisplayMode,
     UiOptionsService
 } from 'scicharts';
-import { CONTROL_PANEL_DEFAULT_VALUES } from 'src/app/models';
+import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS, VARIABLE_CONFIG } from 'src/app/models';
+import { environment } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
@@ -40,16 +42,13 @@ const DEFAULT_PLOT_OPTIONS = {
     }
 };
 
-const dataUrl =
-    'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/';
-
 const SATELLITE_NAMES = {
     earth: 'Earth',
     stereoa: 'Stereo A',
     stereob: 'Stereo B'
 };
 
-// set the UI features for H3lio viz
+// set the UI features for H3lioViz
 const H3LIO_PRESET: IUiFeatures = {
     featureList: DEFAULT_UI_OPTIONS.features.featureList,
     toolbar: false,
@@ -74,8 +73,16 @@ const H3LIO_PRESET: IUiFeatures = {
     styleUrls: [ './plots.component.scss' ]
 })
 export class PlotsComponent implements OnInit {
-    variable = CONTROL_PANEL_DEFAULT_VALUES.colorVariable.serverName;
-    plotRange: [ number, number ] = [ 1635278400000, 1635883423000 ];
+    @Input() timeRange: number[];
+    @Input() runId: string;
+    imageData = IMAGE_DATASETS;
+    imageList: string[] = Object.keys(this.imageData);
+    plotForm: FormGroup = new FormGroup({
+        image: new FormControl(),
+        variable: new FormControl()
+    });
+    selectedVariable = COLOR_MENU_DEFAULT_VALUES.colorVariable.serverName;
+    variableList: string[] = Object.keys(VARIABLE_CONFIG);
 
     constructor(
         private _plotsService: PlotsService,
@@ -85,47 +92,55 @@ export class PlotsComponent implements OnInit {
         this._plotsService.enableCrosshairSync();
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
-        // subscribe to changes in the plots to determine if a new variable is selected/deselected
-        this._plotsService.getPlots$().pipe(
-            debounceTime(300)
-        ).subscribe( plots => {
-            if ( plots.length ) {
-                const selectedRangeVariables = plots.reduce( ( aggregator, plot ) => {
-                    plot.datasets.forEach( dataset => {
-                        dataset.selectedRangeVariables.forEach( variable => {
-                            aggregator[variable] = 0;
-                        });
-                    });
-                    return aggregator;
-                }, {});
-                const selectedRangeVariablesList = Object.keys(selectedRangeVariables);
-                // find a variable that is not the same as the old variable
-                // if a new variable (if changed), create a new synced plot group with that variable
-                const newVariable = selectedRangeVariablesList.find( variable => variable !== this.variable );
-                if ( newVariable ) {
-                    this.variable = newVariable;
-                    this.getSolarWindData( this.variable );
-                }
-                // for now, make sure there are always 3 datasets in the plot for the user (datasets can be hidden
-                // from the plot in ways other than removing, and right now, there is no way to get a dataset back)
-                if ( plots[0].datasets.length < 3 ) {
-                    this.getSolarWindData( this.variable );
-                }
+        this.plotForm.controls.variable.valueChanges.pipe( debounceTime(1000) ).subscribe( newVariableValue => {
+            // reset the plot list
+            this._plotsService.setPlots([]);
+            // get the current image plot
+            if ( this.plotForm.value.image ) {
+                this.getImagePlot( this.plotForm.value.image);
             }
+            newVariableValue.forEach( (variable: string) => {
+                this.getSolarWindData(variable);
+            });
+        });
+        this.plotForm.controls.image.valueChanges.subscribe( newImageValue => {
+            // reset the plot list
+            this._plotsService.setPlots([]);
+            this.getImagePlot( newImageValue );
+            // get the current line plots
+            this.plotForm.value.variable.forEach( (variable: string) => {
+                this.getSolarWindData(variable);
+            });
         });
     }
     
     ngOnInit(): void {
         // initialize to the default variable
-        this.getSolarWindData( this.variable );
+        this.plotForm.controls.variable.setValue( [ this.selectedVariable ] );
+    }
+
+    createImageDataset( variable: string )  {
+        const datasetInfo = this.imageData[variable];
+        const newDataset = {
+            title: datasetInfo.displayName,
+            url: environment.latisUrl + datasetInfo.id + '.jsond',
+            name: datasetInfo.displayName,
+            rangeVariables: [
+                'url'
+            ],
+            selectedRangeVariables: [ 'url' ],
+            domainVariables: [ 'time' ]
+        };
+        return newDataset;
     }
 
     createPlotGroup( variable: string )  {
         const plotGroup = [];
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
+            const urlSuffix: string = environment.production ? `${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
             const newDataset = {
                 title: SATELLITE_NAMES[satellite],
-                url: dataUrl + `evo.${satellite}.json`,
+                url: environment.evolutionDataUrl + urlSuffix,
                 name: SATELLITE_NAMES[satellite],
                 rangeVariables: [
                     'density',
@@ -144,17 +159,29 @@ export class PlotsComponent implements OnInit {
         return plotGroup;
     }
 
+    getImagePlot( imageDatasetId: string ) {
+        const imagePlot: IPlot = {
+            collapsed: false,
+            datasets: [ this.createImageDataset( imageDatasetId ) ],
+            initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
+            range: {
+                start: this.timeRange[0] * 1000,
+                end: this.timeRange[1] * 1000
+            },
+            type: 'IMAGE'
+        };
+        this._plotsService.addPlot( imagePlot );
+    }
+
     getSolarWindData( groupVariable: string ) {
-        // reset the plot list
-        this._plotsService.setPlots([]);
         const plotGroup = this.createPlotGroup( groupVariable );
         const swPlot: IPlot = {
             collapsed: false,
             datasets: plotGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
-                start: this.plotRange[0],
-                end: this.plotRange[1]
+                start: this.timeRange[0] * 1000,
+                end: this.timeRange[1] * 1000
             }
         };
         this._plotsService.addPlot( swPlot );

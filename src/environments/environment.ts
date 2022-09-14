@@ -15,7 +15,7 @@ import { version } from '../../package.json';
 
 let siteRootUrl = window.location.origin;
 // ensure that the root URL ends with a slash
-if ( siteRootUrl.substr(-1) !== '/' ) {
+if ( siteRootUrl.slice(-1, 1) !== '/' ) {
     siteRootUrl += '/';
 }
 
@@ -31,6 +31,10 @@ export const environment = {
             identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
+    catalogUrl: 'http://localhost:4200/assets/catalog/runs.json',
+    // eslint-disable-next-line max-len
+    evolutionDataUrl: 'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/',
+    latisUrl: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: false,
     siteRootUrl: siteRootUrl,
     version: version
@@ -38,5 +42,5 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'http://localhost:8080/paraview'
+    sessionManagerURL: 'http://localhost:8080/paraview/'
 };

@@ -5,12 +5,22 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AngularSplitModule } from 'angular-split';
+import { LaspFooterModule } from 'lasp-footer';
 import { MomentModule } from 'ngx-moment';
+import { GridComponent } from 'scicharts';
 import { ComponentsModule } from 'src/app/modules';
 import { MaterialModule } from 'src/app/modules/material.module';
 import { AwsService, ProfileNavService } from 'src/app/services';
 
-import { ControlPanelComponent, TimePlayerComponent } from './components';
+import {
+    ColorMenuComponent,
+    HintsComponent,
+    LayerMenuComponent,
+    OrientationMenuComponent,
+    PlotsComponent,
+    TimePlayerComponent,
+    ZoomMenuComponent
+} from './components';
 import { VisualizerComponent } from './visualizer.container';
 
 describe('VisualizerComponent', () => {
@@ -20,9 +30,15 @@ describe('VisualizerComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
-                ControlPanelComponent,
+                ColorMenuComponent,
+                HintsComponent,
+                LayerMenuComponent,
+                GridComponent,
+                OrientationMenuComponent,
+                PlotsComponent,
                 TimePlayerComponent,
-                VisualizerComponent
+                VisualizerComponent,
+                ZoomMenuComponent
             ],
             imports: [
                 AngularSplitModule,
@@ -31,6 +47,7 @@ describe('VisualizerComponent', () => {
                 HttpClientTestingModule,
                 RouterTestingModule,
                 ReactiveFormsModule,
+                LaspFooterModule,
                 MaterialModule,
                 MomentModule,
                 NgxSliderModule

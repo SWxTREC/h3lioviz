@@ -20,14 +20,14 @@ export interface IKeyboard {
 export const KEYBOARD_SHORTCUTS: IKeyboard[] = [
     {
         action: 'Rotate',
-        instruction: 'shift + left-click'
+        instruction: 'shift+left-click'
     },
     {
         action: 'Pan',
-        instruction: 'shift + right-click'
+        instruction: 'shift+right-click'
     },
     {
         action: 'Zoom',
-        instruction: 'ctrl + left-click'
+        instruction: 'ctrl+right-click'
     }
 ];
