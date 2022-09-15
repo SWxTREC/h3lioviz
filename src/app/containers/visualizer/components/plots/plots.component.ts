@@ -14,7 +14,7 @@ import {
     UiOptionsService
 } from 'scicharts';
 import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS, VARIABLE_CONFIG } from 'src/app/models';
-import { environment } from 'src/environments/environment';
+import { environment, localUrls } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
     dataDisplay: {
@@ -137,10 +137,11 @@ export class PlotsComponent implements OnInit {
     createPlotGroup( variable: string )  {
         const plotGroup = [];
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
-            const urlSuffix: string = environment.production ? `${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
+            const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
+            const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
             const newDataset = {
                 title: SATELLITE_NAMES[satellite],
-                url: environment.evolutionDataUrl + urlSuffix,
+                url: urlBase + urlSuffix,
                 name: SATELLITE_NAMES[satellite],
                 rangeVariables: [
                     'density',

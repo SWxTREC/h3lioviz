@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
-import { environment } from 'src/environments/environment';
+import { environment, localUrls } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -20,6 +20,7 @@ export class CatalogService {
     }
 
     getCatalog(): Observable<any> {
-        return this._http.get( environment.catalogUrl );
+        const catalogUrl = environment.production ? environment.aws.api + 'availableRuns' : localUrls.catalog;
+        return this._http.get( catalogUrl );
     }
 }
