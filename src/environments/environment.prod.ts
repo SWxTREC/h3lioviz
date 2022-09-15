@@ -12,7 +12,7 @@ if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== 
 
 export const environment = {
     aws: {
-        api: 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com',
+        api: 'https://apigw.prod.swx-trec.com/h3lioviz',
         cognito: {
             appClientId: '5itqpae8gseickjbemm5tprpef',
             region: 'us-east-1',
@@ -21,7 +21,9 @@ export const environment = {
             identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
-    catalogUrl: 'https://apigw.dev.swx-trec.com/h3lioviz/availableRuns',
+    catalogUrl: 'https://apigw.prod.swx-trec.com/h3lioviz/availableRuns',
+    evolutionDataUrl: 'https://apigw.prod.swx-trec.com/h3lioviz/getTimeSeries/',
+    latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
     version: packageInfo.version
@@ -29,5 +31,5 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.swx-trec.com/paraview/'
+    sessionManagerURL: 'https://paraview-web.prod.swx-trec.com/paraview/'
 };

@@ -10,8 +10,10 @@
 </div>
 <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
     <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
-        <as-split-area class="viz__panel viz__panel--full-width" [size]="vizSize" [maxSize]="vizMax">
-            <div class="viz__container" >
+        <as-split-area
+            class="viz__panel viz__panel--full-width"
+            [size]="panelSize">
+            <div class="viz__container">
                 <div class="viz__overlay">
                     <div class="viz__menus">
                         <swt-layer-menu [pvView]="pvView"></swt-layer-menu>
@@ -24,7 +26,13 @@
                         <mat-spinner color="accent" diameter="40"></mat-spinner>
                     </div>
                 </div>
-                <div #pvContent class="viz__pv" [class.viz__pv--empty]="(runId$ | async) == null" [style.height]="vizMax + 'px'" [style.width]="vizMax + 'px'"></div>
+                <div #pvContent
+                    class="viz__pv"
+                    [class.viz__pv--empty]="(runId$ | async) == null"
+                    [class.viz__pv--resizing]="resizing"
+                    [style.width]="vizDimensions[0] + 'px'"
+                    [style.height]="vizDimensions[1] + 'px'">
+                </div>
             </div>
             <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
         </as-split-area>
@@ -32,7 +40,7 @@
         <as-split-area class="viz__panel" [size]="$any('*')" >
             <swt-run-selector class="viz__row" *ngIf="catalog && validConnection" [runId]="runId$ | async" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
             <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
-            <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+            <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
         </as-split-area>
     </as-split>
 </div>
