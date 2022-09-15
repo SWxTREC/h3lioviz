@@ -26,6 +26,7 @@
     &__hints {
         position: absolute;
         bottom: 0;
+        z-index: 1;
     }
     &__loading {
         position: absolute;
