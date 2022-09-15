@@ -142,7 +142,7 @@ export class PlotsComponent implements OnInit {
             const newDataset = {
                 title: SATELLITE_NAMES[satellite],
                 url: urlBase + urlSuffix,
-                name: SATELLITE_NAMES[satellite],
+                name: 'Model data ' + SATELLITE_NAMES[satellite],
                 rangeVariables: [
                     'density',
                     'velocity',
