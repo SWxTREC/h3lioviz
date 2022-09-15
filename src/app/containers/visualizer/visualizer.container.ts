@@ -189,7 +189,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.splitDirection = 'horizontal';
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - playerHeight;
-            const defaultPanelWidth = windowWidth * 0.5;
+            const defaultPanelWidth = windowWidth * 0.35;
             if ( storedDimensions ) {
                 this.vizDimensions = storedDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
