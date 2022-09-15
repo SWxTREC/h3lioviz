@@ -31,9 +31,6 @@ export const environment = {
             identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
         }
     },
-    catalogUrl: 'http://localhost:4200/assets/catalog/runs.json',
-    // eslint-disable-next-line max-len
-    evolutionDataUrl: 'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/',
     latisUrl: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: false,
     siteRootUrl: siteRootUrl,
@@ -43,4 +40,10 @@ export const environment = {
 export const environmentConfig = {
     application: 'visualizer',
     sessionManagerURL: 'http://localhost:8080/paraview/'
+};
+
+export const localUrls = {
+    catalog: 'http://localhost:4200/assets/catalog/runs.json',
+    // eslint-disable-next-line max-len
+    evolutionData: 'https://gist.githubusercontent.com/greglucas/364ad0b42d03efaa4319967212f43983/raw/d47631f106de9b6b1eba64159846f87098322ba5/'
 };
