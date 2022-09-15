@@ -12,7 +12,7 @@ if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== 
 
 export const environment = {
     aws: {
-        api: 'https://d5t5sqiqed.execute-api.us-east-1.amazonaws.com',
+        api: 'https://apigw.prod.swx-trec.com/h3lioviz',
         cognito: {
             appClientId: '5itqpae8gseickjbemm5tprpef',
             region: 'us-east-1',
@@ -31,5 +31,5 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.swx-trec.com/paraview/'
+    sessionManagerURL: 'https://paraview-web.prod.swx-trec.com/paraview/'
 };
