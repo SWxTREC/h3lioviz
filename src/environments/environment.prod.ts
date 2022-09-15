@@ -29,7 +29,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.swx-trec.com/paraview/'
+    sessionManagerURL: 'https://paraview-web.prod.swx-trec.com/paraview/'
 };
 
 // these need to be in file, but are not used for 'production' builds
