@@ -6,6 +6,7 @@ import {
     AxisFormat,
     DEFAULT_UI_OPTIONS,
     DiscreteAxisRangeType,
+    ImageViewerService,
     IMenuOptions,
     IPlot,
     IUiFeatures,
@@ -85,11 +86,13 @@ export class PlotsComponent implements OnInit {
     variableList: string[] = Object.keys(VARIABLE_CONFIG);
 
     constructor(
+        private _imageViewerService: ImageViewerService,
         private _plotsService: PlotsService,
         private _uiOptionsService: UiOptionsService
     ) {
         // this is needed to show values in the legend
         this._plotsService.enableCrosshairSync();
+        this._imageViewerService.setImageViewerSync( true );
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
         this.plotForm.controls.variable.valueChanges.pipe( debounceTime(1000) ).subscribe( newVariableValue => {
