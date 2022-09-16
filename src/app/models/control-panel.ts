@@ -172,14 +172,6 @@ export const IMAGE_DATASETS = {
         id: 'stereo_a_cor2_files',
         displayName: 'STEREO A Coronagraph 2'
     },
-    stereo_b_cor1_files: {
-        id: 'stereo_b_cor1_files',
-        displayName: 'STEREO B Coronagraph 1'
-    },
-    stereo_b_cor2_files: {
-        id: 'stereo_b_cor2_files',
-        displayName: 'STEREO B Coronagraph 2'
-    },
     sdo_aia_0094_image_files: {
         id: 'sdo_aia_0094_image_files',
         displayName: 'SDO AIA 094 (green)'
