@@ -6,6 +6,7 @@ import {
     AxisFormat,
     DEFAULT_UI_OPTIONS,
     DiscreteAxisRangeType,
+    IDataset,
     ImageViewerService,
     IMenuOptions,
     IPlot,
@@ -142,8 +143,7 @@ export class PlotsComponent implements OnInit {
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
             const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
             const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
-            const newDataset = {
-                title: SATELLITE_NAMES[satellite],
+            const newDataset: IDataset = {
                 url: urlBase + urlSuffix,
                 name: 'Model data ' + SATELLITE_NAMES[satellite],
                 rangeVariables: [
@@ -160,6 +160,38 @@ export class PlotsComponent implements OnInit {
             };
             plotGroup.push( newDataset );
         });
+        const magVariables = new Set([ 'bx', 'by', 'bz' ]);
+        const windVariables = new Set([ 'density', 'velocity', 'temperature' ]);
+        if ( magVariables.has(variable) ) {
+            const variableNameMap = {
+                bx: 'Bx',
+                by: 'By',
+                bz: 'Bz'
+            };
+            const archivedAceDataset: IDataset = {
+                url: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/ace_mag_1m.jsond?',
+                name: 'ACE Archived Real Time Data',
+                rangeVariables: [ 'Bx', 'By', 'Bz' ],
+                selectedRangeVariables: [ variableNameMap[variable] ],
+                domainVariables: [ 'time' ]
+            };
+            plotGroup.push( archivedAceDataset );
+        }
+        if ( windVariables.has(variable) ) {
+            const variableNameMap = {
+                density: 'density',
+                velocity: 'speed',
+                temperature: 'temperature'
+            };
+            const archivedAceDataset: IDataset = {
+                url: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/ace_swepam_1m.jsond?',
+                name: 'Archived real time ACE data',
+                rangeVariables: [ 'density', 'speed', 'temperature' ],
+                selectedRangeVariables: [ variableNameMap[variable] ],
+                domainVariables: [ 'time' ]
+            };
+            plotGroup.push( archivedAceDataset );
+        }
         return plotGroup;
     }
 
