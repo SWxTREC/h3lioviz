@@ -86,8 +86,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
-                // if waiting for web socket, open the dialog so the user has something to do
-                if ( this.catalog && !this.validConnection ) {
+                // if waiting for aws server, open the dialog so the user has something to do
+                if ( this.catalog && !this.pvServerStarted ) {
                     this.openDialog();
                 }
             })
@@ -111,6 +111,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._websocket.pvServerStarted$.subscribe( started => {
                 this.pvServerStarted = started;
+                if ( this.pvServerStarted === true && this.runId$.value ) {
+                    this.dialog.closeAll();
+                }
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
@@ -121,10 +124,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._websocket.errorMessage$.subscribe( socketErrorMessage => {
                 this.errorMessage = socketErrorMessage;
-                if ( socketErrorMessage != null ) {
-                    // close the dialog if the socket does not connect
-                    this.dialog.closeAll();
-                }
             })
         );
     }
@@ -137,7 +136,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.pvViewResize();
             if ( this.validConnection ) {
                 this.errorMessage = null;
-                this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
                 // websocket is connected, if runId, load run data
@@ -242,7 +240,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    // only opens if no valid connection, to give the user a task while websocket is connecting
+    // only opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
