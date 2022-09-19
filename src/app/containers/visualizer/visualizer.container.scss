@@ -72,6 +72,11 @@
         &--empty {
             background: radial-gradient(white, gray);
             opacity: 0.8;
+            ::ng-deep {
+                img {
+                    visibility: hidden;
+                }
+            }
         }
         &--resizing {
             filter: brightness(80%) blur(4px);
