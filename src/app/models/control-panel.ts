@@ -156,6 +156,22 @@ export const INITIAL_TICK_STEP =
     ( LAYER_MENU_DEFAULT_VALUES.numberOfContours - 1 );
 
 export const IMAGE_DATASETS = {
+    soho_lasco_c2_files: {
+        id: 'soho_lasco_c2_files',
+        displayName: 'SOHO LASCO C2'
+    },
+    soho_lasco_c3_files: {
+        id: 'soho_lasco_c3_files',
+        displayName: 'SOHO LASCO C3'
+    },
+    stereo_a_cor1_files: {
+        id: 'stereo_a_cor1_files',
+        displayName: 'STEREO A Coronagraph 1'
+    },
+    stereo_a_cor2_files: {
+        id: 'stereo_a_cor2_files',
+        displayName: 'STEREO A Coronagraph 2'
+    },
     sdo_aia_0094_image_files: {
         id: 'sdo_aia_0094_image_files',
         displayName: 'SDO AIA 094 (green)'

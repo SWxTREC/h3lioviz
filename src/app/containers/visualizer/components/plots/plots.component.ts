@@ -125,8 +125,7 @@ export class PlotsComponent implements OnInit {
 
     createImageDataset( variable: string )  {
         const datasetInfo = this.imageData[variable];
-        const newDataset = {
-            title: datasetInfo.displayName,
+        const newDataset: IDataset = {
             url: environment.latisUrl + datasetInfo.id + '.jsond',
             name: datasetInfo.displayName,
             rangeVariables: [
@@ -135,6 +134,11 @@ export class PlotsComponent implements OnInit {
             selectedRangeVariables: [ 'url' ],
             domainVariables: [ 'time' ]
         };
+        // some image datasets are converted to files because they are not standard types
+        const needsType = !variable.includes('image');
+        if ( needsType ) {
+            newDataset.type = 'STRING_LIST';
+        }
         return newDataset;
     }
 
