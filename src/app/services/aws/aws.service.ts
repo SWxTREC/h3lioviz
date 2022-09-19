@@ -21,7 +21,8 @@ export class AwsService {
         private _profileService: ProfileNavService
     ) {
         this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( loginStatus => {
-            this.loggedIn = loginStatus;
+            this.loggedIn = true;
+            // this.loggedIn = loginStatus;
         });
     }
 

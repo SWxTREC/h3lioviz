@@ -1,10 +1,10 @@
 <div class="home">
-    <a *ngIf="isLoggedIn" class="home__message" routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
-    <div *ngIf="!isLoggedIn" class="home__message">
-        <button mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
+    <div class="home__message" >
         <p>
             Explore heliosphere model runs in 3 dimensions
         </p>
+        <a *ngIf="isLoggedIn" routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
+        <button *ngIf="!isLoggedIn" mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
     </div>
     <div class="home__media">
         <img src="https://swx-trec.com/swx-trec-assets/h3lioviz/enlil-3d.gif" alt="movie showing 3-d visualization of solar wind model">
