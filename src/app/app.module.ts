@@ -36,11 +36,6 @@ import { AwsService, ProfileNavService } from './services';
         AuthGuard,
         AwsService,
         ProfileNavService,
-        LaspNavService,
-        {
-            provide: LaspNavService,
-            useExisting: ProfileNavService
-        },
         {
             provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: { appearance: 'outline' }
