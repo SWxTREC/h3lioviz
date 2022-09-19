@@ -19,7 +19,7 @@ export class RunSelectorComponent {
         adf481bd: 'CCMC',
         c753358e: 'CCMC',
         ced4d677: 'CCMC',
-        d9bcc5cc: 'CCMC'
+        d9bcc5cc: 'SWPC'
     };
 
     updateSelection( event: MatSelectChange ) {
