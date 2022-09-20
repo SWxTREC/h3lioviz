@@ -1,7 +1,7 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { clone, snakeCase } from 'lodash';
+import { clone, isEmpty, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { INITIAL_TICK_STEP, IVariableInfo, LAYER_MENU_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
@@ -49,7 +49,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             this.layerMenu.addControl(controlName, new FormControl( LAYER_MENU_DEFAULT_VALUES[controlName]));
         });
         // get user contourRanges from session storage if it exists, or from defaults
-        if ( sessionStorage.getItem('contourRanges')) {
+        if ( !isEmpty(sessionStorage.getItem('contourRanges'))) {
             this.userContourRanges = JSON.parse(sessionStorage.getItem('contourRanges'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
@@ -76,7 +76,8 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('layerMenu'))) || clone(LAYER_MENU_DEFAULT_VALUES);
             this.layerMenu.setValue( initialFormValues );
-            // this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+            const initialContourVariable = initialFormValues.contourVariable.serverName;
+            this.contourRange = this.userContourRanges[ initialContourVariable ];
         }
     }
 
@@ -91,10 +92,18 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         return o1.displayName === o2.displayName;
     }
 
-    getTickStep(): number {
+    getContourArray( contourRange: [number, number], numberOfContours: number ): number[] {
+        const interval = this.getTickInterval();
+        const indexArray = [ ...Array(numberOfContours).keys() ]; // [0, 1, 2, …]
+        const contourArray =
+            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * interval)) );
+        return contourArray;
+    }
+
+    getTickInterval(): number {
         const numberOfContours = this.layerMenu.value.numberOfContours;
-        const step = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
-        return step;
+        const interval = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
+        return interval;
     }
 
     contourRangeChange( event: ChangeContext ) {
@@ -131,7 +140,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         this.subscriptions.push( this.layerMenu.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
-                const newContourRange = this.userContourRanges[ contourVariableServerName ];
+                const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
                 this.updateContourRange( newContourRange );
             })
         );
@@ -144,7 +153,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         // subscribe to LON SLICE TYPE changes and render appropriately
         this.subscriptions.push( this.layerMenu.controls.lonSliceType.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
-                if ( newLonSliceType === 'Solar-equator' ) {
+                if ( newLonSliceType === 'solar-equator' ) {
                     this.session.call('pv.h3lioviz.snap_solar_plane', [ 'equator' ]);
                 } else {
                     this.session.call('pv.h3lioviz.snap_solar_plane', [ 'ecliptic' ]);
@@ -157,12 +166,10 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
         const numberOfContours = this.layerMenu.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
+
         this.contourRange = clone( newRange );
-        const indexArray = [ ...Array(numberOfContours).keys() ];
-        const step = numberOfContours > 2 ? this.getTickStep() : undefined;
-        this.contourArray = numberOfContours > 2 ?
-            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * step)) ) :
-            clone(newRange);
+        const tickInterval = numberOfContours > 2 ? this.getTickInterval() : null;
+        this.contourArray = numberOfContours > 2 ? this.getContourArray( newRange, numberOfContours ) : clone(newRange);
         const trimmedArray: number[] = this.contourArray.slice(1, -1);
 
         const newOptions: Options = {
@@ -172,8 +179,8 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             step: contourVariable.step,
             animate: false,
             showTicksValues: false,
-            tickStep: step ?? null,
-            ticksArray: step ? trimmedArray : null
+            tickStep: tickInterval,
+            ticksArray: trimmedArray.length ? trimmedArray : null
         };
         this.contourOptions = newOptions;
         // determine which area to render in contours
@@ -182,17 +189,22 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
 
     updateVisibilityByContourArea() {
         const contourVariableName: IVariableInfo = this.layerMenu.value.contourVariable.serverName;
-        // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
-        if ( this.layerMenu.value.contourArea === 'cme' ) {
-            // set the values for the cme
-            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
-            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
-            this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
-        } else {
-            // set the values for the entire area
+        if ( !this.layerMenu.value.cmeContours ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
-            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
-            this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
+            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+        } else {
+            // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
+            if ( this.layerMenu.value.contourArea === 'cme' ) {
+                // set the values for the cme
+                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
+                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+                this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
+            } else {
+                // set the values for the entire area
+                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+                this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
+            }
         }
     }
 

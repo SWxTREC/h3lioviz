@@ -141,7 +141,7 @@ export const LAYER_MENU_DEFAULT_VALUES = {
     cmeContours: false,
     latSlice: true,
     lonSlice: false,
-    lonSliceType: 'Solar-equator',
+    lonSliceType: 'solar-equator',
     lonStreamlines: false,
     numberOfContours: 3,
     radialSlice: false,
