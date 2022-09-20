@@ -62,7 +62,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
-                sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
+                this.saveUserSettings();
             })
         );
     }
@@ -109,6 +109,11 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
     contourRangeChange( event: ChangeContext ) {
         this.updateContourRange( [ event.value, event.highValue ] );
         this.renderDebouncer.next();
+    }
+
+    saveUserSettings(): void {
+        sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
+        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
     }
 
     setFormSubscriptions() {
@@ -161,7 +166,6 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
         const numberOfContours = this.layerMenu.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
-        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
 
         this.contourRange = clone( newRange );
         const interval = numberOfContours > 2 ? this.getTickInterval() : null;
