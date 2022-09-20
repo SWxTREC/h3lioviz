@@ -1,7 +1,7 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { clone, snakeCase } from 'lodash';
+import { clone, isEmpty, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { INITIAL_TICK_STEP, IVariableInfo, LAYER_MENU_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
@@ -49,7 +49,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             this.layerMenu.addControl(controlName, new FormControl( LAYER_MENU_DEFAULT_VALUES[controlName]));
         });
         // get user contourRanges from session storage if it exists, or from defaults
-        if ( sessionStorage.getItem('contourRanges')) {
+        if ( !isEmpty(sessionStorage.getItem('contourRanges'))) {
             this.userContourRanges = JSON.parse(sessionStorage.getItem('contourRanges'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
@@ -62,7 +62,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
-                this.saveUserSettings();
+                sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
             })
         );
     }
@@ -76,7 +76,8 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
             const initialFormValues = clone(JSON.parse(sessionStorage.getItem('layerMenu'))) || clone(LAYER_MENU_DEFAULT_VALUES);
             this.layerMenu.setValue( initialFormValues );
-            // this.session.call('pv.h3lioviz.rotate_plane', [ 'lon', Number( this.lonSliceAngle ) ] );
+            const initialContourVariable = initialFormValues.contourVariable.serverName;
+            this.contourRange = this.userContourRanges[ initialContourVariable ];
         }
     }
 
@@ -91,20 +92,23 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         return o1.displayName === o2.displayName;
     }
 
-    getTickStep(): number {
+    getContourArray( contourRange: [number, number], numberOfContours: number ): number[] {
+        const interval = this.getTickInterval();
+        const indexArray = [ ...Array(numberOfContours).keys() ]; // [0, 1, 2, …]
+        const contourArray =
+            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * interval)) );
+        return contourArray;
+    }
+
+    getTickInterval(): number {
         const numberOfContours = this.layerMenu.value.numberOfContours;
-        const step = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
-        return step;
+        const interval = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
+        return interval;
     }
 
     contourRangeChange( event: ChangeContext ) {
         this.updateContourRange( [ event.value, event.highValue ] );
         this.renderDebouncer.next();
-    }
-
-    saveUserSettings(): void {
-        sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
-        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
     }
 
     setFormSubscriptions() {
@@ -131,15 +135,14 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         this.subscriptions.push( this.layerMenu.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
-                console.log(this.userContourRanges);
                 const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
-                // this.updateContourRange( newContourRange );
+                this.updateContourRange( newContourRange );
             })
         );
         // subscribe to CONTOUR AREA changes and call update contour function
         this.subscriptions.push( this.layerMenu.controls.contourArea.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
-                // this.updateContourRange( this.contourRange );
+                this.updateContourRange( this.contourRange );
             })
         );
         // subscribe to LON SLICE TYPE changes and render appropriately
@@ -158,12 +161,11 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
         const numberOfContours = this.layerMenu.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
+        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
+
         this.contourRange = clone( newRange );
-        const indexArray = [ ...Array(numberOfContours).keys() ];
-        const step = numberOfContours > 2 ? this.getTickStep() : undefined;
-        this.contourArray = numberOfContours > 2 ?
-            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * step)) ) :
-            clone(newRange);
+        const interval = numberOfContours > 2 ? this.getTickInterval() : null;
+        this.contourArray = numberOfContours > 2 ? this.getContourArray( newRange, numberOfContours ) : clone(newRange);
         const trimmedArray: number[] = this.contourArray.slice(1, -1);
 
         const newOptions: Options = {
@@ -173,8 +175,8 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             step: contourVariable.step,
             animate: false,
             showTicksValues: false,
-            tickStep: step ?? null,
-            ticksArray: step ? trimmedArray : null
+            tickStep: interval,
+            ticksArray: trimmedArray.length ? trimmedArray : null
         };
         this.contourOptions = newOptions;
         // determine which area to render in contours
