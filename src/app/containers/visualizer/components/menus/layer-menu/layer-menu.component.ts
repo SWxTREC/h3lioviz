@@ -168,7 +168,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
 
         this.contourRange = clone( newRange );
-        const interval = numberOfContours > 2 ? this.getTickInterval() : null;
+        const tickInterval = numberOfContours > 2 ? this.getTickInterval() : null;
         this.contourArray = numberOfContours > 2 ? this.getContourArray( newRange, numberOfContours ) : clone(newRange);
         const trimmedArray: number[] = this.contourArray.slice(1, -1);
 
@@ -179,7 +179,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             step: contourVariable.step,
             animate: false,
             showTicksValues: false,
-            tickStep: interval,
+            tickStep: tickInterval,
             ticksArray: trimmedArray.length ? trimmedArray : null
         };
         this.contourOptions = newOptions;
