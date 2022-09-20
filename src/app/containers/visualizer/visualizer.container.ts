@@ -86,8 +86,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
-                // if waiting for web socket, open the dialog so the user has something to do
-                if ( this.catalog && !this.validConnection ) {
+                // if waiting for aws server, open the dialog so the user has something to do
+                if ( this.catalog && !this.pvServerStarted ) {
                     this.openDialog();
                 }
             })
@@ -100,6 +100,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
                     this.loadModel( id );
+                    sessionStorage.setItem( 'runId', JSON.stringify(id) );
                 }
             })
         );
@@ -111,6 +112,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._websocket.pvServerStarted$.subscribe( started => {
                 this.pvServerStarted = started;
+                if ( this.pvServerStarted === true && this.runId$.value ) {
+                    this.dialog.closeAll();
+                }
                 if (waitingMessageInterval) {
                     clearInterval(waitingMessageInterval);
                 }
@@ -121,10 +125,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._websocket.errorMessage$.subscribe( socketErrorMessage => {
                 this.errorMessage = socketErrorMessage;
-                if ( socketErrorMessage != null ) {
-                    // close the dialog if the socket does not connect
-                    this.dialog.closeAll();
-                }
             })
         );
     }
@@ -137,7 +137,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.pvViewResize();
             if ( this.validConnection ) {
                 this.errorMessage = null;
-                this.dialog.closeAll();
                 const divRenderer = this.pvContent.nativeElement;
                 this.pvView.setContainer( divRenderer );
                 // websocket is connected, if runId, load run data
@@ -150,7 +149,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy() {
         this._laspNavService.setAlwaysSticky( false );
-        this.saveSettings();
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
@@ -170,6 +168,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
+            sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
             this.setTimestep( timeIndex );
         });
     }
@@ -226,23 +225,17 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
         const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
 
-        // if there are timeTicks, then the model has already been loaded, skip to set timeIndex
-        if ( this.timeTicks.length ) {
-            this.setTimestep( timeIndex );
-        } else {
-            // load new model run and get time ticks (slow)
-            this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
-                this.getTimeTicks( timeIndex );
-            }).catch( (error: { data: { exception: string } }) => {
-                this.errorMessage = 'select another value, ' +
+        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
+            this.getTimeTicks( timeIndex );
+        }).catch( (error: { data: { exception: string } }) => {
+            this.errorMessage = 'select another value, ' +
                     (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
-                // remove bad runId and allow user to try again…
-                this.updateRunId( null );
-            });
-        }
+            // remove bad runId and allow user to try again…
+            this.updateRunId( null );
+        });
     }
 
-    // only opens if no valid connection, to give the user a task while websocket is connecting
+    // only opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
@@ -266,18 +259,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    saveSettings() {
-        sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
-        sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
-        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
-        userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
-        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
-    }
-
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
+        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     /* before storing vizDimensions, make sure there are two elements, each a valid number
