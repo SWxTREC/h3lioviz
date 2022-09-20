@@ -183,17 +183,22 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
 
     updateVisibilityByContourArea() {
         const contourVariableName: IVariableInfo = this.layerMenu.value.contourVariable.serverName;
-        // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
-        if ( this.layerMenu.value.contourArea === 'cme' ) {
-            // set the values for the cme
-            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
-            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
-            this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
-        } else {
-            // set the values for the entire area
+        if ( !this.layerMenu.value.cmeContours ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
-            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
-            this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
+            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+        } else {
+            // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
+            if ( this.layerMenu.value.contourArea === 'cme' ) {
+                // set the values for the cme
+                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
+                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+                this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
+            } else {
+                // set the values for the entire area
+                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+                this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
+            }
         }
     }
 
