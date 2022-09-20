@@ -100,6 +100,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
                     this.loadModel( id );
+                    sessionStorage.setItem( 'runId', JSON.stringify(id) );
                 }
             })
         );
@@ -148,7 +149,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy() {
         this._laspNavService.setAlwaysSticky( false );
-        this.saveSettings();
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
@@ -168,6 +168,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
+            sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
             this.setTimestep( timeIndex );
         });
     }
@@ -258,18 +259,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    saveSettings() {
-        sessionStorage.setItem( 'runId', JSON.stringify(this.runId$.value) );
-        sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
-        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
-        userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
-        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
-    }
-
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
+        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
     }
 
     /* before storing vizDimensions, make sure there are two elements, each a valid number
