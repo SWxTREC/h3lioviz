@@ -19,7 +19,8 @@ export class HomeComponent implements OnDestroy {
     ) {
         this._scripts.misc.ignoreMaxPageWidth( this );
         this.subscriptions.push( this.profileService.isLoggedIn.subscribe( (loginStatus: boolean) => {
-            this.isLoggedIn = loginStatus;
+            this.isLoggedIn = true;
+            // this.isLoggedIn = loginStatus;
         }));
     }
 
