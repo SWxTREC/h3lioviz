@@ -131,20 +131,21 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         this.subscriptions.push( this.layerMenu.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
-                const newContourRange = this.userContourRanges[ contourVariableServerName ];
-                this.updateContourRange( newContourRange );
+                console.log(this.userContourRanges);
+                const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
+                // this.updateContourRange( newContourRange );
             })
         );
         // subscribe to CONTOUR AREA changes and call update contour function
         this.subscriptions.push( this.layerMenu.controls.contourArea.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
-                this.updateContourRange( this.contourRange );
+                // this.updateContourRange( this.contourRange );
             })
         );
         // subscribe to LON SLICE TYPE changes and render appropriately
         this.subscriptions.push( this.layerMenu.controls.lonSliceType.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
-                if ( newLonSliceType === 'Solar-equator' ) {
+                if ( newLonSliceType === 'solar-equator' ) {
                     this.session.call('pv.h3lioviz.snap_solar_plane', [ 'equator' ]);
                 } else {
                     this.session.call('pv.h3lioviz.snap_solar_plane', [ 'ecliptic' ]);
