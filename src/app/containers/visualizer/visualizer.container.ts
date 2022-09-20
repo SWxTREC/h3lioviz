@@ -224,20 +224,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
         const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
 
-        // if there are timeTicks, then the model has already been loaded, skip to set timeIndex
-        if ( this.timeTicks.length ) {
-            this.setTimestep( timeIndex );
-        } else {
-            // load new model run and get time ticks (slow)
-            this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
-                this.getTimeTicks( timeIndex );
-            }).catch( (error: { data: { exception: string } }) => {
-                this.errorMessage = 'select another value, ' +
+        this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
+            this.getTimeTicks( timeIndex );
+        }).catch( (error: { data: { exception: string } }) => {
+            this.errorMessage = 'select another value, ' +
                     (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
-                // remove bad runId and allow user to try again…
-                this.updateRunId( null );
-            });
-        }
+            // remove bad runId and allow user to try again…
+            this.updateRunId( null );
+        });
     }
 
     // only opens if AWS server is starting up to give the user something to do

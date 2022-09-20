@@ -42,7 +42,9 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         );
     }
 
-    ngOnChanges(): void {
+    ngOnChanges( changes ): void {
+        // any time there are changes to the socket, timeTicks, or timeIndex, make sure playing is false
+        this.playing = false;
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
