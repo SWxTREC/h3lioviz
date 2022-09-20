@@ -11,7 +11,7 @@ export const routes: Routes = [
         path: 'docs',
         loadChildren: () => import( './containers/docs/docs.module').then( m => m.DocsModule )
     }, {
-        canActivate: [ AuthGuard ],
+        // canActivate: [ AuthGuard ],
         data: { footer: FooterMode.MINIMAL },
         loadChildren: () => import( './containers/visualizer/visualizer.module').then( m => m.VisualizerModule ),
         path: 'visualizer'

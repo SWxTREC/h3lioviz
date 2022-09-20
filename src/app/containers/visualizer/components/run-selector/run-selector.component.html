@@ -5,7 +5,8 @@
 	<mat-label>Catalog</mat-label>
 	<mat-select [value]="runId" (selectionChange)="updateSelection($event)">
 		<mat-option *ngFor="let run of catalog" [value]="run['run_id']">
-			{{run['rundate_cal'] | amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+			<!-- TODO: institution will ultimately come from the metadata in the catalog. REMOVE THIS DEFAULT TO SWPC as soon as no longer valid!!! -->
+			{{run['rundate_cal'] | amDateFormat: 'YYYY-MM-DD HH:mm:ss'}} ({{ institutionMap[run['run_id']] || 'SWPC' }})
 		</mat-option>
 	</mat-select>
 </mat-form-field>
