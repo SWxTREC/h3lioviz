@@ -11,6 +11,16 @@ export class RunSelectorComponent {
     @Input() catalog: IModelMetadata[];
     @Input() runId: string;
     @Output() updateRunId: EventEmitter<string> = new EventEmitter(undefined);
+    institutionMap = {
+        '3a543571': 'CCMC',
+        '7d7b81aa': 'CCMC',
+        '8c8bc354': 'SWx TREC',
+        aa53eb15: 'CCMC',
+        adf481bd: 'CCMC',
+        c753358e: 'CCMC',
+        ced4d677: 'CCMC',
+        d9bcc5cc: 'SWPC'
+    };
 
     updateSelection( event: MatSelectChange ) {
         this.updateRunId.emit( event.value );
