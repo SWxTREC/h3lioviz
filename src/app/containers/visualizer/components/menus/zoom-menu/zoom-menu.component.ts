@@ -11,7 +11,7 @@ export class ZoomMenuComponent implements OnChanges {
 
     constructor() {
         const storedZoomState = JSON.parse(sessionStorage.getItem('zoomState'));
-        this.zoomState = storedZoomState || false;
+        this.zoomState = storedZoomState || true;
     }
     
     ngOnChanges() {

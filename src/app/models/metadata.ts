@@ -17,6 +17,7 @@ export interface IModelMetadata {
     grid_old: string;
     initial: string;
     initial_old: string;
+    institute: string;
     mevo: number;
     mfld: number;
     model: string;
