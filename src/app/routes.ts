@@ -1,8 +1,6 @@
 import { Routes } from '@angular/router';
 import { FooterMode } from 'lasp-footer';
 
-import { AuthGuard } from './guards/auth-guard.service';
-
 export const routes: Routes = [
     {
         path: '',

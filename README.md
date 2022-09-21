@@ -105,22 +105,4 @@ This will:
 
 ### Deploy to AWS
 
-Run this Jenkins job (TK) to make a production build and deploy to the production AWS environment.
-
-Until the job is available, you can manually upload the files with the commented instructions below.
-
-<!-- Merge `dev` into `main`. From main, `npm run build:prod` to create the `dist/` folder. Upload the contents of `dist/swt/` to AWS. The deployed site should reflect the code contained in the `main` branch. -->
-
-<!-- ### Deploy to GitHub pages
-
-From the main branch, run `npm run deploy`
-
-This will:
-
-* Run `npm run build:pages` to create the `/docs` directory that will be deployed
-* Make a copy of `docs/index.html` and name it `docs/404.html` (for some reason the angular instructions say to do this)
-* Take the current build of `/docs` from the current branch and push it up to the remote `gh-pages` branch were it will be served
-
-After a few minutes, you will see the changes at the GitHub-hosted site https://swxtrec.github.io/h3lioviz.
-
-You can run this script from any branch, but the site should reflect the content of the current main branch. -->
+Run this Jenkins job https://jenkins-build.lasp.colorado.edu/job/swx-h3lioviz-prod/ to make a production build. Currently there is a manual step to deploy to the production AWS environment. Notify Brian McClellan or Greg Lucas to do this step. In future this will be automated.

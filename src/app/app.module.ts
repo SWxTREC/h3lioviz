@@ -7,7 +7,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { LaspFooterModule } from 'lasp-footer';
-import { LaspNavModule, LaspNavService } from 'lasp-nav';
+import { LaspNavModule } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { AppComponent } from './app.component';
