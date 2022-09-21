@@ -1,14 +1,14 @@
 <form class="plots__controls" [formGroup]="plotForm">
 	<h2 class="plots__header">Imagery/plots:</h2>
 	<mat-form-field>
-		<mat-label>Solar data</mat-label>
+		<mat-label>Solar images</mat-label>
 		<mat-select formControlName="image">
 			<mat-option>None</mat-option>
 			<mat-option *ngFor="let imageOption of imageList" [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
 		</mat-select>
 	</mat-form-field>
 	<mat-form-field>
-		<mat-label>Solar wind data</mat-label>
+		<mat-label>Solar wind variables</mat-label>
 		<mat-select formControlName="variable" multiple>
 			<mat-option *ngFor="let variableOption of variableList" [value]="variableOption">{{variableOption}}</mat-option>
 		</mat-select>
