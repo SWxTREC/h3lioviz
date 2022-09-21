@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
@@ -57,6 +57,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         public dialog: MatDialog,
         private _awsService: AwsService,
         private _catalogService: CatalogService,
+        private _changeDetector: ChangeDetectorRef,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
         private _websocket: WebsocketService
@@ -296,6 +297,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     updateRunId( runId: string ) {
         // reset timeTicks to trigger new model load
         this.timeTicks = [];
+        // this will destroy the time player so that playing stops
+        this._changeDetector.detectChanges();
         this.runId$.next( runId );
     }
 }
