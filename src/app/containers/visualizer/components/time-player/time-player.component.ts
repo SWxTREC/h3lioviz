@@ -27,6 +27,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
             this.timestepDebouncer.pipe(
                 debounceTime(300)
             ).subscribe((value) => this.updateTime.emit(value)));
+
         this.subscriptions.push(
             this.playingDebouncer.pipe(
                 debounceTime(300)
@@ -36,7 +37,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                     this.playTimesteps( this.timeIndex );
                 } else {
                     // stop when the pause button is pressed
-                    this.updateTime.emit( this.timeIndex );
+                    this.updateTime.emit( this.timeIndex || 0 );
                 }
             })
         );
@@ -45,6 +46,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     ngOnChanges(): void {
         // any time there are changes to the inputs, make sure playing is false
         this.playing = false;
+
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
@@ -52,6 +54,9 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        // stop playing and set index when time player is destroyed
+        this.playing = false;
+        this.updateTime.emit( this.timeIndex );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
@@ -67,19 +72,19 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         const nextIndex = index + 1;
         if ( nextIndex < this.timeTicks.length ) {
             this.session.call( 'pv.time.index.set', [ nextIndex ]).then( () => {
-                if (this.playing) {
+                if ( this.playing ) {
                     // increment timeIndex here, once graphics are loaded
                     this.timeIndex = index;
                     this.playTimesteps( nextIndex );
                 } else {
-                    this.updateTime.emit( this.timeIndex );
+                    this.updateTime.emit( index );
                 }
             });
         } else {
             // stop when last time step is reached
             this.playing = false;
             this.timeIndex = this.timeTicks.length - 1;
-            this.updateTime.emit( this.timeIndex );
+            this.updateTime.emit( index );
         }
     }
 
