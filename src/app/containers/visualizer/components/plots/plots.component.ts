@@ -173,7 +173,7 @@ export class PlotsComponent implements OnInit {
                 bz: 'Bz'
             };
             const archivedAceDataset: IDataset = {
-                url: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/ace_mag_1m.jsond?',
+                url: environment.latisUrl + 'ace_mag_1m.jsond?',
                 name: 'ACE Archived Real Time Data',
                 rangeVariables: [ 'Bx', 'By', 'Bz' ],
                 selectedRangeVariables: [ variableNameMap[variable] ],
@@ -188,7 +188,7 @@ export class PlotsComponent implements OnInit {
                 temperature: 'temperature'
             };
             const archivedAceDataset: IDataset = {
-                url: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/ace_swepam_1m.jsond?',
+                url: environment.latisUrl + 'ace_swepam_1m.jsond?',
                 name: 'Archived real time ACE data',
                 rangeVariables: [ 'density', 'speed', 'temperature' ],
                 selectedRangeVariables: [ variableNameMap[variable] ],
