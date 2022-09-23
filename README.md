@@ -89,7 +89,7 @@ When you are ready to push your image, contact the web team infrastructure group
 
 ## Deploy H3lioViz
 
-Merges to the `dev` branch will automatically be deployed to <https://dev.swx-trec.com/h3lioviz>. This is the `dev` deploy in the AWS environment and the contents of the `dev` brach will be reflected there.
+Merges to the `dev` branch will automatically be deployed to <https://dev.swx-trec.com/h3lioviz>. This is the `dev` deploy in the AWS environment and the contents of the `dev` branch will be reflected there.
 
 Be sure to `npm run lint && npm test` before merging to the `dev` branch.
 
