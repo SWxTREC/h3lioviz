@@ -84,7 +84,7 @@ export class PlotsComponent implements OnInit {
         variable: new FormControl()
     });
     selectedVariable = COLOR_MENU_DEFAULT_VALUES.colorVariable.serverName;
-    variableList: string[] = Object.keys(VARIABLE_CONFIG);
+    variableList: string[] = [ 'density', 'velocity', 'pressure', 'temperature', 'bx', 'by', 'bz' ];
 
     constructor(
         private _imageViewerService: ImageViewerService,
