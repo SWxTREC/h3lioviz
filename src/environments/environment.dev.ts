@@ -1,4 +1,4 @@
-import { name, version } from '../../package.json';
+import packageInfo from '../../package.json';
 
 let siteRootUrl = window.location.origin;
 
@@ -8,7 +8,7 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
 }
 
 // if not on localhost, ensure that the root URL in ends with the name of the app
-if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== name ) {
+if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== packageInfo.name ) {
     siteRootUrl += name + '/';
 }
 
@@ -26,7 +26,7 @@ export const environment = {
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
-    version: version
+    version: packageInfo.version
 };
 
 export const environmentConfig = {

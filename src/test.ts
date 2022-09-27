@@ -10,6 +10,10 @@ import {
 
 declare const require: any;
 
+if ( !window.global ) {
+    (window as any).global = {};
+}
+
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
     BrowserDynamicTestingModule,
