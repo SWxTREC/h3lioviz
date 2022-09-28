@@ -15,7 +15,7 @@ import {
     SeriesDisplayMode,
     UiOptionsService
 } from 'scicharts';
-import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS, VARIABLE_CONFIG } from 'src/app/models';
+import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
