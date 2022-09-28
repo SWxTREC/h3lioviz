@@ -102,6 +102,7 @@ This will:
 * run the linter and unit tests and abort if they fail
 * increment the version, commit the change, and create a git tag
 * push the changes and the new tag to the remote repo
+* merge the version changes back into the dev branch
 
 ### Deploy to AWS
 
