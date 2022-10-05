@@ -177,7 +177,7 @@ export const IMAGE_DATASETS = {
         displayName: 'SDO AIA 094 (green)'
     },
     sdo_aia_0094_0335_0193_image_files: {
-        id: 'sdo_aia_0094_0335_0193_image_file',
+        id: 'sdo_aia_0094_0335_0193_image_files',
         displayName: 'SDO AIA 094, 335, 193 composite'
     },
     sdo_aia_0131_image_files: {
