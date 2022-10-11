@@ -4,8 +4,9 @@
 <mat-form-field>
 	<mat-label>Catalog</mat-label>
 	<mat-select laspSelectAutoClose [value]="runId" (selectionChange)="updateSelection($event)">
-		<mat-option *ngFor="let run of catalog" [value]="run['run_id']">
-			{{run['rundate_cal'] | amDateFormat: 'YYYY-MM-DD HH:mm:ss'}} ({{ run.institute }})
+		<mat-option *ngFor="let run of catalog; let i = index" [value]="run['run_id']">
+			{{run['rundate_cal'] | amDateFormat: 'YYYY-MM-DD HH:mm:ss'}}
+			({{ run.institute }}<span *ngIf="resolutionArray[i]">, {{ resolutionArray[i] }} resolution</span>)
 		</mat-option>
 	</mat-select>
 </mat-form-field>
