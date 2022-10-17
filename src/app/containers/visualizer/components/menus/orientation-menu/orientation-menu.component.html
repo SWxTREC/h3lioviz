@@ -1,9 +1,21 @@
-<button mat-icon-button matTooltip="Snap to view" class="menu__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
+<button mat-icon-button matTooltip="Orientation" class="menu__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
     <mat-icon>language</mat-icon>
 </button>
-<mat-menu #orientationMenu xPosition="after">
-	<h3>Snap to view:</h3> 
-    <div mat-menu-item (click)="snapTo('ecliptic')">Ecliptic</div>
-    <div mat-menu-item (click)="snapTo('meridional')">Meridional</div>
-    <div mat-menu-item (click)="snapTo('initial')">Oblique</div>
+<mat-menu #orientationMenu class="orientation" xPosition="after">
+    Snap to view:
+    <div class="menu__row">
+        <div sciStopClick class="orientation__option">
+            <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
+            Ecliptic
+        </div>
+        <div sciStopClick class="orientation__option">
+            <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
+            Meridional
+        </div>
+        <div sciStopClick class="orientation__option">
+            <img src="assets/images/oblique.png" (click)="snapTo('oblique')">
+            Oblique
+        </div>
+    </div>
+    <button sciStopClick class="orientation__button" mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
 </mat-menu>

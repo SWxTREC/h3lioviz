@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialModule } from 'src/app/modules';
 
-import { ZoomMenuComponent } from './zoom-menu.component';
+import { ZoomMenuComponent } from './mouse-zoom.component';
 
 describe('ZoomMenuComponent', () => {
     let component: ZoomMenuComponent;

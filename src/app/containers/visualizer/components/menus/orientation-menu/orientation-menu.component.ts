@@ -28,6 +28,10 @@ export class OrientationMenuComponent implements OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
+    }
+
     snapTo( view: string ) {
         this.pvView.get().session.call( 'pv.h3lioviz.snap_to_view', [ view ] );
         this.renderDebouncer.next();

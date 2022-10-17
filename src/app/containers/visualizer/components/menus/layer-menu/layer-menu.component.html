@@ -41,7 +41,7 @@
     <mat-menu #contourMenu xPosition="after">
         <div sciStopClick class="layer-menu__form">
             <div class="menu__row">
-                <mat-form-field class="menu__control menu__control--row">
+                <mat-form-field class="menu__control">
                     <mat-label>Contour variable</mat-label>
                     <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
                         <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
@@ -49,7 +49,7 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-                <mat-form-field class="menu__control menu__control--row">
+                <mat-form-field class="menu__control">
                     <mat-label>Number of contours</mat-label>
                     <input matInput type="number" min="2" max="10" formControlName="numberOfContours">
                 </mat-form-field>
@@ -74,7 +74,7 @@
     <mat-menu #lonSliceMenu xPosition="after">
         <div sciStopClick>
             <mat-radio-group formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
-                <mat-radio-button class="menu__control menu__control--col" value="ecliptic">Ecliptic</mat-radio-button>
+                <mat-radio-button class="menu__control" value="ecliptic">Ecliptic</mat-radio-button>
                 <mat-radio-button value="solar-equator">Solar equator</mat-radio-button>
             </mat-radio-group>
         </div>

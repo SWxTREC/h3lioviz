@@ -2,7 +2,7 @@ export * from './hints/hints.component';
 export * from './menus/color-menu/color-menu.component';
 export * from './menus/layer-menu/layer-menu.component';
 export * from './menus/orientation-menu/orientation-menu.component';
-export * from './menus/zoom-menu/zoom-menu.component';
+export * from './mouse-zoom/mouse-zoom.component';
 export * from './plots/plots.component';
 export * from './run-selector/run-selector.component';
 export * from './run-selector-dialog/run-selector-dialog.component';
