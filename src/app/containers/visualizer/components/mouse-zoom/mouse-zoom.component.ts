@@ -5,7 +5,7 @@ import { Component, Input, OnChanges } from '@angular/core';
     templateUrl: './mouse-zoom.component.html',
     styleUrls: [ './mouse-zoom.component.scss' ]
 })
-export class ZoomMenuComponent implements OnChanges {
+export class MouseZoomComponent implements OnChanges {
     @Input() pvView: any;
     zoomState: boolean;
 

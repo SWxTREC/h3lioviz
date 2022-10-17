@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialModule } from 'src/app/modules';
 
-import { ZoomMenuComponent } from './mouse-zoom.component';
+import { MouseZoomComponent } from './mouse-zoom.component';
 
-describe('ZoomMenuComponent', () => {
-    let component: ZoomMenuComponent;
-    let fixture: ComponentFixture<ZoomMenuComponent>;
+describe('MouseZoomComponent', () => {
+    let component: MouseZoomComponent;
+    let fixture: ComponentFixture<MouseZoomComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ ZoomMenuComponent ],
+            declarations: [ MouseZoomComponent ],
             imports: [ MaterialModule ]
         })
     .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ZoomMenuComponent);
+        fixture = TestBed.createComponent(MouseZoomComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

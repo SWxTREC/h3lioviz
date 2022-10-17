@@ -16,10 +16,10 @@ import {
     ColorMenuComponent,
     HintsComponent,
     LayerMenuComponent,
+    MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
-    TimePlayerComponent,
-    ZoomMenuComponent
+    TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -35,10 +35,10 @@ describe('VisualizerComponent', () => {
                 LayerMenuComponent,
                 GridComponent,
                 OrientationMenuComponent,
+                MouseZoomComponent
                 PlotsComponent,
                 TimePlayerComponent,
                 VisualizerComponent,
-                ZoomMenuComponent
             ],
             imports: [
                 AngularSplitModule,

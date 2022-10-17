@@ -3,16 +3,9 @@
 </button>
 <form [formGroup]="layerMenu">
     <mat-menu #visibilityMenu="matMenu" xPosition="after">
-        <div sciStopClick class="layer-menu__form layer-menu__form--visibility">
+        <div class="layer-menu__form layer-menu__form--visibility">
             <div mat-menu-item class="menu__checkbox">
                 <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
-            </div>
-            <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
-                <mat-checkbox color="primary" class="menu__control" formControlName="cmeContours">
-                    Contour surfaces
-                    <span class="layer-menu__value">({{layerMenu.value.contourVariable?.displayName}})</span>
-                </mat-checkbox>
-                <div mat-menu-item #contourTrigger="matMenuTrigger" [matMenuTriggerFor]="contourMenu"></div>
             </div>
             <div mat-menu-item class="menu__checkbox menu__checkbox--trigger">
                 <mat-checkbox color="primary" class="menu__control" formControlName="lonSlice">
@@ -35,39 +28,6 @@
             </div>
             <div mat-menu-item class="menu__checkbox">
                 <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
-            </div>
-        </div>
-    </mat-menu>
-    <mat-menu #contourMenu xPosition="after">
-        <div sciStopClick class="layer-menu__form">
-            <div class="menu__row">
-                <mat-form-field class="menu__control">
-                    <mat-label>Contour variable</mat-label>
-                    <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
-                        <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
-                            {{ variable.value.displayName }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="menu__control">
-                    <mat-label>Number of contours</mat-label>
-                    <input matInput type="number" min="2" max="10" formControlName="numberOfContours">
-                </mat-form-field>
-                <mat-button-toggle-group class="layer-menu__toggle-button" formControlName="contourArea" color="primary" aria-label="contour type, cme or all">
-                    <mat-button-toggle value="cme">CME</mat-button-toggle>
-                    <mat-button-toggle value="all">All</mat-button-toggle>
-                </mat-button-toggle-group>
-            </div>
-            <div>
-                <strong>Range of {{ layerMenu.value.contourVariable.displayName }}</strong>
-                <small innerHTML=" ({{layerMenu.value.contourVariable.units}})"></small>
-            </div>
-            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
-            <div>
-                <strong>Contour surface values</strong>
-                <div>
-                    {{ contourArray | json }}
-                </div>
             </div>
         </div>
     </mat-menu>

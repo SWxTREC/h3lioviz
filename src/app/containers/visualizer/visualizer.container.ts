@@ -153,6 +153,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        this.setControlPanel();
+        this.setPlotsPanel();
         this.subscriptions.push( this._websocket.validConnection$.subscribe( validConnection => {
             this.validConnection = validConnection;
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
@@ -288,6 +290,40 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         window.location.reload();
     }
 
+    setControlPanel() {
+        this.openControls ? this.drawer.open() : this.drawer.close();
+        // for portrait, control panel pushes over vertical panels
+        // if horizontal panels and plots panel is open, plots panel will squish to accomodate the control panel
+        // otherwise, if no plots panel, viz needs to be resized
+        if ( this.splitDirection === 'horizontal' && !this.openPlots ) {
+            this.vizDimensions[0] = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            this.pvViewResize();
+            this.storeValidVizDimensions();
+        }
+        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
+        sessionStorage.setItem('panelSettings', panelSettings );
+    }
+
+    setPlotsPanel() {
+        // Gets the sizes of the visible panels
+        const sizes = this.splitElement.getVisibleAreaSizes();
+        // if two visible split areas, preserve the viz width so it can be restored
+        this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
+        const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+        if ( this.splitDirection === 'horizontal' ) {
+            // restore to previous, if no previous, use a default width
+            const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
+            this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
+        } else {
+            this.vizDimensions[0] = maximumVizWidth;
+        }
+        this.vizPanelSize = this.vizDimensions[0];
+        this.pvViewResize();
+        this.storeValidVizDimensions();
+        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
+        sessionStorage.setItem('panelSettings', panelSettings );
+    }
+
     setTimestep( timeIndex: number ) {
         this.loading = true;
         this.timeIndex = timeIndex;
@@ -320,38 +356,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     toggleControlPanel() {
         this.openControls = !this.openControls;
-        this.openControls ? this.drawer.open() : this.drawer.close();
-        // for portrait, control panel pushes over vertical panels
-        // if horizontal panels and plots panel is open, plots panel will squish to accomodate the control panel
-        // otherwise, if no plots panel, viz needs to be resized
-        if ( this.splitDirection === 'horizontal' && !this.openPlots ) {
-            this.vizDimensions[0] = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
-            this.pvViewResize();
-            this.storeValidVizDimensions();
-        }
-        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
-        sessionStorage.setItem('panelSettings', panelSettings );
+        this.setControlPanel();
     }
 
     togglePlotsPanel() {
         this.openPlots = !this.openPlots;
-        // Gets the sizes of the visible panels
-        const sizes = this.splitElement.getVisibleAreaSizes();
-        // if two visible split areas, preserve the viz width so it can be restored
-        this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
-        const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
-        if ( this.splitDirection === 'horizontal' ) {
-            // restore to previous, if no previous, use a default width
-            const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
-            this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
-        } else {
-            this.vizDimensions[0] = maximumVizWidth;
-        }
-        this.vizPanelSize = this.vizDimensions[0];
-        this.pvViewResize();
-        this.storeValidVizDimensions();
-        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
-        sessionStorage.setItem('panelSettings', panelSettings );
+        this.setPlotsPanel();
     }
 
     updateRunId( runId: string ) {
