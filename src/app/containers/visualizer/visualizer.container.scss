@@ -92,4 +92,21 @@
         height: 100%;
         width: 100%;
     }
+    &__toolbar {
+        &--title {
+            justify-content: center;
+            height: 20px;
+        }
+        &--buttons {
+            justify-content: space-between;
+            height: 40px;
+            padding: 0 2px;
+        }
+        &--single-row {
+            gap: 1rem;
+            justify-content: flex-end;
+            height: 60px;
+            padding: 0 2px;
+        }
+    }
 }

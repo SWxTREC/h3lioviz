@@ -10,6 +10,7 @@ import { environment, localUrls } from 'src/environments/environment';
 })
 export class CatalogService {
     catalog$: BehaviorSubject<IModelMetadata[]> = new BehaviorSubject(undefined);
+    runTitles: {};
 
     constructor(
         private _http: HttpClient
@@ -19,6 +20,11 @@ export class CatalogService {
             // sort catalog by `rundate_cal`
             catalog.sort( ( a, b ) => moment(b['rundate_cal']).valueOf() - moment(a['rundate_cal']).valueOf() );
             this.catalog$.next(catalog);
+            this.runTitles = Array.from(this.catalog$.value).reduce( (aggregator, run) => {
+                const time = moment.utc( run['rundate_cal'] ).format('YYYY-MM-DD HH:mm:ss');
+                aggregator[ run['run_id'] ] = `${time} (${run.institute})`;
+                return aggregator;
+            }, {});
         });
     }
 
