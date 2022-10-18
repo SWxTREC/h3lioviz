@@ -1,11 +1,10 @@
-<form [formGroup]="contours">
-	                <mat-checkbox color="primary" class="forms__control" formControlName="cmeContours">
-                    Contour surfaces
-                    <span class="layers__value">({{contours.value.contourVariable?.displayName}})</span>
-                </mat-checkbox>
-
-	<div class="forms__row">
-		<mat-form-field class="forms__control">
+<form class="contours" [formGroup]="contours">
+	<mat-checkbox class="contours__spacer" color="primary" formControlName="cmeContours">
+		Contour surfaces
+		<span class="form__value">({{contours.value.contourVariable?.displayName}})</span>
+	</mat-checkbox>
+	<ng-container *ngIf="contours.value.cmeContours">
+		<mat-form-field>
 			<mat-label>Contour variable</mat-label>
 			<mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
 				<mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
@@ -13,24 +12,24 @@
 				</mat-option>
 			</mat-select>
 		</mat-form-field>
-		<mat-form-field class="forms__control">
+		<mat-form-field>
 			<mat-label>Number of contours</mat-label>
 			<input matInput type="number" min="2" max="10" formControlName="numberOfContours">
 		</mat-form-field>
-		<mat-button-toggle-group class="layers__toggle-button" formControlName="contourArea" color="primary" aria-label="contour type, cme or all">
+		<mat-button-toggle-group class="contours__toggle-button contours__spacer" formControlName="contourArea" color="primary" aria-label="contour type, cme or all">
 			<mat-button-toggle value="cme">CME</mat-button-toggle>
 			<mat-button-toggle value="all">All</mat-button-toggle>
 		</mat-button-toggle-group>
-	</div>
-	<div>
-		<strong>Range of {{ contours.value.contourVariable.displayName }}</strong>
-		<small innerHTML=" ({{contours.value.contourVariable.units}})"></small>
-	</div>
-	<ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
-	<div>
-		<strong>Contour surface values</strong>
-		<div>
-			{{ contourArray | json }}
+		<div class="contours__spacer" >
+			<strong>Range of {{ contours.value.contourVariable.displayName }}</strong>
+			<small innerHTML=" ({{contours.value.contourVariable.units}})"></small>
+			<ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
 		</div>
-	</div>
+		<div>
+			<strong>Contour surface values</strong>
+			<div>
+				{{ contourArray | json }}
+			</div>
+		</div>
+	</ng-container>
 </form>

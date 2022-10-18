@@ -1,0 +1,23 @@
+@import 'src/theme/theme-colors.scss';
+.contours {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    &__spacer {
+        margin-bottom: 1rem;
+    }
+    &__toggle-button {
+        height: 2rem;
+        align-items: center;
+        .mat-button-toggle {
+            width: 50%;
+        }
+        .mat-button-toggle-checked {
+            background-color: $color-primary;
+            &.mat-button-toggle-appearance-standard {
+                color: white;
+            }
+        }
+    }
+}
