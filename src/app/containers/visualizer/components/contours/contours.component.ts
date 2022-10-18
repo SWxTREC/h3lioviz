@@ -118,7 +118,6 @@ export class ContoursComponent implements OnInit, OnChanges {
         this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
-                console.log({ newFormValues });
                 this.updateVisibilityControls( newFormValues );
                 // this will render every time any named control in the form is updated
                 // the contour range is tracked outside of the form and is updated and rendered in contourRangeChange()
@@ -201,7 +200,6 @@ export class ContoursComponent implements OnInit, OnChanges {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 if ( controlName === 'cmeContours' ) {
-                    console.log({ controlName });
                     // tie the threshold state to the cmeContours state and area selected
                     if ( state === 'on' ) {
                         this.updateVisibilityByContourArea();
