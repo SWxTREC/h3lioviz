@@ -1,4 +1,4 @@
-.menu {
+.form {
 	&__control {
 		gap: 1rem;
 	}
@@ -47,4 +47,7 @@
         margin: 1rem 0;
         position: relative !important;
     }
+	&__value {
+		color: silver;
+	}
 }
