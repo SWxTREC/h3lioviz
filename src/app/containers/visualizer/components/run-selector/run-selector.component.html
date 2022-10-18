@@ -1,7 +1,7 @@
-<h2 class="selector__header">
+<h2>
     {{ runId ? 'Selected ' : 'Select a ' }} model run:
 </h2>
-<mat-form-field class="selector__content">
+<mat-form-field>
     <mat-label>Catalog</mat-label>
     <mat-select laspSelectAutoClose [value]="runId" (selectionChange)="updateSelection($event)">
         <mat-option *ngFor="let run of catalog; let i = index" [value]="run['run_id']">
