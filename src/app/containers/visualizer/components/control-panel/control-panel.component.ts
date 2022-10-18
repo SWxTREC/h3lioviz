@@ -8,7 +8,7 @@ import { Component, Input, OnDestroy } from '@angular/core';
 export class ControlPanelComponent implements OnDestroy {
     @Input() pvView: any;
     expansionState = {
-        layers: false,
+        layers: true,
         contours: false,
         colors: false
     };

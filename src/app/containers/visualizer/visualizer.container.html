@@ -1,6 +1,6 @@
 <mat-drawer-container [hasBackdrop]="false">
     <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'">
-        <swt-control-panel [pvView]="pvView"></swt-control-panel>
+        <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
     </mat-drawer>
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
     <ng-container *ngIf="errorMessage">
@@ -12,7 +12,7 @@
     <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
-    <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="false">
+    <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
         <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
             <as-split-area
             class="viz__panel viz__panel--full-width"
@@ -31,7 +31,7 @@
                     <mat-toolbar-row *ngIf="splitDirection === 'horizontal'" class="viz__toolbar viz__toolbar--title">
                         <small>{{ runTitle }}</small>
                         <button mat-icon-button aria-label="button to select a new model run">
-                            <mat-icon matTooltip="switch model runs" (click)="openDialog()">
+                            <mat-icon matTooltip="switch model runs" matTooltipPosition="above" (click)="openDialog()">
                                     compare_arrows
                             </mat-icon>
                         </button>
@@ -52,7 +52,7 @@
                     </mat-toolbar-row>
                 </mat-toolbar>
                 <div class="viz__container">
-                    <swt-run-selector class="viz__row" *ngIf="catalog && validConnection && (runId$ | async) == null" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
+                    <swt-run-selector *ngIf="catalog && validConnection && (runId$ | async) == null" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
                     <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
                     <div class="viz__overlay" *ngIf="runId$ | async">
                         <div class="viz__menus">

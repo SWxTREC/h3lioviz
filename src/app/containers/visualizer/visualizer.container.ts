@@ -96,7 +96,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         );
         const storedPanelSettings = JSON.parse( sessionStorage.getItem('panelSettings'));
         this.openControls = storedPanelSettings ? storedPanelSettings[0] : false;
-        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : true;
+        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : false;
     }
     
     ngOnInit() {
@@ -266,7 +266,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
-            width: '325px'
+            width: '500px'
         });
         dialogRef.afterClosed().subscribe( result => {
             if ( result ) {
