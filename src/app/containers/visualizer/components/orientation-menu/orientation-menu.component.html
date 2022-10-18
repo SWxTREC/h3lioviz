@@ -1,9 +1,9 @@
-<button mat-icon-button matTooltip="Orientation" class="menu__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
+<button mat-icon-button matTooltip="Orientation" class="orientation__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
     <mat-icon>language</mat-icon>
 </button>
 <mat-menu #orientationMenu class="orientation" xPosition="after">
     Snap to view:
-    <div class="menu__row">
+    <div class="form__row">
         <div sciStopClick class="orientation__option">
             <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
             Ecliptic

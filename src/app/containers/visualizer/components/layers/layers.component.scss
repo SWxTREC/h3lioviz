@@ -1,6 +1,10 @@
 @import 'src/theme/theme-colors.scss';
 
-.layer-menu {
+.layers {
+	&__form {
+		display: flex;
+		flex-direction: column;
+	}
 	&__toggle-button {
 		height: 2rem;
 		align-items: center;
@@ -12,14 +16,6 @@
 			&.mat-button-toggle-appearance-standard {
 				color: white;
 			}
-		}
-	}
-	&__form {
-		display: flex;
-		flex-direction: column;
-		&--visibility {
-			// stabilize the width so it doesn't jump around
-			width: 320px;
 		}
 	}
 	&__value {

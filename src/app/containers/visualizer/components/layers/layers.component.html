@@ -1,0 +1,32 @@
+<form class="layers__form" [formGroup]="layers">
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" class="form__control" formControlName="lonSlice">
+            Equatorial slice
+            <span class="layers__value">({{layers.value.lonSliceType | titlecase}})</span>
+        </mat-checkbox>
+    </div>
+    <div *ngIf="layers.value.lonSlice" >
+        <mat-radio-group formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
+            <mat-radio-button class="form__control" value="ecliptic">Ecliptic</mat-radio-button>
+            <mat-radio-button value="solar-equator">Solar equator</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="latSlice">Meridional slice</mat-checkbox>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="satFieldlines">Satellite fieldlines</mat-checkbox>
+    </div>
+    <div mat-menu-item class="form__checkbox">
+        <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
+    </div>
+</form>

@@ -10,11 +10,11 @@ import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import {
-    ColorMenuComponent,
-    ContourSettingsComponent,
+    ColorsComponent,
+    ContoursComponent,
     ControlPanelComponent,
     HintsComponent,
-    LayerMenuComponent,
+    LayersComponent,
     MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
@@ -41,11 +41,11 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
-        ColorMenuComponent,
-        ContourSettingsComponent,
+        ColorsComponent,
+        ContoursComponent,
         ControlPanelComponent,
         HintsComponent,
-        LayerMenuComponent,
+        LayersComponent,
         MouseZoomComponent,
         OrientationMenuComponent,
         PlotsComponent,

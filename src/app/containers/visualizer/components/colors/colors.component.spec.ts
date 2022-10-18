@@ -4,15 +4,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'src/app/modules';
 
-import { ColorMenuComponent } from './color-menu.component';
+import { ColorsComponent } from './colors.component';
 
-describe('ColorMenuComponent', () => {
-    let component: ColorMenuComponent;
-    let fixture: ComponentFixture<ColorMenuComponent>;
+describe('ColorsComponent', () => {
+    let component: ColorsComponent;
+    let fixture: ComponentFixture<ColorsComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ ColorMenuComponent ],
+            declarations: [ ColorsComponent ],
             imports: [
                 BrowserAnimationsModule,
                 MaterialModule,
@@ -24,7 +24,7 @@ describe('ColorMenuComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ColorMenuComponent);
+        fixture = TestBed.createComponent(ColorsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

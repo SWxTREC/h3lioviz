@@ -5,25 +5,25 @@ import { clone, isEmpty, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
-    CONTOUR_MENU_DEFAULT_VALUES,
+    CONTOUR_FORM_DEFAULT_VALUES,
     INITIAL_TICK_STEP,
     IVariableInfo,
     VARIABLE_CONFIG
 } from 'src/app/models';
 
 @Component({
-    selector: 'swt-contour-settings',
-    templateUrl: './contour-settings.component.html',
-    styleUrls: [ './contour-settings.component.scss' ]
+    selector: 'swt-contours',
+    templateUrl: './contours.component.html',
+    styleUrls: [  '../form.scss', './contours.component.scss' ]
 })
-export class ContourSettingsComponent implements OnInit, OnChanges {
+export class ContoursComponent implements OnInit, OnChanges {
     @Input() pvView: any;
-    defaultContourVariable: IVariableInfo = CONTOUR_MENU_DEFAULT_VALUES.contourVariable;
+    defaultContourVariable: IVariableInfo = CONTOUR_FORM_DEFAULT_VALUES.contourVariable;
 
     // contourArray keeps track of the array of contour values sent to the server
     // the numbers are calculated from the contour range and the number of contours
     contourArray: number[] = [];
-    contourSettings: FormGroup = new FormGroup({});
+    contours: FormGroup = new FormGroup({});
     // contourRange keeps track of the user settings on the contour range slider
     contourRange: [number, number] = ( this.defaultContourVariable.defaultSubsetRange );
     contourOptions: Options = {
@@ -45,8 +45,8 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
 
     constructor() {
         // initialize FormGroup with default contour menu names and values
-        Object.keys(CONTOUR_MENU_DEFAULT_VALUES).forEach( controlName => {
-            this.contourSettings.addControl(controlName, new FormControl( CONTOUR_MENU_DEFAULT_VALUES[controlName]));
+        Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
+            this.contours.addControl(controlName, new FormControl( CONTOUR_FORM_DEFAULT_VALUES[controlName]));
         });
         // get user contourRanges from session storage if it exists, or from defaults
         if ( !isEmpty(sessionStorage.getItem('contourRanges'))) {
@@ -74,8 +74,8 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('contourSettings'))) || clone(CONTOUR_MENU_DEFAULT_VALUES);
-            this.contourSettings.setValue( initialFormValues );
+            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('contours'))) || clone(CONTOUR_FORM_DEFAULT_VALUES);
+            this.contours.setValue( initialFormValues );
             const initialContourVariable = initialFormValues.contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
         }
@@ -103,19 +103,19 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
     }
 
     getTickInterval(): number {
-        const numberOfContours = this.contourSettings.value.numberOfContours;
+        const numberOfContours = this.contours.value.numberOfContours;
         const interval = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
         return interval;
     }
 
     saveUserSettings(): void {
-        sessionStorage.setItem('contourSettings', JSON.stringify( this.contourSettings.value ));
+        sessionStorage.setItem('contours', JSON.stringify( this.contours.value ));
         sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
     }
 
     setFormSubscriptions() {
         // subscribe to any form change
-        this.subscriptions.push( this.contourSettings.valueChanges
+        this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
                 console.log({ newFormValues });
@@ -126,7 +126,7 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
             })
         );
         // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
-        this.subscriptions.push( this.contourSettings.controls.numberOfContours.valueChanges
+        this.subscriptions.push( this.contours.controls.numberOfContours.valueChanges
             .pipe( debounceTime(300) ).subscribe( ( value: number ) => {
                 // TODO: better validation and include possibility of 0 and 1
                 if ( value > 1 ) {
@@ -135,7 +135,7 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
             })
         );
         // subscribe to CONTOUR VARIABLE changes and call update contour function with new contour variable values
-        this.subscriptions.push( this.contourSettings.controls.contourVariable.valueChanges
+        this.subscriptions.push( this.contours.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
                 const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
@@ -143,15 +143,15 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
             })
         );
         // subscribe to CONTOUR AREA changes and call update contour function
-        this.subscriptions.push( this.contourSettings.controls.contourArea.valueChanges
+        this.subscriptions.push( this.contours.controls.contourArea.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
                 this.updateContourRange( this.contourRange );
             })
         );
     }
     updateContourRange( newRange: [number, number] ) {
-        const contourVariable: IVariableInfo = this.contourSettings.value.contourVariable;
-        const numberOfContours = this.contourSettings.value.numberOfContours;
+        const contourVariable: IVariableInfo = this.contours.value.contourVariable;
+        const numberOfContours = this.contours.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
 
         this.contourRange = clone( newRange );
@@ -175,13 +175,13 @@ export class ContourSettingsComponent implements OnInit, OnChanges {
     }
 
     updateVisibilityByContourArea() {
-        const contourVariableName: IVariableInfo = this.contourSettings.value.contourVariable.serverName;
-        if ( !this.contourSettings.value.cmeContours ) {
+        const contourVariableName: IVariableInfo = this.contours.value.contourVariable.serverName;
+        if ( !this.contours.value.cmeContours ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
         } else {
             // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
-            if ( this.contourSettings.value.contourArea === 'cme' ) {
+            if ( this.contours.value.contourArea === 'cme' ) {
                 // set the values for the cme
                 this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
                 this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );

@@ -3,6 +3,11 @@
 		margin-top: 1rem;
 		width: 100%;
 	}
+	&__icon {
+		background-color: transparentize(black, 0.7);
+		border-radius: 0;
+		color: white;
+	}
 	&__option {
 		display: flex;
 		flex-direction: column;

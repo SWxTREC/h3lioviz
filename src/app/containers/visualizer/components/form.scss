@@ -5,11 +5,6 @@
 	&__fill {
 		flex: 1 1 auto;
 	}
-	&__icon {
-		background-color: transparentize(black, 0.7);
-		border-radius: 0;
-		color: white;
-	}
 	&__checkbox {
 		width: 100%;
 		&--trigger {

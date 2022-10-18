@@ -6,21 +6,21 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-    COLOR_MENU_DEFAULT_VALUES,
+    COLOR_FORM_DEFAULT_VALUES,
     COLORMAPS,
     IVariableInfo,
     VARIABLE_CONFIG
 } from 'src/app/models';
 
 @Component({
-    selector: 'swt-color-menu',
-    templateUrl: './color-menu.component.html',
-    styleUrls: [ '../menu.scss', './color-menu.component.scss' ]
+    selector: 'swt-colors',
+    templateUrl: './colors.component.html',
+    styleUrls: [  '../form.scss', './colors.component.scss' ]
 })
-export class ColorMenuComponent implements OnChanges, OnDestroy {
+export class ColorsComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
 
-    defaultColorVariable: IVariableInfo = COLOR_MENU_DEFAULT_VALUES.colorVariable;
+    defaultColorVariable: IVariableInfo = COLOR_FORM_DEFAULT_VALUES.colorVariable;
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
     colorForm: FormGroup = new FormGroup({});
@@ -55,8 +55,8 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
 
     constructor() {
         // initialize FormGroup with default color menu names and values
-        Object.keys(COLOR_MENU_DEFAULT_VALUES).forEach( controlName => {
-            this.colorForm.addControl(controlName, new FormControl( COLOR_MENU_DEFAULT_VALUES[controlName]));
+        Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {
+            this.colorForm.addControl(controlName, new FormControl( COLOR_FORM_DEFAULT_VALUES[controlName]));
         });
         // create user objects from session storage if it exists, or from defaults
         // colormaps
@@ -80,7 +80,7 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
             this.userOpacities = JSON.parse(sessionStorage.getItem('opacities'));
         } else {
             Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userOpacities[variable] = COLOR_MENU_DEFAULT_VALUES.opacity;
+                this.userOpacities[variable] = COLOR_FORM_DEFAULT_VALUES.opacity;
             });
         }
       
@@ -101,7 +101,7 @@ export class ColorMenuComponent implements OnChanges, OnDestroy {
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(COLOR_MENU_DEFAULT_VALUES);
+            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(COLOR_FORM_DEFAULT_VALUES);
             this.colorForm.setValue( initialFormValues );
         }
     }
