@@ -1,13 +1,13 @@
 .layers {
-	&__list {
-		list-style-type: none;
-		li {
-			padding: 0.25rem 0;
-		}
-	}
-	&__group {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
+    &__list {
+        list-style-type: none;
+        li {
+            padding: 0.25rem 0;
+        }
+    }
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
 }
