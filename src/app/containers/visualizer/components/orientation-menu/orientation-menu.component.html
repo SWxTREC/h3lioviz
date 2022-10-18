@@ -2,7 +2,9 @@
     <mat-icon>language</mat-icon>
 </button>
 <mat-menu #orientationMenu class="orientation" xPosition="after">
-    Snap to view:
+    <span class="orientation__header">
+        Snap to view:
+    </span>
     <div class="form__row">
         <div sciStopClick class="orientation__option">
             <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">

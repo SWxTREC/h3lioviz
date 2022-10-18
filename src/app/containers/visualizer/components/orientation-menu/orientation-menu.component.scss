@@ -3,6 +3,9 @@
 		margin-top: 1rem;
 		width: 100%;
 	}
+	&__header {
+		font-weight: bold;
+	}
 	&__icon {
 		background-color: transparentize(black, 0.7);
 		border-radius: 0;

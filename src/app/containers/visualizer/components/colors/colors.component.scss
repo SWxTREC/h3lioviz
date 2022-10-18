@@ -1,4 +1,8 @@
 .colors {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     &__swatch {
         height: 20px;
     }
