@@ -1,6 +1,24 @@
-<p>control-panel works!</p>
-<swt-layers [pvView]="pvView"></swt-layers>
-<mat-divider></mat-divider>
-<swt-contours [pvView]="pvView"></swt-contours>
-<mat-divider></mat-divider>
-<swt-colors [pvView]="pvView"></swt-colors>
+<mat-expansion-panel class="control__expander">
+	<mat-expansion-panel-header class="control__header">
+	  <mat-panel-title>
+	    Layers
+	  </mat-panel-title>
+	</mat-expansion-panel-header>
+	<swt-layers [pvView]="pvView"></swt-layers>
+</mat-expansion-panel>
+<mat-expansion-panel class="control__expander">
+	<mat-expansion-panel-header class="control__header">
+	  <mat-panel-title>
+	    Contours
+	  </mat-panel-title>
+	</mat-expansion-panel-header>
+	<swt-contours [pvView]="pvView"></swt-contours>
+</mat-expansion-panel>
+<mat-expansion-panel class="control__expander">
+	<mat-expansion-panel-header class="control__header">
+	  <mat-panel-title>
+	    Colors
+	  </mat-panel-title>
+	</mat-expansion-panel-header>
+	<swt-colors [pvView]="pvView"></swt-colors>
+</mat-expansion-panel>

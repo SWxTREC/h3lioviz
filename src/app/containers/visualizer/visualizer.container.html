@@ -57,9 +57,7 @@
                     <div class="viz__overlay" *ngIf="runId$ | async">
                         <div class="viz__menus">
                             <swt-mouse-zoom></swt-mouse-zoom>
-                            <!-- <swt-layer-menu [pvView]="pvView"></swt-layer-menu> -->
                             <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
-                            <!-- <swt-colors [pvView]="pvView"></swt-colors> -->
                         </div>
                         <swt-hints class="viz__hints"></swt-hints>
                         <div *ngIf="loading" class="viz__loading">
