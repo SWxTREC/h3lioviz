@@ -1,5 +1,5 @@
-<mat-drawer-container [hasBackdrop]="false">
-    <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'">
+<mat-drawer-container [hasBackdrop]="splitDirection === 'vertical'">
+    <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="toggleControlPanel()">
         <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
     </mat-drawer>
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
@@ -17,39 +17,23 @@
             <as-split-area
             class="viz__panel viz__panel--full-width"
             [size]="vizPanelSize"
-            [minSize]="controlPanelSize + 20"
+            [minSize]="controlPanelSize + 60"
             [order]="0">
-                <mat-toolbar *ngIf="runId$ | async">
-                    <mat-toolbar-row *ngIf="splitDirection === 'horizontal'" class="viz__toolbar viz__toolbar--buttons">
-                        <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
-                            {{ openControls ? 'Hide' : 'Show' }} Controls
-                        </button>
-                        <button mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
-                            {{ openPlots ? 'Hide' : 'Show' }} Plots
-                        </button>
-                    </mat-toolbar-row>
-                    <mat-toolbar-row *ngIf="splitDirection === 'horizontal'" class="viz__toolbar viz__toolbar--title">
-                        <small>{{ runTitle }}</small>
+                <mat-toolbar class="viz__toolbar" *ngIf="runId$ | async">
+                    <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
+                        {{ openControls ? 'Hide' : 'Show' }} Controls
+                    </button>
+                    <div>
+                        <small *ngIf="showTitle">{{ runTitle }}</small>
                         <button mat-icon-button aria-label="button to select a new model run">
                             <mat-icon matTooltip="switch model runs" matTooltipPosition="above" (click)="openDialog()">
-                                    compare_arrows
+                                swap_vert
                             </mat-icon>
                         </button>
-                    </mat-toolbar-row>
-                    <mat-toolbar-row *ngIf="splitDirection === 'vertical'" class="viz__toolbar viz__toolbar--single-row">
-                        <div></div>
-                        <div >
-                            <small>{{ runTitle }}</small>
-                            <button mat-icon-button aria-label="button to select a new model run">
-                                <mat-icon matTooltip="switch model runs">
-                                        compare_arrows
-                                </mat-icon>
-                            </button>
-                        </div>
-                        <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
-                            {{ openControls ? 'Hide' : 'Show' }} Controls
-                        </button>
-                    </mat-toolbar-row>
+                    </div>
+                    <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
+                        {{ openPlots ? 'Hide' : 'Show' }} Plots
+                    </button>
                 </mat-toolbar>
                 <div class="viz__container">
                     <swt-run-selector *ngIf="catalog && validConnection && (runId$ | async) == null" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>

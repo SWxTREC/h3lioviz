@@ -25,7 +25,7 @@ import { RunSelectorDialogComponent } from './components';
 // change these values if the height of the header or footer changes
 const headerFooterHeight = 44 + 28;
 // height of components attached to the viz, currently the player and the toolbar
-const vizAccessoriesHeight = 81 + 64;
+const vizAccessoriesHeight = 81 + 45;
 
 @Component({
     selector: 'swt-visualizer',
@@ -52,6 +52,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     resizing = true;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     runTitle: string;
+    showTitle: boolean;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -92,6 +93,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             ).subscribe(() => {
                 this.initVizDimensions();
                 this.pvViewResize();
+                this.determineShowTitle();
             })
         );
         const storedPanelSettings = JSON.parse( sessionStorage.getItem('panelSettings'));
@@ -177,6 +179,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    determineShowTitle() {
+        this.showTitle =
+            (this.splitDirection === 'horizontal' && this.vizDimensions[0] > 600) ||
+            (this.splitDirection === 'vertical' && this.windowWidth > 480 );
+    }
+
     dragEnd( event: any ) {
         const newSize = event.sizes[0];
         if ( this.splitDirection === 'horizontal' ) {
@@ -186,6 +194,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // portrait, new height
             this.vizDimensions[1] = newSize - vizAccessoriesHeight;
         }
+        this.determineShowTitle();
         this.pvViewResize();
         this.storeValidVizDimensions();
     }
@@ -213,7 +222,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.splitDirection = 'horizontal';
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
-            const defaultVizWidth = this.openPlots ? this.windowWidth * 0.35 - this.gutterSize : this.windowWidth;
+            const availableWindowWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.35 - this.gutterSize : availableWindowWidth;
             if ( storedDimensions ) {
                 this.vizDimensions = storedDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
@@ -300,28 +310,33 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.pvViewResize();
             this.storeValidVizDimensions();
         }
+        this.determineShowTitle();
         const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
         sessionStorage.setItem('panelSettings', panelSettings );
     }
 
     setPlotsPanel() {
-        // Gets the sizes of the visible panels
-        const sizes = this.splitElement.getVisibleAreaSizes();
-        // if two visible split areas, preserve the viz width so it can be restored
-        this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
-        const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+        // plot panel only opens and closes in the horizontal direction
         if ( this.splitDirection === 'horizontal' ) {
-            // restore to previous, if no previous, use a default width
-            const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
-            this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
-        } else {
-            this.vizDimensions[0] = maximumVizWidth;
+            // Gets the sizes of the visible panels
+            const sizes = this.splitElement.getVisibleAreaSizes();
+            // if two visible split areas, preserve the viz width so it can be restored
+            this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
+            const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            if ( this.splitDirection === 'horizontal' ) {
+                // restore to previous, if no previous, use a default width
+                const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
+                this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
+            } else {
+                this.vizDimensions[0] = maximumVizWidth;
+            }
+            this.vizPanelSize = this.vizDimensions[0];
+            this.determineShowTitle();
+            this.pvViewResize();
+            this.storeValidVizDimensions();
+            const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
+            sessionStorage.setItem('panelSettings', panelSettings );
         }
-        this.vizPanelSize = this.vizDimensions[0];
-        this.pvViewResize();
-        this.storeValidVizDimensions();
-        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
-        sessionStorage.setItem('panelSettings', panelSettings );
     }
 
     setTimestep( timeIndex: number ) {
