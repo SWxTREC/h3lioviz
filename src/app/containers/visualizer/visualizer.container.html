@@ -1,5 +1,5 @@
 <mat-drawer-container [hasBackdrop]="splitDirection === 'vertical'">
-    <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="toggleControlPanel()">
+    <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="openControls = false; setControlPanel()">
         <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
     </mat-drawer>
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
