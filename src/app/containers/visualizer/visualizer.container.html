@@ -74,7 +74,7 @@
                 </div>
                 <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
             </as-split-area>
-            <as-split-area class="viz__panel" *ngIf="openPlots" [size]="$any('*')" [order]="1">
+            <as-split-area class="viz__panel" *ngIf="openPlots || splitDirection === 'vertical' " [size]="$any('*')" [order]="1">
                 <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
             </as-split-area>
         </as-split>
