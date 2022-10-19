@@ -98,7 +98,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.openControls = storedPanelSettings ? storedPanelSettings[0] : false;
         this.openPlots = storedPanelSettings ? storedPanelSettings[1] : false;
     }
-    
+
     ngOnInit() {
         this.initVizDimensions();
         this._scripts.misc.ignoreMaxPageWidth( this );

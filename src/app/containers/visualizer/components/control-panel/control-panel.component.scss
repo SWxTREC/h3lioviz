@@ -1,27 +1,27 @@
 @import 'src/theme/theme-colors.scss';
 .control {
-	&__expander {
-		border-radius: 0;
-		background-color: $color-primary;
-		::ng-deep {
-			.mat-expansion-panel-body {
-				background: white;
-				padding: 0;
-			}
-			.mat-expansion-panel-content {
-				background: white;
-			}
-		}
-	}
-	&__header {
-		::ng-deep {
-			color: white;
-			.mat-expansion-panel-header-title {
-				color: inherit;
-			}
-			.mat-expansion-indicator:after {
-				color: inherit;
-			}
-		}
-	}
+    &__expander {
+        border-radius: 0;
+        background-color: $color-primary;
+        ::ng-deep {
+            .mat-expansion-panel-body {
+                background: white;
+                padding: 0;
+            }
+            .mat-expansion-panel-content {
+                background: white;
+            }
+        }
+    }
+    &__header {
+        ::ng-deep {
+            color: white;
+            .mat-expansion-panel-header-title {
+                color: inherit;
+            }
+            .mat-expansion-indicator:after {
+                color: inherit;
+            }
+        }
+    }
 }
