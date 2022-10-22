@@ -6,16 +6,22 @@
         Snap to view:
     </span>
     <div class="form__row">
-        <div sciStopClick class="orientation__option">
-            <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
+        <div class="orientation__option">
+            <button mat-button sciStopClick>
+                <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
+            </button>
             Ecliptic
         </div>
-        <div sciStopClick class="orientation__option">
-            <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
+        <div class="orientation__option">
+            <button mat-button sciStopClick>
+                <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
+            </button>
             Meridional
         </div>
-        <div sciStopClick class="orientation__option">
-            <img src="assets/images/oblique.png" (click)="snapTo('oblique')">
+        <div class="orientation__option">
+            <button mat-button sciStopClick>
+                <img src="assets/images/oblique.png" (click)="snapTo('initial')">
+            </button>
             Oblique
         </div>
     </div>
