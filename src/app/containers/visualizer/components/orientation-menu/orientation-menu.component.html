@@ -1,4 +1,4 @@
-<button mat-icon-button matTooltip="Orientation" class="orientation__icon" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
+<button mat-icon-button matTooltip="Orientation" class="orientation__icon mat-elevation-z2" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
     <mat-icon>language</mat-icon>
 </button>
 <mat-menu #orientationMenu class="orientation" xPosition="after">
@@ -7,19 +7,19 @@
     </span>
     <div class="form__row">
         <div class="orientation__option">
-            <button mat-button sciStopClick>
+            <button class="mat-elevation-z2" mat-button sciStopClick>
                 <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
             </button>
             Ecliptic
         </div>
         <div class="orientation__option">
-            <button mat-button sciStopClick>
+            <button class="mat-elevation-z2" mat-button sciStopClick>
                 <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
             </button>
             Meridional
         </div>
         <div class="orientation__option">
-            <button mat-button sciStopClick>
+            <button class="mat-elevation-z2" mat-button sciStopClick>
                 <img src="assets/images/oblique.png" (click)="snapTo('initial')">
             </button>
             Oblique

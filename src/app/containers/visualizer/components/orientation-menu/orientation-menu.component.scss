@@ -7,9 +7,9 @@
         font-weight: bold;
     }
     &__icon {
-        background-color: transparentize(black, 0.7);
-        border-radius: 0;
-        color: white;
+        background-color: white;
+        border-radius: 4px;
+        margin: 0.25rem;
     }
     &__option {
         display: flex;
@@ -19,6 +19,7 @@
             padding: 0;
         }
         img {
+            border-radius: 4px;
             width: 65px;
         }
     }
