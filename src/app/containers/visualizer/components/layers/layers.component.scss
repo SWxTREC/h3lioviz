@@ -1,9 +1,7 @@
 .layers {
-    &__list {
-        list-style-type: none;
-        li {
-            padding: 0.25rem 0;
-        }
+    &__conditional-item {
+        margin-left: 1rem;
+        height: 60px;
     }
     &__group {
         display: flex;
