@@ -9,8 +9,8 @@ export class ControlPanelComponent implements OnDestroy {
     @Input() pvView: any;
     expansionState = {
         layers: true,
-        contours: false,
-        colors: false
+        contours: true,
+        colors: true
     };
 
     constructor() {
