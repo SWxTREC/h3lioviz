@@ -1,11 +1,11 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
 @Component({
-    selector: 'swt-zoom-menu',
-    templateUrl: './zoom-menu.component.html',
-    styleUrls: [ '../menu.scss',  './zoom-menu.component.scss' ]
+    selector: 'swt-mouse-zoom',
+    templateUrl: './mouse-zoom.component.html',
+    styleUrls: [ './mouse-zoom.component.scss' ]
 })
-export class ZoomMenuComponent implements OnChanges {
+export class MouseZoomComponent implements OnChanges {
     @Input() pvView: any;
     zoomState: boolean;
 
@@ -19,10 +19,6 @@ export class ZoomMenuComponent implements OnChanges {
         if ( this.pvView ) {
             this.setZoom();
         }
-    }
-
-    resetZoom() {
-        this.pvView.get().viewStream.resetCamera();
     }
 
     setZoom() {

@@ -1,0 +1,26 @@
+.orientation {
+    &__button {
+        margin-top: 1rem;
+        width: 100%;
+    }
+    &__header {
+        font-weight: bold;
+    }
+    &__icon {
+        background-color: white;
+        border-radius: 4px;
+        margin: 0.25rem;
+    }
+    &__option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        button {
+            padding: 0;
+        }
+        img {
+            border-radius: 4px;
+            width: 65px;
+        }
+    }
+}

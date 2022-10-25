@@ -4,15 +4,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from 'src/app/modules';
 
-import { LayerMenuComponent } from './layer-menu.component';
+import { LayersComponent } from './layers.component';
 
-describe('LayerMenuComponent', () => {
-    let component: LayerMenuComponent;
-    let fixture: ComponentFixture<LayerMenuComponent>;
+describe('LayersComponent', () => {
+    let component: LayersComponent;
+    let fixture: ComponentFixture<LayersComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ LayerMenuComponent ],
+            declarations: [ LayersComponent ],
             imports: [
                 BrowserAnimationsModule,
                 NgxSliderModule,
@@ -24,7 +24,7 @@ describe('LayerMenuComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(LayerMenuComponent);
+        fixture = TestBed.createComponent(LayersComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

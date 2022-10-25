@@ -1,0 +1,39 @@
+<mat-expansion-panel 
+    class="control__expander"
+    [expanded]="expansionState.layers"
+    (opened)="expansionState.layers = true"
+    (closed)="expansionState.layers = false"
+    >
+    <mat-expansion-panel-header class="control__header">
+        <mat-panel-title>
+            Layers
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <swt-layers [pvView]="pvView"></swt-layers>
+</mat-expansion-panel>
+<mat-expansion-panel 
+    class="control__expander"
+    [expanded]="expansionState.contours"
+    (opened)="expansionState.contours = true"
+    (closed)="expansionState.contours = false"
+    >
+    <mat-expansion-panel-header class="control__header">
+        <mat-panel-title>
+            Contours
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <swt-contours [pvView]="pvView"></swt-contours>
+</mat-expansion-panel>
+<mat-expansion-panel 
+    class="control__expander"
+    [expanded]="expansionState.colors"
+    (opened)="expansionState.colors = true"
+    (closed)="expansionState.colors = false"
+    >
+    <mat-expansion-panel-header class="control__header">
+      <mat-panel-title>
+        Colors
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <swt-colors [pvView]="pvView"></swt-colors>
+</mat-expansion-panel>

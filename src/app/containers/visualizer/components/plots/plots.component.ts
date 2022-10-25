@@ -15,7 +15,7 @@ import {
     SeriesDisplayMode,
     UiOptionsService
 } from 'scicharts';
-import { COLOR_MENU_DEFAULT_VALUES, IMAGE_DATASETS } from 'src/app/models';
+import { COLOR_FORM_DEFAULT_VALUES, IMAGE_DATASETS } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
 
 const DEFAULT_PLOT_OPTIONS = {
@@ -83,7 +83,7 @@ export class PlotsComponent implements OnInit {
         image: new FormControl(),
         variable: new FormControl()
     });
-    selectedVariable = COLOR_MENU_DEFAULT_VALUES.colorVariable.serverName;
+    selectedVariable = COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName;
     variableList: string[] = [ 'density', 'velocity', 'pressure', 'temperature', 'bx', 'by', 'bz' ];
 
     constructor(

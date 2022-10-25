@@ -1,0 +1,43 @@
+<form class="colors" [formGroup]="colorForm">
+    <mat-form-field>
+        <mat-label>Color variable</mat-label>
+        <mat-select [compareWith]="compareObjectNames" formControlName="colorVariable">
+            <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
+                {{ variable.value.displayName }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>
+            Colormap for {{ variableConfigurations[ colorVariableServerName ].displayName }}
+        </mat-label>
+        <mat-select [compareWith]="compareObjectNames" formControlName="colormap">
+            <mat-option *ngFor="let color of colormaps | keyvalue" [value]="color.value">
+                <div>
+                    {{ color.value.displayName }} <img class="colors__swatch" [src]="color.value.imgSrc">
+                </div>
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div>
+        <strong>
+            Color range
+            <small innerHTML=" ({{ variableConfigurations[ colorVariableServerName ].units }})"></small>
+        </strong>
+        <!-- removing this button until we make it work again -->
+        <!-- <button
+            mat-raised-button color="primary"
+            (click)="scaleColorRange()"
+            >
+            scale to view
+        </button> -->
+    </div>
+    <div class="form__spacer">
+        <img [src]="colorForm.value.colormap?.imgSrc" height="20" width="100%" [style.paddingRight]="colorbarRightOffset" [style.paddingLeft]="colorbarLeftOffset" [style.maxWidth]="'418px'">
+        <ngx-slider laspEnhancedNgxSlider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
+    </div>
+    <div>
+        <strong>Opacity gradient </strong>
+        <ngx-slider laspEnhancedNgxSlider [options]="opacityOptions" ngDefaultControl formControlName="opacity"></ngx-slider>
+    </div>
+</form>

@@ -5,7 +5,7 @@ import { debounceTime } from 'rxjs/operators';
 @Component({
     selector: 'swt-orientation-menu',
     templateUrl: './orientation-menu.component.html',
-    styleUrls: [ '../menu.scss', './orientation-menu.component.scss' ]
+    styleUrls: [ '../form.scss', './orientation-menu.component.scss' ]
 })
 export class OrientationMenuComponent implements OnDestroy {
     @Input() pvView: any;
@@ -26,6 +26,10 @@ export class OrientationMenuComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    }
+
+    resetZoom() {
+        this.pvView.get().viewStream.resetCamera();
     }
 
     snapTo( view: string ) {

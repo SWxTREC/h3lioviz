@@ -1,3 +1,7 @@
+<mat-drawer-container [hasBackdrop]="splitDirection === 'vertical'">
+    <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="openControls = false; setControlPanel()">
+        <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
+    </mat-drawer>
 <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
     <ng-container *ngIf="errorMessage">
         <p class="viz__error">{{ errorMessage }}</p>
@@ -8,39 +12,55 @@
     <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
     <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
 </div>
-<div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
-    <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
-        <as-split-area
+    <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
+        <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
+            <as-split-area
             class="viz__panel viz__panel--full-width"
-            [size]="panelSize">
-            <div class="viz__container">
-                <div class="viz__overlay" *ngIf="runId$ | async">
-                    <div class="viz__menus">
-                        <swt-layer-menu [pvView]="pvView"></swt-layer-menu>
-                        <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
-                        <swt-zoom-menu [pvView]="pvView"></swt-zoom-menu>
-                        <swt-color-menu [pvView]="pvView"></swt-color-menu>
+            [size]="vizPanelSize"
+            [minSize]="controlPanelSize + 60"
+            [order]="0">
+                <mat-toolbar class="viz__toolbar" *ngIf="runId$ | async">
+                    <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
+                        {{ openControls ? 'Hide' : 'Show' }} Controls
+                    </button>
+                    <div>
+                        <small *ngIf="showTitle">{{ runTitle }}</small>
+                        <button mat-icon-button aria-label="button to select a new model run">
+                            <mat-icon matTooltip="switch model runs" matTooltipPosition="above" (click)="openDialog()">
+                                swap_vert
+                            </mat-icon>
+                        </button>
                     </div>
-                    <swt-hints class="viz__hints"></swt-hints>
-                    <div *ngIf="loading" class="viz__loading">
-                        <mat-spinner color="accent" diameter="40"></mat-spinner>
+                    <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
+                        {{ openPlots ? 'Hide' : 'Show' }} Plots
+                    </button>
+                </mat-toolbar>
+                <div class="viz__container">
+                    <swt-run-selector *ngIf="catalog && validConnection && (runId$ | async) == null" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
+                    <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
+                    <div class="viz__overlay" *ngIf="runId$ | async">
+                        <div class="viz__menus">
+                            <swt-mouse-zoom [pvView]="pvView"></swt-mouse-zoom>
+                            <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
+                        </div>
+                        <swt-hints class="viz__hints"></swt-hints>
+                        <div *ngIf="loading" class="viz__loading">
+                            <mat-spinner color="accent" diameter="40"></mat-spinner>
+                        </div>
+                    </div>
+                    <div #pvContent
+                        class="viz__pv"
+                        [class.viz__pv--empty]="(runId$ | async) == null"
+                        [class.viz__pv--resizing]="resizing"
+                        [style.width]="(vizDimensions[0]) + 'px'"
+                        [style.height]="vizDimensions[1] + 'px'">
                     </div>
                 </div>
-                <div #pvContent
-                    class="viz__pv"
-                    [class.viz__pv--empty]="(runId$ | async) == null"
-                    [class.viz__pv--resizing]="resizing"
-                    [style.width]="vizDimensions[0] + 'px'"
-                    [style.height]="vizDimensions[1] + 'px'">
-                </div>
-            </div>
-            <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
-        </as-split-area>
-        <!-- for the weird $any, see https://github.com/angular-split/angular-split/issues/220 -->
-        <as-split-area class="viz__panel" [size]="$any('*')" >
-            <swt-run-selector class="viz__row" *ngIf="catalog && validConnection" [runId]="runId$ | async" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
-            <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
-            <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
-        </as-split-area>
-    </as-split>
-</div>
+                <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+            </as-split-area>
+            <as-split-area class="viz__panel" *ngIf="openPlots || splitDirection === 'vertical' " [size]="$any('*')" [order]="1">
+                <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+            </as-split-area>
+        </as-split>
+    </div>
+</mat-drawer-container>

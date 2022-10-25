@@ -1,22 +1,29 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { clone, isEmpty, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { INITIAL_TICK_STEP, IVariableInfo, LAYER_MENU_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
+import {
+    CONTOUR_FORM_DEFAULT_VALUES,
+    INITIAL_TICK_STEP,
+    IVariableInfo,
+    VARIABLE_CONFIG
+} from 'src/app/models';
 
 @Component({
-    selector: 'swt-layer-menu',
-    templateUrl: './layer-menu.component.html',
-    styleUrls: [ '../menu.scss', './layer-menu.component.scss' ]
+    selector: 'swt-contours',
+    templateUrl: './contours.component.html',
+    styleUrls: [  '../form.scss', './contours.component.scss' ]
 })
-export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
+export class ContoursComponent implements OnInit, OnChanges {
     @Input() pvView: any;
-    defaultContourVariable: IVariableInfo = LAYER_MENU_DEFAULT_VALUES.contourVariable;
+    defaultContourVariable: IVariableInfo = CONTOUR_FORM_DEFAULT_VALUES.contourVariable;
+
     // contourArray keeps track of the array of contour values sent to the server
     // the numbers are calculated from the contour range and the number of contours
     contourArray: number[] = [];
+    contours: FormGroup = new FormGroup({});
     // contourRange keeps track of the user settings on the contour range slider
     contourRange: [number, number] = ( this.defaultContourVariable.defaultSubsetRange );
     contourOptions: Options = {
@@ -29,24 +36,17 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
         tickStep: INITIAL_TICK_STEP,
         ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
-    lonSliceAngle: string;
-    lonSliceOptions = {
-        validRange: [ -10, 10 ],
-        stepSize: 0.5
-    };
-
-    layerMenu: FormGroup = new FormGroup({});
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
-    showAngleAdjust = false;
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
 
+
     constructor() {
-        // initialize FormGroup with default layer menu names and values
-        Object.keys(LAYER_MENU_DEFAULT_VALUES).forEach( controlName => {
-            this.layerMenu.addControl(controlName, new FormControl( LAYER_MENU_DEFAULT_VALUES[controlName]));
+        // initialize FormGroup with default contour menu names and values
+        Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
+            this.contours.addControl(controlName, new FormControl( CONTOUR_FORM_DEFAULT_VALUES[controlName]));
         });
         // get user contourRanges from session storage if it exists, or from defaults
         if ( !isEmpty(sessionStorage.getItem('contourRanges'))) {
@@ -66,7 +66,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
     }
-
+        
     ngOnChanges(): void {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
@@ -74,22 +74,24 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('layerMenu'))) || clone(LAYER_MENU_DEFAULT_VALUES);
-            this.layerMenu.setValue( initialFormValues );
+            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('contours'))) || clone(CONTOUR_FORM_DEFAULT_VALUES);
+            this.contours.setValue( initialFormValues );
             const initialContourVariable = initialFormValues.contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
         }
     }
 
-    ngOnInit(): void { }
-
-    ngOnDestroy(): void {
-        this.subscriptions.forEach( subscription => subscription.unsubscribe() );
+    ngOnInit(): void {
     }
 
     // This mat-select compareWith function is used to verify the proper label for the selection in the dropdown
     compareObjectNames(o1: any, o2: any): boolean {
         return o1.displayName === o2.displayName;
+    }
+
+    contourRangeChange( event: ChangeContext ) {
+        this.updateContourRange( [ event.value, event.highValue ] );
+        this.renderDebouncer.next();
     }
 
     getContourArray( contourRange: [number, number], numberOfContours: number ): number[] {
@@ -101,24 +103,19 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     getTickInterval(): number {
-        const numberOfContours = this.layerMenu.value.numberOfContours;
+        const numberOfContours = this.contours.value.numberOfContours;
         const interval = ( this.contourRange[1] - this.contourRange[0] ) / ( numberOfContours  - 1 );
         return interval;
     }
 
-    contourRangeChange( event: ChangeContext ) {
-        this.updateContourRange( [ event.value, event.highValue ] );
-        this.renderDebouncer.next();
-    }
-
     saveUserSettings(): void {
-        sessionStorage.setItem('layerMenu', JSON.stringify( this.layerMenu.value ));
+        sessionStorage.setItem('contours', JSON.stringify( this.contours.value ));
         sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
     }
 
     setFormSubscriptions() {
         // subscribe to any form change
-        this.subscriptions.push( this.layerMenu.valueChanges
+        this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
@@ -128,7 +125,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
         // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
-        this.subscriptions.push( this.layerMenu.controls.numberOfContours.valueChanges
+        this.subscriptions.push( this.contours.controls.numberOfContours.valueChanges
             .pipe( debounceTime(300) ).subscribe( ( value: number ) => {
                 // TODO: better validation and include possibility of 0 and 1
                 if ( value > 1 ) {
@@ -137,7 +134,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
         // subscribe to CONTOUR VARIABLE changes and call update contour function with new contour variable values
-        this.subscriptions.push( this.layerMenu.controls.contourVariable.valueChanges
+        this.subscriptions.push( this.contours.controls.contourVariable.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
                 const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
@@ -145,26 +142,15 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
         // subscribe to CONTOUR AREA changes and call update contour function
-        this.subscriptions.push( this.layerMenu.controls.contourArea.valueChanges
+        this.subscriptions.push( this.contours.controls.contourArea.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
                 this.updateContourRange( this.contourRange );
             })
         );
-        // subscribe to LON SLICE TYPE changes and render appropriately
-        this.subscriptions.push( this.layerMenu.controls.lonSliceType.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
-                if ( newLonSliceType === 'solar-equator' ) {
-                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'equator' ]);
-                } else {
-                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'ecliptic' ]);
-                }
-            })
-        );
     }
-
     updateContourRange( newRange: [number, number] ) {
-        const contourVariable: IVariableInfo = this.layerMenu.value.contourVariable;
-        const numberOfContours = this.layerMenu.value.numberOfContours;
+        const contourVariable: IVariableInfo = this.contours.value.contourVariable;
+        const numberOfContours = this.contours.value.numberOfContours;
         this.userContourRanges[ contourVariable.serverName ] = clone( newRange );
 
         this.contourRange = clone( newRange );
@@ -188,13 +174,13 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     updateVisibilityByContourArea() {
-        const contourVariableName: IVariableInfo = this.layerMenu.value.contourVariable.serverName;
-        if ( !this.layerMenu.value.cmeContours ) {
+        const contourVariableName: IVariableInfo = this.contours.value.contourVariable.serverName;
+        if ( !this.contours.value.cmeContours ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
         } else {
             // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
-            if ( this.layerMenu.value.contourArea === 'cme' ) {
+            if ( this.contours.value.contourArea === 'cme' ) {
                 // set the values for the cme
                 this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
                 this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
@@ -210,10 +196,7 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
-            if ( controlName === 'satellites' ) {
-                const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                this.session.call( 'pv.h3lioviz.toggle_satellites', [ state ] );
-            } else if (typeof controlStates[ controlName ] === 'boolean') {
+            if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 if ( controlName === 'cmeContours' ) {
@@ -231,4 +214,5 @@ export class LayerMenuComponent implements OnChanges, OnDestroy, OnInit {
             }
         });
     }
+
 }

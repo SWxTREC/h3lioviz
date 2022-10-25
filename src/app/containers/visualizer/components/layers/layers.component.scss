@@ -1,0 +1,11 @@
+.layers {
+    &__conditional-item {
+        margin-left: 1rem;
+        height: 60px;
+    }
+    &__group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}

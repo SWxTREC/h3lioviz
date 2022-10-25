@@ -16,11 +16,11 @@ export const environment = {
     aws: {
         api: 'https://apigw.dev.swx-trec.com/h3lioviz/',
         cognito: {
-            appClientId: '5itqpae8gseickjbemm5tprpef',
+            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
             region: 'us-east-1',
-            userPoolId: 'Dgc4otkxZ',
+            userPoolId: 'm1uXvZDys',
             loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
-            identityPoolId: '9f26842f-2e5d-4c32-abf5-91b71e82e3a2'
+            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
         }
     },
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',

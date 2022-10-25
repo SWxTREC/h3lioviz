@@ -1,5 +1,16 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    HostListener,
+    OnDestroy,
+    OnInit,
+    ViewChild
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSidenav } from '@angular/material/sidenav';
+import { SplitComponent } from 'angular-split';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
 import { BehaviorSubject, Subject } from 'rxjs';
@@ -11,9 +22,10 @@ import { environment } from 'src/environments/environment';
 
 import { RunSelectorDialogComponent } from './components';
 
-// change these values if the height of the header, footer, or player changes
+// change these values if the height of the header or footer changes
 const headerFooterHeight = 44 + 28;
-const playerHeight = 81;
+// height of components attached to the viz, currently the player and the toolbar
+const vizAccessoriesHeight = 81 + 45;
 
 @Component({
     selector: 'swt-visualizer',
@@ -23,15 +35,24 @@ const playerHeight = 81;
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
+    @ViewChild( 'drawer') drawer: MatSidenav;
+    @ViewChild(SplitComponent) splitElement: SplitComponent;
+
     catalog: IModelMetadata[];
     componentMaxHeight: number;
+    controlPanelSize = 300;
     errorMessage: string = null;
+    gutterSize = 11;
     loading = true;
-    panelSize: number;
+    openPlots: boolean;
+    openControls: boolean;
+    previousVizWidth: number;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
     resizing = true;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
+    runTitle: string;
+    showTitle: boolean;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
@@ -40,11 +61,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     version = environment.version;
     // [ width, height ] for paraview resize, drag direction is variable so assign appropriately
     vizDimensions: [ number, number ] = [ undefined, undefined ];
-    vizMin = 300;
+    vizPanelSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     windowResize$: Subject<void> = new Subject();
-
+    windowWidth: number;
 
     @HostListener( 'window:resize')
     onResize() {
@@ -72,11 +93,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             ).subscribe(() => {
                 this.initVizDimensions();
                 this.pvViewResize();
+                this.determineShowTitle();
             })
         );
-
+        const storedPanelSettings = JSON.parse( sessionStorage.getItem('panelSettings'));
+        this.openControls = storedPanelSettings ? storedPanelSettings[0] : false;
+        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : false;
     }
-    
+
     ngOnInit() {
         this.initVizDimensions();
         this._scripts.misc.ignoreMaxPageWidth( this );
@@ -131,6 +155,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        this.setControlPanel();
+        this.setPlotsPanel();
         this.subscriptions.push( this._websocket.validConnection$.subscribe( validConnection => {
             this.validConnection = validConnection;
             // pvView will be undefined if no validConnection and defined and initialized if validConnection
@@ -153,6 +179,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    determineShowTitle() {
+        this.showTitle =
+            (this.splitDirection === 'horizontal' && this.vizDimensions[0] > 600) ||
+            (this.splitDirection === 'vertical' && this.windowWidth > 480 );
+    }
+
     dragEnd( event: any ) {
         const newSize = event.sizes[0];
         if ( this.splitDirection === 'horizontal' ) {
@@ -160,8 +192,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.vizDimensions[0] = newSize;
         } else {
             // portrait, new height
-            this.vizDimensions[1] = newSize - playerHeight;
+            this.vizDimensions[1] = newSize - vizAccessoriesHeight;
         }
+        this.determineShowTitle();
         this.pvViewResize();
         this.storeValidVizDimensions();
     }
@@ -175,12 +208,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     /* note window dimensions and keep track of viz dimensions
-    * panel size (height or width, depending on direction) is calculated from relevant viz dimension
+    * viz panel size (height or width, depending on direction) is calculated from relevant viz dimension
     */
     initVizDimensions() {
-        const windowWidth: number = window.innerWidth;
+        this.windowWidth = window.innerWidth;
         const windowHeight: number = window.innerHeight;
-        const landscapeWindow: boolean = windowWidth > windowHeight;
+        const landscapeWindow: boolean = this.windowWidth > windowHeight;
         // height of window whether landscape or portrait
         this.componentMaxHeight = windowHeight - headerFooterHeight;
         const storedDimensions = JSON.parse( sessionStorage.getItem( 'vizDimensions' ) );
@@ -188,40 +221,43 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
             // height is limiting factor
-            const vizMaxHeight = this.componentMaxHeight - playerHeight;
-            const defaultPanelWidth = windowWidth * 0.35;
+            const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
+            const availableWindowWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.35 - this.gutterSize : availableWindowWidth;
             if ( storedDimensions ) {
                 this.vizDimensions = storedDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
                 this.vizDimensions[1] = Math.min( storedDimensions[1], vizMaxHeight);
             } else {
-                // initialize to defaultPanelWidth and vizMaxHeight
-                this.vizDimensions = [ defaultPanelWidth, vizMaxHeight ];
+                // initialize to defaultVizWidth and vizMaxHeight
+                this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
             }
             // for landscape, panelSize is width
-            this.panelSize = this.vizDimensions[0] ?? defaultPanelWidth;
+            this.vizPanelSize = this.vizDimensions[0] ?? defaultVizWidth;
         } else {
             this.splitDirection = 'vertical';
             // width is limiting factor
-            const defaultVizHeight = (this.componentMaxHeight * 0.5) - playerHeight;
+            const defaultVizHeight = (this.componentMaxHeight * 0.5) - vizAccessoriesHeight;
             if ( storedDimensions ) {
                 this.vizDimensions = storedDimensions;
                 // ensure new width is not greater than maxWidth for this window
-                this.vizDimensions[0] = Math.min( storedDimensions[0], windowWidth);
+                this.vizDimensions[0] = Math.min( storedDimensions[0], this.windowWidth);
             } else {
-                // initialize to windowWidth and defaultVizHeight
-                this.vizDimensions = [ windowWidth, defaultVizHeight ];
+                // initialize to this.windowWidth and defaultVizHeight
+                this.vizDimensions = [ this.windowWidth, defaultVizHeight ];
             }
-            // for portrait, panelSize is height plus playerHeight
-            this.panelSize = this.vizDimensions[1] ?
-                this.vizDimensions[1] + playerHeight : defaultVizHeight + playerHeight;
+            // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
+            this.vizPanelSize = this.vizDimensions[1] ?
+                this.vizDimensions[1] + vizAccessoriesHeight : defaultVizHeight;
         }
         this.storeValidVizDimensions();
     }
 
-    // called only when both pvView and runId$.value are true
+    /* called only when both pvView and runId$.value are true */
     loadModel( runId: string ) {
         this.errorMessage = null;
+        this.runTitle = this._catalogService.runTitles[this.runId$.value];
+
         // check for a stored time index for this runId, default to 0
         const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
         const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
@@ -236,11 +272,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         });
     }
 
-    // only opens if AWS server is starting up to give the user something to do
+    // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
-            width: '325px'
+            width: '500px'
         });
         dialogRef.afterClosed().subscribe( result => {
             if ( result ) {
@@ -257,6 +293,49 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // delay a beat to allow for render time
                 setTimeout(() => this.resizing = false, 500);
             });
+        }
+    }
+
+    refresh() {
+        window.location.reload();
+    }
+
+    setControlPanel() {
+        this.openControls ? this.drawer.open() : this.drawer.close();
+        // for portrait, control panel pushes over vertical panels
+        // if horizontal panels and plots panel is open, plots panel will squish to accomodate the control panel
+        // otherwise, if no plots panel, viz needs to be resized
+        if ( this.splitDirection === 'horizontal' && !this.openPlots ) {
+            this.vizDimensions[0] = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            this.pvViewResize();
+            this.storeValidVizDimensions();
+        }
+        this.determineShowTitle();
+        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
+        sessionStorage.setItem('panelSettings', panelSettings );
+    }
+
+    setPlotsPanel() {
+        // plot panel only opens and closes in the horizontal direction
+        if ( this.splitDirection === 'horizontal' ) {
+            // Gets the sizes of the visible panels
+            const sizes = this.splitElement.getVisibleAreaSizes();
+            // if two visible split areas, preserve the viz width so it can be restored
+            this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
+            const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            if ( this.splitDirection === 'horizontal' ) {
+                // restore to previous, if no previous, use a default width
+                const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
+                this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
+            } else {
+                this.vizDimensions[0] = maximumVizWidth;
+            }
+            this.vizPanelSize = this.vizDimensions[0];
+            this.determineShowTitle();
+            this.pvViewResize();
+            this.storeValidVizDimensions();
+            const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
+            sessionStorage.setItem('panelSettings', panelSettings );
         }
     }
 
@@ -282,7 +361,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.vizDimensions[index] = window.innerWidth * 0.5;
                     } else {
                         // height is not defined
-                        this.vizDimensions[index] = (this.componentMaxHeight * 0.5) - playerHeight;
+                        this.vizDimensions[index] = (this.componentMaxHeight * 0.5) - vizAccessoriesHeight;
                     }
                 }
             });
@@ -290,8 +369,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    refresh() {
-        window.location.reload();
+    toggleControlPanel() {
+        this.openControls = !this.openControls;
+        this.setControlPanel();
+    }
+
+    togglePlotsPanel() {
+        this.openPlots = !this.openPlots;
+        this.setPlotsPanel();
     }
 
     updateRunId( runId: string ) {

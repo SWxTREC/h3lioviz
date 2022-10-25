@@ -128,22 +128,25 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     }
 };
 
-export const COLOR_MENU_DEFAULT_VALUES = {
+export const COLOR_FORM_DEFAULT_VALUES = {
     colorVariable: VARIABLE_CONFIG.density,
     colormap: VARIABLE_CONFIG.density.defaultColormap,
     opacity: [ 60, 80 ] as [ number, number ]
 };
 
-export const LAYER_MENU_DEFAULT_VALUES = {
-    contourArea: 'cme',
-    contourVariable: VARIABLE_CONFIG.velocity,
-    cme: false,
+export const CONTOUR_FORM_DEFAULT_VALUES = {
     cmeContours: false,
+    contourVariable: VARIABLE_CONFIG.velocity,
+    numberOfContours: 3,
+    contourArea: 'cme'
+};
+
+export const LAYER_FORM_DEFAULT_VALUES = {
+    cme: false,
     latSlice: true,
     lonSlice: false,
     lonSliceType: 'solar-equator',
     lonStreamlines: false,
-    numberOfContours: 3,
     radialSlice: false,
     satellites: true,
     satFieldlines: false
@@ -151,9 +154,9 @@ export const LAYER_MENU_DEFAULT_VALUES = {
 
 export const INITIAL_TICK_STEP =
     // the difference between the high value and the low value, divided by numberOfContours - 1
-    ( LAYER_MENU_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] -
-        LAYER_MENU_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
-    ( LAYER_MENU_DEFAULT_VALUES.numberOfContours - 1 );
+    ( CONTOUR_FORM_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] -
+        CONTOUR_FORM_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
+    ( CONTOUR_FORM_DEFAULT_VALUES.numberOfContours - 1 );
 
 export const IMAGE_DATASETS = {
     soho_lasco_c2_files: {

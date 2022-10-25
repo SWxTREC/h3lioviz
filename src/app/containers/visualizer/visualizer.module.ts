@@ -10,15 +10,17 @@ import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import {
-    ColorMenuComponent,
+    ColorsComponent,
+    ContoursComponent,
+    ControlPanelComponent,
     HintsComponent,
-    LayerMenuComponent,
+    LayersComponent,
+    MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
     RunSelectorComponent,
     RunSelectorDialogComponent,
-    TimePlayerComponent,
-    ZoomMenuComponent
+    TimePlayerComponent
 } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
@@ -39,16 +41,18 @@ import { VisualizerComponent } from './visualizer.container';
         ReactiveFormsModule
     ],
     declarations: [
-        ColorMenuComponent,
+        ColorsComponent,
+        ContoursComponent,
+        ControlPanelComponent,
         HintsComponent,
-        LayerMenuComponent,
+        LayersComponent,
+        MouseZoomComponent,
         OrientationMenuComponent,
         PlotsComponent,
         RunSelectorComponent,
         RunSelectorDialogComponent,
         TimePlayerComponent,
-        VisualizerComponent,
-        ZoomMenuComponent
+        VisualizerComponent
     ]
 })
 export class VisualizerModule { }

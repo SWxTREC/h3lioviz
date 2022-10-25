@@ -13,13 +13,13 @@ import { MaterialModule } from 'src/app/modules/material.module';
 import { AwsService, ProfileNavService } from 'src/app/services';
 
 import {
-    ColorMenuComponent,
+    ColorsComponent,
     HintsComponent,
-    LayerMenuComponent,
+    LayersComponent,
+    MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
-    TimePlayerComponent,
-    ZoomMenuComponent
+    TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
 
@@ -30,15 +30,15 @@ describe('VisualizerComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [
-                ColorMenuComponent,
+                ColorsComponent,
                 HintsComponent,
-                LayerMenuComponent,
+                LayersComponent,
                 GridComponent,
                 OrientationMenuComponent,
+                MouseZoomComponent,
                 PlotsComponent,
                 TimePlayerComponent,
-                VisualizerComponent,
-                ZoomMenuComponent
+                VisualizerComponent
             ],
             imports: [
                 AngularSplitModule,
