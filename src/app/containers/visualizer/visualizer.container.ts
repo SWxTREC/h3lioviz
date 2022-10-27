@@ -112,7 +112,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
                 // if waiting for aws server, open the dialog so the user has something to do
-                if ( this.catalog && !this.pvServerStarted ) {
+                if ( (this.catalog && !this.runId$.value) || (this.catalog && !this.pvServerStarted) ) {
                     this.openDialog();
                 }
             })
@@ -276,7 +276,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
-            width: '500px'
+            disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
             if ( result ) {

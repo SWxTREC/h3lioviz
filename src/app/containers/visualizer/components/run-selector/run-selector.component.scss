@@ -2,4 +2,30 @@
     padding: 0.25rem 1rem;
     display: flex;
     flex-direction: column;
+    .mat-cell {
+        padding: 4px;
+    }
+    .mat-header-cell {
+        padding: 4px;
+    }
+    .mat-row:hover {
+        background: #eee;
+        cursor: pointer;
+    }
+    .mat-row.highlighted {
+      background: #999;
+    }
+}
+
+.selector-table {
+    &__detail {
+          height: 0;
+          td {
+            padding: 0;
+            border-bottom-width: 0;
+          }
+    }
+    &__info {
+        padding: 1rem;
+    }
 }

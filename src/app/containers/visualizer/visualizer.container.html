@@ -36,7 +36,6 @@
                     </button>
                 </mat-toolbar>
                 <div class="viz__container">
-                    <swt-run-selector *ngIf="catalog && validConnection && (runId$ | async) == null" [catalog]="catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
                     <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
                     <div class="viz__overlay" *ngIf="runId$ | async">
                         <div class="viz__menus">
