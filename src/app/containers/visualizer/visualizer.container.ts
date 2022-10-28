@@ -283,7 +283,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            if ( result ) {
+            if ( result && result !== this.runId$.value ) {
                 this.updateRunId( result );
             }
         });
