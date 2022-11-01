@@ -8,7 +8,7 @@
             <td mat-cell *matCellDef="let run" > {{ run[column] }} </td>
         </ng-container>
         <ng-container *ngIf="column === 'more'">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> More info </th>
+            <th mat-header-cell *matHeaderCellDef> More info </th>
             <td mat-cell *matCellDef="let run" (click)="expandedRun = expandedRun === run ? null : run"> <mat-icon>more_vert</mat-icon> </td>
         </ng-container>
     </ng-container>
