@@ -99,25 +99,27 @@ export class PlotsComponent implements OnInit {
         this.plotForm.controls.variable.valueChanges.pipe( debounceTime(1000) ).subscribe( newVariableValue => {
             // reset the plot list
             this._plotsService.setPlots([]);
-            // get the current image plot
+            // get the current image plots
             if ( this.plotForm.value.image ) {
-                this.getImagePlot( this.plotForm.value.image);
+                this.getImagePlot( this.plotForm.value.image );
             }
             newVariableValue.forEach( (variable: string) => {
                 this.getSolarWindData(variable);
             });
         });
-        this.plotForm.controls.image.valueChanges.subscribe( newImageValue => {
+        this.plotForm.controls.image.valueChanges.subscribe( newImageValues => {
             // reset the plot list
             this._plotsService.setPlots([]);
-            this.getImagePlot( newImageValue );
+            this.getImagePlot( newImageValues);
             // get the current line plots
-            this.plotForm.value.variable.forEach( (variable: string) => {
-                this.getSolarWindData(variable);
-            });
+            if ( this.plotForm.value.variable ) {
+                this.plotForm.value.variable.forEach( (variable: string) => {
+                    this.getSolarWindData(variable);
+                });
+            }
         });
     }
-    
+
     ngOnInit(): void {
         // initialize to the default variable
         this.plotForm.controls.variable.setValue( [ this.selectedVariable ] );
@@ -199,10 +201,11 @@ export class PlotsComponent implements OnInit {
         return plotGroup;
     }
 
-    getImagePlot( imageDatasetId: string ) {
+    getImagePlot( imageIds: string[] ) {
+        const imageDatasets = imageIds.map( imageId => this.createImageDataset( imageId ));
         const imagePlot: IPlot = {
             collapsed: false,
-            datasets: [ this.createImageDataset( imageDatasetId ) ],
+            datasets: imageDatasets,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
                 start: this.timeRange[0] * 1000,
