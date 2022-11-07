@@ -27,6 +27,9 @@
             border-bottom-width: 0;
           }
     }
+    &__expand {
+        overflow: hidden;
+    }
     &__info {
         color: $color-info;
     }
