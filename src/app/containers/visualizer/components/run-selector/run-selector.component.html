@@ -19,7 +19,7 @@
     <ng-container matColumnDef="moreDetail">
         <td mat-cell *matCellDef="let run" [attr.colspan]="displayedColumns.length">
             <div class="selector-table__expand" [@detailExpand]="expandedRun === run ? 'expanded' : 'collapsed'" >
-                <div *ngIf="expandedRun === run" class="selector-table__more">
+                <div class="selector-table__more">
                     <div *ngFor="let item of allMetadata" >
                         <strong>{{ item }}{{ headers[item] ? ' ("' + headers[item] + '")' : null }}: </strong> {{ run[item ]}}
                     </div>
