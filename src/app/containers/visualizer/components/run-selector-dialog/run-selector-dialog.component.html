@@ -3,5 +3,5 @@
 </div>
 <div mat-dialog-actions>
     <button mat-button *ngIf="previousSelection" [mat-dialog-close]="previousSelection">Cancel</button>
-    <button mat-button [disabled]="!data.runId" [mat-dialog-close]="data.runId">Select</button>
+    <button mat-raised-button color="primary" [disabled]="!data.runId" [mat-dialog-close]="data.runId">Select</button>
 </div>
