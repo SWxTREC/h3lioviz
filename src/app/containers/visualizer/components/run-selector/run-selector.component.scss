@@ -1,5 +1,43 @@
+@import 'src/theme/theme-colors.scss';
+
 :host {
     padding: 0.25rem 1rem;
     display: flex;
     flex-direction: column;
+    .mat-cell {
+        padding: 4px;
+    }
+    .mat-header-cell {
+        padding: 4px;
+    }
+    .mat-row:hover {
+        background: #eee;
+        cursor: pointer;
+    }
+    .mat-row.highlighted {
+      background: #ccc;
+    }
+}
+
+.selector-table {
+    &__detail {
+          height: 0;
+          td {
+            padding: 0;
+            border-bottom-width: 0;
+          }
+    }
+    &__expand {
+        overflow: hidden;
+    }
+    &__info {
+        color: $color-info;
+    }
+    &__more {
+        padding: 1rem;
+        height: 200px;
+        overflow: scroll;
+        background: #eee;
+        cursor: default;
+    }
 }

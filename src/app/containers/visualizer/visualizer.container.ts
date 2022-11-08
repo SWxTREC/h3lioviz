@@ -98,7 +98,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         );
         const storedPanelSettings = JSON.parse( sessionStorage.getItem('panelSettings'));
         this.openControls = storedPanelSettings ? storedPanelSettings[0] : false;
-        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : false;
+        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : true;
     }
 
     ngOnInit() {
@@ -112,9 +112,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
                 // if waiting for aws server, open the dialog so the user has something to do
-                if ( this.catalog && !this.pvServerStarted ) {
-                    this.openDialog();
-                }
+                setTimeout(() => {
+                    if ( (this.catalog && !this.runId$.value) || (this.catalog && !this.pvServerStarted) ) {
+                        this.openDialog();
+                    } else {
+                        this.dialog.closeAll();
+                    }
+                }, 0);
             })
         );
 
@@ -223,7 +227,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
             const availableWindowWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
-            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.35 - this.gutterSize : availableWindowWidth;
+            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth;
             if ( storedDimensions ) {
                 this.vizDimensions = storedDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
@@ -276,10 +280,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: { runId: this.runId$.value, catalog: this.catalog },
-            width: '500px'
+            disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            if ( result ) {
+            if ( result && result !== this.runId$.value ) {
                 this.updateRunId( result );
             }
         });

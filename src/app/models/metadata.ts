@@ -44,4 +44,5 @@ export interface IModelMetadata {
     type: string;
     version: string;
     xalpha: number;
+    resolution?: string;
 }

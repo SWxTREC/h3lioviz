@@ -16,13 +16,9 @@ export class RunSelectorDialogComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: { runId: string; catalog: IModelMetadata[] },
         private _catalogService: CatalogService
     ) {}
-    
+
     ngOnInit(): void {
         this.previousSelection = this.data.runId;
-    }
-
-    onCancel(): void {
-        this.dialogRef.close();
     }
 
     updateRunId( value: string ) {
