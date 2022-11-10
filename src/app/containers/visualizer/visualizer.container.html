@@ -23,14 +23,12 @@
                     <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
                         {{ openControls ? 'Hide' : 'Show' }} Controls
                     </button>
-                    <div class="viz__row" matTooltip="Select model run" matTooltipPosition="above" >
-                        <small>{{ showTitle ? runTitle : 'Select' }}</small>
-                        <button class="viz__more-button" mat-raised-button color="accent" aria-label="button to select a new model run" (click)="openDialog()">
+                    <button mat-raised-button color="accent" matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
+                        {{ showTitle ? runTitle : 'Select' }}
                             <mat-icon>
                                 keyboard_arrow_down
                             </mat-icon>
-                        </button>
-                    </div>
+                    </button>
                     <!-- remove div and reinstate button when plots are saved in a service -->
                     <div></div>
                     <!-- <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
