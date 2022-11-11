@@ -23,7 +23,7 @@
                     <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
                         {{ openControls ? 'Hide' : 'Show' }} Controls
                     </button>
-                    <button mat-raised-button color="accent" matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
+                    <button mat-button matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
                         {{ showTitle ? runTitle : 'Select' }}
                             <mat-icon>
                                 keyboard_arrow_down
