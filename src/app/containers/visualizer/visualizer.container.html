@@ -23,17 +23,17 @@
                     <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
                         {{ openControls ? 'Hide' : 'Show' }} Controls
                     </button>
-                    <div>
-                        <small *ngIf="showTitle">{{ runTitle }}</small>
-                        <button mat-icon-button aria-label="button to select a new model run">
-                            <mat-icon matTooltip="Switch model runs" matTooltipPosition="above" (click)="openDialog()">
-                                more_vert
+                    <button mat-button matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
+                        {{ showTitle ? runTitle : 'Select' }}
+                            <mat-icon>
+                                keyboard_arrow_down
                             </mat-icon>
-                        </button>
-                    </div>
-                    <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
-                        {{ openPlots ? 'Hide' : 'Show' }} Plots
                     </button>
+                    <!-- remove div and reinstate button when plots are saved in a service -->
+                    <div></div>
+                    <!-- <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
+                        {{ openPlots ? 'Hide' : 'Show' }} Plots
+                    </button> -->
                 </mat-toolbar>
                 <div class="viz__container">
                     <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
