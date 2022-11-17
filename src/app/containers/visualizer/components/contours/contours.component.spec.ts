@@ -1,4 +1,7 @@
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'src/app/modules';
 
 import { ContoursComponent } from './contours.component';
 
@@ -8,7 +11,13 @@ describe('ContoursComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ ContoursComponent ]
+            declarations: [ ContoursComponent ],
+            imports: [
+                MaterialModule,
+                NgxSliderModule,
+                ReactiveFormsModule
+            ]
+
         })
     .compileComponents();
     });
