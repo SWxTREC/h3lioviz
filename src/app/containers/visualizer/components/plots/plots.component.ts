@@ -110,7 +110,9 @@ export class PlotsComponent implements OnInit {
         this.plotForm.controls.image.valueChanges.subscribe( newImageValues => {
             // reset the plot list
             this._plotsService.setPlots([]);
-            this.getImagePlot( newImageValues);
+            if ( newImageValues.length ) {
+                this.getImagePlot( newImageValues);
+            }
             // get the current line plots
             if ( this.plotForm.value.variable ) {
                 this.plotForm.value.variable.forEach( (variable: string) => {
