@@ -1,16 +1,26 @@
-<form class="plots__controls" [formGroup]="plotForm">
-    <h2 class="plots__header">Images/plots:</h2>
-    <mat-form-field>
-        <mat-label>Solar images</mat-label>
-        <mat-select laspSelectAutoClose formControlName="image" multiple>
-            <mat-option *ngFor="let imageOption of imageList" [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
-        </mat-select>
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Solar wind variables</mat-label>
-        <mat-select laspSelectAutoClose formControlName="variable" multiple>
-            <mat-option *ngFor="let variableOption of variableList" [value]="variableOption">{{variableOption}}</mat-option>
-        </mat-select>
-    </mat-form-field>
-</form>
-<sci-grid></sci-grid>
+<div class="plots">
+    <form class="plots__controls" [formGroup]="plotForm">
+        <h2 class="plots__header">Images/plots:</h2>
+        <mat-form-field>
+            <mat-label>Solar images</mat-label>
+            <mat-select laspSelectAutoClose formControlName="image" multiple>
+                <mat-option *ngFor="let imageOption of imageList" [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Solar wind variables</mat-label>
+            <mat-select laspSelectAutoClose formControlName="variable" multiple>
+                <mat-option *ngFor="let variableOption of variableList" [value]="variableOption">{{variableOption}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </form>
+    <sci-grid></sci-grid>
+    <div class="plots__filler"></div>
+    <p>
+        <small>
+            ACE data provided by the ACE MAG and ACE SWEPAM instrument teams and the ACE Science Center <a href="http://www.srl.caltech.edu/ACE/ASC/" target="_blank">http://www.srl.caltech.edu/ACE/ASC/</a>.<br>
+            SDO/AIA data provided by NASA/SDO <a href="https://sdo.gsfc.nasa.gov/" target="_blank">https://sdo.gsfc.nasa.gov/</a> and the AIA, EVE, and HMI science teams.<br>
+            SOHO is a project of international cooperation between ESA and NASA. STEREO (Solar TErrestrial RElations Observatory) is the third mission in NASA's Solar Terrestrial Probes program (STP).
+        </small>
+    </p>
+</div>
