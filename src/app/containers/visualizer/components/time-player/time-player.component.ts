@@ -37,7 +37,8 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                     this.playTimesteps( this.timeIndex );
                 } else {
                     // stop when the pause button is pressed
-                    this.updateTime.emit( this.timeIndex || 0 );
+                    const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2);
+                    this.updateTime.emit( this.timeIndex || defaultTimeIndex );
                 }
             })
         );

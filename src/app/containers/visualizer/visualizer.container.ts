@@ -203,10 +203,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.storeValidVizDimensions();
     }
 
-    getTimeTicks( timeIndex: number ) {
+    getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
             sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
+            const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
+            timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
         });
     }
@@ -262,9 +264,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.errorMessage = null;
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
 
-        // check for a stored time index for this runId, default to 0
+        // check for a stored time index for this runId
         const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
-        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : 0;
+        const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : undefined;
 
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
             this.getTimeTicks( timeIndex );
