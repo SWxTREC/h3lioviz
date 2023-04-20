@@ -13,7 +13,7 @@
         </mat-label>
         <mat-select [compareWith]="compareObjectNames" formControlName="colormap">
             <mat-option *ngFor="let color of colormaps | keyvalue" [value]="color.value">
-                <div>
+                <div class="colors__option">
                     {{ color.value.displayName }} <img class="colors__swatch" [src]="color.value.imgSrc">
                 </div>
             </mat-option>
