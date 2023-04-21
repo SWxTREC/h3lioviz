@@ -68,6 +68,6 @@ export class AppComponent {
     constructor(
         private _snippets: LaspBaseAppSnippetsService
     ) {
-        this._snippets.appComponent.allExcept([ this._snippets.appComponent.setupGoogleAnalytics ]);
+        this._snippets.appComponent.all({ googleAnalyticsId: environment.googleAnalyticsId });
     }
 }
