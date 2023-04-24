@@ -136,7 +136,7 @@ export const COLOR_FORM_DEFAULT_VALUES = {
 
 export const CONTOUR_FORM_DEFAULT_VALUES = {
     cmeContours: true,
-    contourVariable: VARIABLE_CONFIG.velocity,
+    contourVariable: VARIABLE_CONFIG.density,
     numberOfContours: 3,
     contourArea: 'cme'
 };
