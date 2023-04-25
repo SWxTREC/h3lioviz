@@ -1,8 +1,14 @@
 .plots {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     &__controls {
         > *:not(last) {
             margin-right: 0.5rem;
         }
+    }
+    &__filler {
+        flex: 1 1 auto;
     }
     &__header {
         display: inline;
