@@ -2,71 +2,20 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import {
-    AnalogAxisRangeType,
-    AxisFormat,
-    DEFAULT_UI_OPTIONS,
-    DiscreteAxisRangeType,
     IDataset,
     ImageViewerService,
     IMenuOptions,
     IPlot,
-    IUiFeatures,
     PlotsService,
-    SeriesDisplayMode,
     UiOptionsService
 } from 'scicharts';
-import { COLOR_FORM_DEFAULT_VALUES, IMAGE_DATASETS } from 'src/app/models';
+import { COLOR_FORM_DEFAULT_VALUES, DEFAULT_PLOT_OPTIONS, H3LIO_PRESET, IMAGE_DATASETS } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
-
-const DEFAULT_PLOT_OPTIONS = {
-    dataDisplay: {
-        seriesDisplayMode: SeriesDisplayMode.lines,
-        allowGaps: true,
-        thresholdRatio: 5
-    },
-    useGlobalSettings: false,
-    view: {
-        navigator: false,
-        yAxes: true
-    },
-    xAxis: {
-        labels: AxisFormat.auto
-    },
-    yAxis: {
-        range: {
-            analogType: AnalogAxisRangeType.auto,
-            discreteType: DiscreteAxisRangeType.showFullRange,
-            low: null,
-            high: null
-        },
-        scaling: undefined,
-        useMultipleAxes: false
-    }
-};
 
 const SATELLITE_NAMES = {
     earth: 'Earth',
     stereoa: 'Stereo A',
     stereob: 'Stereo B'
-};
-
-// set the UI features for H3lioViz
-const H3LIO_PRESET: IUiFeatures = {
-    featureList: DEFAULT_UI_OPTIONS.features.featureList,
-    toolbar: false,
-    filters: false,
-    metadata: false,
-    download: true,
-    globalSettings: false,
-    overplot: false,
-    limits: false,
-    events: false,
-    binnedData: false,
-    discreteData: false,
-    rangeSelector: false,
-    sliceSelector: false,
-    collapsible: false,
-    modifyDatasetsButton: false
 };
 
 @Component({
