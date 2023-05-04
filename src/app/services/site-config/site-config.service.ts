@@ -4,7 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { assign } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject } from 'rxjs';
-import { ConfigLabels, ISiteConfig } from 'src/app/models/site-config';
+import { ParamsService, PlotsService } from 'scicharts';
+import { DEFAULT_PLOT_OPTIONS } from 'src/app/models';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, ISiteConfig } from 'src/app/models/site-config';
 
 @Injectable({
     providedIn: 'root'
@@ -15,9 +17,16 @@ export class SiteConfigService {
     constructor(
         public location: Location,
         public router: Router,
-        private _activatedRoute: ActivatedRoute
+        private _activatedRoute: ActivatedRoute,
+        private _paramsService: ParamsService,
+        private _plotsService: PlotsService
     ) {
-        this.config$ = new BehaviorSubject({});
+        this.config$ = new BehaviorSubject( DEFAULT_SITE_CONFIG );
+        // update site config with plot changes
+        this._plotsService.getPlots$().subscribe(() => {
+            const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
+            this._updateSiteConfig(changedParams);
+        });
     }
 
     /** return the site config */
@@ -46,16 +55,13 @@ export class SiteConfigService {
 
     /** stringify objects for session storage and use in the url */
     parseConfigToJson( config: ISiteConfig ) {
-        const jsonConfig: any = {};
-        if ( config.plots ) {
-            jsonConfig[ ConfigLabels.plotParams ] = JSON.stringify( config.plots );
-        }
-        if ( config.globalOptions ) {
-            jsonConfig[ ConfigLabels.globalOptionsParams ] = JSON.stringify( config.globalOptions );
-        }
-        if ( config.globalRanges ) {
-            jsonConfig[ ConfigLabels.rangeParams ] = JSON.stringify( config.globalRanges );
-        }
+        // iterate through config keys and map to config labels with stringified content
+        const jsonConfig = Object.keys( config ).reduce( (aggregator, key) => {
+            if ( config[key] ) {
+                aggregator[ ConfigLabels[key] ] = JSON.stringify( config[key] );
+            }
+            return aggregator;
+        }, {});
         return jsonConfig;
     }
 

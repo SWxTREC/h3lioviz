@@ -1,12 +1,11 @@
+import { IColormapInfo } from './control-panel';
+
 export interface IVariableInfo {
     serverName: string;
     displayName: string;
     units: string;
     defaultColorRange: [ number, number ];
-    defaultColormap: {
-        displayName: string;
-        serverName: string;
-    };
+    defaultColormap: IColormapInfo;
     defaultSubsetRange: [ number, number ];
     entireRange: [ number, number ];
     step: number;

@@ -80,7 +80,6 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
         );
     }
 
-
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
             if ( controlName === 'satellites' ) {

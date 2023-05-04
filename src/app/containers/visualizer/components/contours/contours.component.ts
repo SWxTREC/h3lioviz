@@ -66,7 +66,7 @@ export class ContoursComponent implements OnInit, OnChanges {
             })
         );
     }
-        
+
     ngOnChanges(): void {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
@@ -148,6 +148,7 @@ export class ContoursComponent implements OnInit, OnChanges {
             })
         );
     }
+
     updateContourRange( newRange: [number, number] ) {
         const contourVariable: IVariableInfo = this.contours.value.contourVariable;
         const numberOfContours = this.contours.value.numberOfContours;

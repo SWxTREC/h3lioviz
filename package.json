@@ -61,6 +61,7 @@
     "lasp-nav": "^1.10.3",
     "lasp-range-slider": "^3.6.4",
     "lasp-search": "^1.3.3",
+    "lz-string": "^1.5.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
     "ngx-markdown": "^13.1.0",

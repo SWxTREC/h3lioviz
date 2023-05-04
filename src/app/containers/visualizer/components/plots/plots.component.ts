@@ -9,7 +9,12 @@ import {
     PlotsService,
     UiOptionsService
 } from 'scicharts';
-import { COLOR_FORM_DEFAULT_VALUES, DEFAULT_PLOT_OPTIONS, H3LIO_PRESET, IMAGE_DATASETS } from 'src/app/models';
+import {
+    COLOR_FORM_DEFAULT_VALUES,
+    DEFAULT_PLOT_OPTIONS,
+    H3LIO_PRESET,
+    IMAGE_DATASETS
+} from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
 
 const SATELLITE_NAMES = {
@@ -97,6 +102,7 @@ export class PlotsComponent implements OnInit {
 
     createPlotGroup( variable: string )  {
         const plotGroup = [];
+        // push model data to plotGroup
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
             const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
             const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
@@ -119,6 +125,7 @@ export class PlotsComponent implements OnInit {
         });
         const magVariables = new Set([ 'bx', 'by', 'bz' ]);
         const windVariables = new Set([ 'density', 'velocity', 'temperature' ]);
+        // push corresponding ACE variables to plotGroup
         if ( magVariables.has(variable) ) {
             const variableNameMap = {
                 bx: 'Bx',
