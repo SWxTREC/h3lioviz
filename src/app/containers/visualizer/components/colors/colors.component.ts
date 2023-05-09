@@ -1,16 +1,19 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { clone } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
     COLOR_FORM_DEFAULT_VALUES,
     COLORMAPS,
+    ConfigLabels,
+    ISiteConfig,
     IVariableInfo,
     VARIABLE_CONFIG
 } from 'src/app/models';
+import { SiteConfigService } from 'src/app/services';
 
 @Component({
     selector: 'swt-colors',
@@ -47,43 +50,26 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     };
     renderDebouncer: Subject<string> = new Subject<string>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];
     userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
     userColorRanges: { [parameter: string]: [ number, number ] } = {};
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
 
-    constructor() {
+    constructor(
+        private _siteCofigService: SiteConfigService
+    ) {
+        this._siteCofigService.config$.subscribe( config => this.siteConfig = config );
         // initialize FormGroup with default color menu names and values
         Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {
             this.colorForm.addControl(controlName, new FormControl( COLOR_FORM_DEFAULT_VALUES[controlName]));
         });
-        // create user objects from session storage if it exists, or from defaults
-        // colormaps
-        if ( sessionStorage.getItem('colormaps') ) {
-            this.userColormaps = JSON.parse(sessionStorage.getItem('colormaps'));
-        } else {
-            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userColormaps[variable] = VARIABLE_CONFIG[variable].defaultColormap;
-            });
-        }
-        // colorRanges
-        if ( sessionStorage.getItem('colorRanges')) {
-            this.userColorRanges = JSON.parse(sessionStorage.getItem('colorRanges'));
-        } else {
-            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userColorRanges[variable] = VARIABLE_CONFIG[variable].defaultColorRange;
-            });
-        }
-        // opacities
-        if ( sessionStorage.getItem('opacities')) {
-            this.userOpacities = JSON.parse(sessionStorage.getItem('opacities'));
-        } else {
-            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userOpacities[variable] = COLOR_FORM_DEFAULT_VALUES.opacity;
-            });
-        }
-      
+        // create user objects from site config
+        this.userColormaps = this.siteConfig[ ConfigLabels.colormaps ];
+        this.userColorRanges = this.siteConfig[ ConfigLabels.colorRanges ];
+        this.userOpacities = this.siteConfig[ ConfigLabels.opacities ];
+
         this.subscriptions.push(
             this.renderDebouncer.pipe(
                 debounceTime( 300 )
@@ -100,9 +86,8 @@ export class ColorsComponent implements OnChanges, OnDestroy {
             this.session = this.pvView.get().session;
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
-            // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('controlPanel'))) || clone(COLOR_FORM_DEFAULT_VALUES);
-            this.colorForm.setValue( initialFormValues );
+            // once form is interacting with session via subscriptions, initialize the form from siteConfig
+            this.colorForm.setValue( this.siteConfig[ ConfigLabels.colorSettings ] );
         }
     }
 
@@ -121,10 +106,11 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     }
 
     saveUserSettings(): void {
-        sessionStorage.setItem('colorForm', JSON.stringify( this.colorForm.value ));
-        sessionStorage.setItem('opacities', JSON.stringify( this.userOpacities ));
-        sessionStorage.setItem('colormaps', JSON.stringify( this.userColormaps ));
-        sessionStorage.setItem('colorRanges', JSON.stringify( this.userColorRanges ));
+        // update all color settings in site config
+        this._siteCofigService.updateSiteConfig( { [ ConfigLabels.colorSettings ]: this.colorForm.value } );
+        this._siteCofigService.updateSiteConfig( { [ ConfigLabels.opacities ]: this.userOpacities } );
+        this._siteCofigService.updateSiteConfig( { [ ConfigLabels.colormaps ]: this.userColormaps } );
+        this._siteCofigService.updateSiteConfig( { [ ConfigLabels.colorRanges ]: this.userColorRanges } );
     }
 
     setFormSubscriptions() {
@@ -156,14 +142,14 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         // subscribe to COLORMAP changes, set userColormap, and reset PV colormap
         this.subscriptions.push( this.colorForm.controls.colormap.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newColormapObject => {
-                this.userColormaps[ this.colorVariableServerName ] = clone(newColormapObject);
+                this.userColormaps[ this.colorVariableServerName ] = cloneDeep(newColormapObject);
                 this.session.call('pv.h3lioviz.set_colormap', [ this.colorVariableServerName, newColormapObject.serverName ]);
             }));
         // subscribe to OPACITY slider set user opacity per color variable and 'set_opacity'
         this.subscriptions.push( this.colorForm.controls.opacity.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( ( opacity ) => {
                 const newOpacityRange: [ number, number ] = opacity;
-                this.userOpacities[this.colorVariableServerName] = clone(newOpacityRange);
+                this.userOpacities[this.colorVariableServerName] = cloneDeep(newOpacityRange);
                 const opacityLow: number = newOpacityRange[0] / 100;
                 const opacityHigh: number = newOpacityRange[1] / 100;
                 if ( this.colorVariableServerName[ 0 ] === 'b' ) {
@@ -189,7 +175,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         this.colorbarLeftOffset = this.getPercentageOfFullColorRange( leftOffset );
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         this.colorRange = [ event.value, event.highValue ];
-        this.userColorRanges[ this.colorVariableServerName ] = clone(this.colorRange);
+        this.userColorRanges[ this.colorVariableServerName ] = cloneDeep(this.colorRange);
         this.pvView.get().session.call('pv.h3lioviz.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }

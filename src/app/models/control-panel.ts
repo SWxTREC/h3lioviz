@@ -146,6 +146,36 @@ export const COLOR_FORM_DEFAULT_VALUES: IColorSettings = {
     opacity: [ 60, 80 ] as [ number, number ]
 };
 
+export const DEFAULT_COLORMAPS: { [parameter: string]: IColormapInfo }  =
+    Object.keys(VARIABLE_CONFIG).reduce( (aggregator, variable) => {
+        aggregator[variable] = VARIABLE_CONFIG[variable].defaultColormap;
+        return aggregator;
+    }, {});
+
+export const DEFAULT_COLOR_RANGES: { [parameter: string]: [ number, number ] } =
+    Object.keys(VARIABLE_CONFIG).reduce( (aggregator, variable) => {
+        aggregator[variable] = VARIABLE_CONFIG[variable].defaultColorRange;
+        return aggregator;
+    }, {});
+
+export interface IControlPanel {
+    layers: boolean;
+    contours: boolean;
+    colors: boolean;
+}
+
+export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
+    layers: true,
+    contours: true,
+    colors: false
+};
+
+export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
+    Object.keys(VARIABLE_CONFIG).reduce( (aggregator, variable) => {
+        aggregator[variable] = COLOR_FORM_DEFAULT_VALUES.opacity;
+        return aggregator;
+    }, {});
+
 export interface IContourSettings {
     cmeContours: boolean;
     contourVariable: IVariableInfo;
@@ -159,6 +189,12 @@ export const CONTOUR_FORM_DEFAULT_VALUES: IContourSettings = {
     numberOfContours: 3,
     contourArea: 'cme'
 };
+
+export const DEFAULT_CONTOUR_RANGES: { [parameter: string]: [ number, number ] } =
+    Object.keys(VARIABLE_CONFIG).reduce( (aggregator, variable) => {
+        aggregator[variable] = VARIABLE_CONFIG[variable].defaultSubsetRange;
+        return aggregator;
+    }, {});
 
 export interface ILayers {
     cme: boolean;

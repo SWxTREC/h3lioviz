@@ -5,14 +5,16 @@ import { assign } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject } from 'rxjs';
 import { ParamsService, PlotsService } from 'scicharts';
-import { DEFAULT_PLOT_OPTIONS } from 'src/app/models';
+import {
+    DEFAULT_PLOT_OPTIONS
+} from 'src/app/models';
 import { ConfigLabels, DEFAULT_SITE_CONFIG, ISiteConfig } from 'src/app/models/site-config';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SiteConfigService {
-    config$: BehaviorSubject<ISiteConfig>;
+    config$: BehaviorSubject<ISiteConfig> = new BehaviorSubject( DEFAULT_SITE_CONFIG );
 
     constructor(
         public location: Location,
@@ -21,11 +23,10 @@ export class SiteConfigService {
         private _paramsService: ParamsService,
         private _plotsService: PlotsService
     ) {
-        this.config$ = new BehaviorSubject( DEFAULT_SITE_CONFIG );
         // update site config with plot changes
         this._plotsService.getPlots$().subscribe(() => {
             const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
-            this._updateSiteConfig(changedParams);
+            this.updateSiteConfig({plots: changedParams});
         });
     }
 
@@ -38,6 +39,14 @@ export class SiteConfigService {
     getCompressedSiteConfig(config: ISiteConfig) {
         const jsonConfig = this.parseConfigToJson(config);
         return compressToEncodedURIComponent(JSON.stringify(jsonConfig));
+    }
+
+    getParamsFromQueryOrStorage( siteConfigFromUrl: ISiteConfig, parameter: string ) {
+        if (siteConfigFromUrl[ ConfigLabels[parameter]] ) {
+            return siteConfigFromUrl[ ConfigLabels[parameter]];
+        } else {
+            return JSON.parse(sessionStorage.getItem(parameter));
+        }
     }
 
     /** given the current config, update the URL to shadow the config values */
@@ -84,7 +93,7 @@ export class SiteConfigService {
     }
 
     /** given an update param ( e.g. { paramName: value } ) merge new value with current config */
-    private _updateSiteConfig( updateParam: {}, updateUrl = true ): void {
+    updateSiteConfig( updateParam: {}, updateUrl = true ): void {
         this.setSiteConfig( assign( {}, this.getSiteConfig(), updateParam ), updateUrl );
     }
 }

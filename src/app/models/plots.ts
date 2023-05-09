@@ -3,10 +3,13 @@ import {
     AxisFormat,
     DEFAULT_UI_OPTIONS,
     DiscreteAxisRangeType,
+    IDataset,
     IMenuOptions,
+    IPlotParamsAll,
     IUiFeatures,
     SeriesDisplayMode
 } from 'scicharts';
+import { environment, localUrls } from 'src/environments/environment';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
     dataDisplay: {
@@ -30,7 +33,7 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
             low: null,
             high: null
         },
-        scaling: undefined,
+        scaling: 'linear',
         useMultipleAxes: false
     }
 };
@@ -52,6 +55,12 @@ export const H3LIO_PRESET: IUiFeatures = {
     sliceSelector: false,
     collapsible: false,
     modifyDatasetsButton: false
+};
+
+export const SATELLITE_NAMES = {
+    earth: 'Earth',
+    stereoa: 'Stereo A',
+    stereob: 'Stereo B'
 };
 
 export const IMAGE_DATASETS = {
@@ -139,4 +148,93 @@ export const IMAGE_DATASETS = {
         id: 'stereo_a_cor2_files',
         displayName: 'STEREO A Coronagraph 2'
     }
+};
+
+export const imageDatasetCatalog: { [parameter: string]: IDataset } = Object.keys(IMAGE_DATASETS).reduce( (aggregator, dataset) => {
+    const datasetInfo = IMAGE_DATASETS[dataset];
+    const scichartsDataset: IDataset = {
+        url: environment.latisUrl + datasetInfo.id + '.jsond',
+        name: datasetInfo.displayName,
+        rangeVariables: [
+            'url'
+        ],
+        selectedRangeVariables: [ 'url' ],
+        domainVariables: [ 'time' ]
+    };
+    // some image datasets are converted to files because they are not standard types
+    const needsType = !dataset.includes('image');
+    if ( needsType ) {
+        scichartsDataset.type = 'STRING_LIST';
+    }
+    aggregator[dataset] = scichartsDataset;
+    return aggregator;
+}, {});
+
+export const modelDatasetCatalog: { [parameter: string]: IDataset } =
+    [ 'stereoa', 'earth', 'stereob' ].reduce( ( aggregator, satellite: string) => {
+        const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
+        // const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
+        const newDataset: IDataset = {
+        // TODO will need to add the suffix when called from the catalog later
+            url: urlBase, // + urlSuffix,
+            name: 'Model data ' + SATELLITE_NAMES[satellite],
+            rangeVariables: [
+                'density',
+                'velocity',
+                'pressure',
+                'temperature',
+                'bx',
+                'by',
+                'bz'
+            ],
+            // selectedRangeVariables: [ variable ],
+            domainVariables: [ 'time' ]
+        };
+        aggregator[ satellite ] = newDataset;
+        return aggregator;
+    }, {});
+
+export const observedDatasetCatalog: { [parameter: string]: IDataset } = {
+    ace_mag_1m: {
+        url: environment.latisUrl + 'ace_mag_1m.jsond?',
+        name: 'ACE Archived Real Time Data',
+        rangeVariables: [ 'Bx', 'By', 'Bz' ],
+        // selectedRangeVariables: [ variableNameMap[variable] ],
+        domainVariables: [ 'time' ]
+    },
+    ace_swepam_1m: {
+        url: environment.latisUrl + 'ace_swepam_1m.jsond?',
+        name: 'Archived real time ACE data',
+        rangeVariables: [ 'density', 'speed', 'temperature' ],
+        // selectedRangeVariables: [ variableNameMap[variable] ],
+        domainVariables: [ 'time' ]
+    }
+};
+
+export const datasetMapById: { [parameter: string]: IDataset } =
+    Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
+
+export const DEFAULT_PLOT_CONFIG: IPlotParamsAll = {
+    // TODO replace 'density' with a default variable server name
+    plots: [
+        {
+            datasets: [
+                {
+                    datasetId: 'stereoa',
+                    rangeVars: [ 'density' ]
+                },
+                {
+                    datasetId: 'earth',
+                    rangeVars: [ 'density' ]
+                },
+                {
+                    datasetId: 'stereob',
+                    rangeVars: [ 'density' ]
+                }
+            ],
+            options: {}
+        }
+
+    ],
+    v: ''
 };

@@ -11,7 +11,6 @@ export class OrientationMenuComponent implements OnDestroy {
     @Input() pvView: any;
     renderDebouncer: Subject<string> = new Subject<string>();
     subscriptions: Subscription[] = [];
-    
 
     constructor() {
         // debounce render

@@ -1,15 +1,18 @@
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { clone, isEmpty, snakeCase } from 'lodash';
+import { clone, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
+    ConfigLabels,
     CONTOUR_FORM_DEFAULT_VALUES,
     INITIAL_TICK_STEP,
+    ISiteConfig,
     IVariableInfo,
     VARIABLE_CONFIG
 } from 'src/app/models';
+import { SiteConfigService } from 'src/app/services';
 
 @Component({
     selector: 'swt-contours',
@@ -41,21 +44,17 @@ export class ContoursComponent implements OnInit, OnChanges {
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
+    siteConfig: ISiteConfig;
 
 
-    constructor() {
+    constructor(
+        private _siteConfigService: SiteConfigService
+    ) {
+        this._siteConfigService.config$.subscribe( (config: ISiteConfig ) => this.siteConfig = config );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.contours.addControl(controlName, new FormControl( CONTOUR_FORM_DEFAULT_VALUES[controlName]));
+            this.contours.addControl(controlName, new FormControl( this.siteConfig[ConfigLabels.contourSettings][controlName]));
         });
-        // get user contourRanges from session storage if it exists, or from defaults
-        if ( !isEmpty(sessionStorage.getItem('contourRanges'))) {
-            this.userContourRanges = JSON.parse(sessionStorage.getItem('contourRanges'));
-        } else {
-            Object.keys(VARIABLE_CONFIG).forEach( (variable) => {
-                this.userContourRanges[variable] = VARIABLE_CONFIG[variable].defaultSubsetRange;
-            });
-        }
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(
@@ -73,10 +72,10 @@ export class ContoursComponent implements OnInit, OnChanges {
             this.session = this.pvView.get().session;
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
-            // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('contours'))) || clone(CONTOUR_FORM_DEFAULT_VALUES);
-            this.contours.setValue( initialFormValues );
-            const initialContourVariable = initialFormValues.contourVariable.serverName;
+            // once form is interacting with session via subscriptions, initialize the form from siteConfig
+            this.userContourRanges = this.siteConfig[ ConfigLabels.contourRanges ];
+            this.contours.setValue( this.siteConfig[ ConfigLabels.contourSettings ] );
+            const initialContourVariable = this.siteConfig[ConfigLabels.contourSettings].contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
         }
     }
@@ -109,8 +108,8 @@ export class ContoursComponent implements OnInit, OnChanges {
     }
 
     saveUserSettings(): void {
-        sessionStorage.setItem('contours', JSON.stringify( this.contours.value ));
-        sessionStorage.setItem('contourRanges', JSON.stringify( this.userContourRanges ));
+        this._siteConfigService.updateSiteConfig( { [ ConfigLabels.contourSettings ]: this.contours.value });
+        this._siteConfigService.updateSiteConfig( { [ ConfigLabels.contourRanges ]: this.userContourRanges });
     }
 
     setFormSubscriptions() {
