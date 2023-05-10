@@ -21,7 +21,7 @@ export const environment = {
             identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
         }
     },
-    googleAnalyticsId: 'G-WV39H1NCRR',
+    googleAnalyticsId: 'GT-5NRMGGR',
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
