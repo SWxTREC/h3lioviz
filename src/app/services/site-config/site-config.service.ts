@@ -8,13 +8,13 @@ import { ParamsService, PlotsService } from 'scicharts';
 import {
     DEFAULT_PLOT_OPTIONS
 } from 'src/app/models';
-import { ConfigLabels, DEFAULT_SITE_CONFIG, ISiteConfig } from 'src/app/models/site-config';
+import { ConfigLabels, ISiteConfig } from 'src/app/models/site-config';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SiteConfigService {
-    config$: BehaviorSubject<ISiteConfig> = new BehaviorSubject( DEFAULT_SITE_CONFIG );
+    config$: BehaviorSubject<ISiteConfig> = new BehaviorSubject( undefined );
 
     constructor(
         public location: Location,
@@ -41,13 +41,10 @@ export class SiteConfigService {
         return compressToEncodedURIComponent(JSON.stringify(jsonConfig));
     }
 
-    getParamsFromQueryOrStorage( siteConfigFromUrl: ISiteConfig, parameter: string ) {
-        if (siteConfigFromUrl[ ConfigLabels[parameter]] ) {
-            return siteConfigFromUrl[ ConfigLabels[parameter]];
-        } else {
-            return JSON.parse(sessionStorage.getItem(parameter));
-        }
+    getParamFromStorage( parameter: ConfigLabels ) {
+        return JSON.parse(sessionStorage.getItem( parameter ));
     }
+
 
     /** given the current config, update the URL to shadow the config values */
     navigateToNewUrl() {
@@ -89,7 +86,6 @@ export class SiteConfigService {
         if (updateUrl) {
             this.navigateToNewUrl();
         }
-
     }
 
     /** given an update param ( e.g. { paramName: value } ) merge new value with current config */

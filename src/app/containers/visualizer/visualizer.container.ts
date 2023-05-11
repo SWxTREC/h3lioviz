@@ -20,7 +20,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IPlotParamsAll } from 'scicharts';
-import { ConfigLabels, DEFAULT_PLOT_CONFIG, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
 import {
     AwsService,
     CatalogService,
@@ -115,10 +115,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 return value;
             });
-            this.checkForInitialConfig( expandedConfig );
+            this.initializeSiteConfig( expandedConfig );
         } else {
             // bootstrap the url config
-            this.checkForInitialConfig( DEFAULT_SITE_CONFIG );
+            this.initializeSiteConfig( DEFAULT_SITE_CONFIG );
         }
 
         this.subscriptions.push(
@@ -126,7 +126,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 debounceTime( 300 )
             ).subscribe(() => {
                 // TODO: refine this instead of reinitializing dimensions
-                this._siteConfigService.updateSiteConfig( { [ConfigLabels.vizDimensions]: [ undefined, undefined ]} );
+                this._siteConfigService.updateSiteConfig( { [ConfigLabels.vDimensions]: [ undefined, undefined ]} );
                 this.initVizDimensions();
                 this.pvViewResize();
                 this.determineShowTitle();
@@ -217,25 +217,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
-    /** Check to see if there is a config set in the URL or session storage */
-    checkForInitialConfig( expandedSiteConfig: ISiteConfig ) {
-        // iterate through all elements of ISiteConfig and check url and session storage for values other than the default
-        Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
-            const paramValue = this._siteConfigService.getParamsFromQueryOrStorage(expandedSiteConfig, ConfigLabels[parameter]);
-            if ( !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
-                this._siteConfigService.updateSiteConfig( { [ConfigLabels[parameter]]: paramValue });
-            }
-        });
-        // retrieve the plots in plotParams
-        const plotParams: IPlotParamsAll =
-            expandedSiteConfig.plots ?? this._siteConfigService.getParamsFromQueryOrStorage(expandedSiteConfig, ConfigLabels.plots);
-        if (plotParams.plots.length ) {
-            this.plotConfig = plotParams;
-        } else {
-            this.plotConfig = DEFAULT_PLOT_CONFIG;
-        }
-    }
-
     determineShowTitle() {
         this.showTitle =
             (this.splitDirection === 'horizontal' && this.vizDimensions[0] > 600) ||
@@ -275,7 +256,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const landscapeWindow: boolean = this.windowWidth > windowHeight;
         // height of window whether landscape or portrait
         this.componentMaxHeight = windowHeight - headerFooterHeight;
-        const storedDimensions = this.siteConfig?.vizDimensions;
+        const storedDimensions = this.siteConfig?.vDimensions;
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
@@ -422,7 +403,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     }
                 }
             });
-            this._siteConfigService.updateSiteConfig({ [ConfigLabels.vizDimensions]: this.vizDimensions });
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.vDimensions]: this.vizDimensions });
         }
     }
 

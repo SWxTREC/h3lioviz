@@ -190,7 +190,13 @@ export class PlotsComponent implements OnInit {
             return aggregator;
         }, { mag: [], swepam: []});
         const observedDatasets = Object.keys( observedVariablesByInstrument )
-            .map( key => this.createObservedDataset(key, observedVariablesByInstrument[key] ));
+            .map( key => {
+                if ( observedVariablesByInstrument[key].length ) {
+                    return this.createObservedDataset(key, observedVariablesByInstrument[key] );
+                } else {
+                    return null;
+                }
+            }).filter( dataset => dataset );
         const observedPlotOptions = DEFAULT_PLOT_OPTIONS as IMenuOptions;
         observedPlotOptions.yAxis.useMultipleAxes = true;
         const observedPlot: IPlot = {

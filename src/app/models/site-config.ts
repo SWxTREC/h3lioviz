@@ -15,6 +15,7 @@ import {
     ILayers,
     LAYER_FORM_DEFAULT_VALUES
 } from './control-panel';
+import { DEFAULT_PLOT_CONFIG } from './plots';
 
 // this object holds all the application state
 export interface ISiteConfig {
@@ -26,12 +27,12 @@ export interface ISiteConfig {
     cPanelExpansions: IControlPanel;
     layers: ILayers;
     opacities:  { [parameter: string]: [ number, number ] };
-    vPanelSettings: [ boolean, boolean ];
-    plots?: IPlotParamsAll;
+    plots: IPlotParamsAll;
     runId: string;
     timeTicks: number[];
     timeIndexMap: { [parameter: string]: number };
-    vizDimensions: [ number, number ];
+    vDimensions: [ number, number ];
+    vPanelSettings: [ boolean, boolean ];
     zoomState: 'on' | 'off';
 }
 
@@ -44,12 +45,12 @@ export enum ConfigLabels {
     cPanelExpansions = 'cPanelExpansions',
     layers = 'layers',
     opacities = 'opacities',
-    vPanelSettings = 'vPanelSettings',
     plots = 'plots',
     runId = 'runId',
     timeTicks = 'timeTicks',
     timeIndexMap = 'timeIndexMap',
-    vizDimensions = 'vizDimensions',
+    vDimensions = 'vDimensions',
+    vPanelSettings = 'vPanelSettings',
     zoomState = 'zoomState'
 }
 
@@ -62,10 +63,11 @@ export const DEFAULT_SITE_CONFIG: ISiteConfig = {
     cPanelExpansions: DEFAULT_CONTROL_PANEL_EXPANSIONS,
     layers: LAYER_FORM_DEFAULT_VALUES,
     opacities: DEFAULT_OPACITIES,
-    vPanelSettings: [ false, true ],
+    plots: DEFAULT_PLOT_CONFIG,
     runId: undefined,
     timeTicks: [],
     timeIndexMap: {},
-    vizDimensions: [ undefined, undefined ],
+    vDimensions: [ undefined, undefined ],
+    vPanelSettings: [ false, true ],
     zoomState: 'on'
 };
