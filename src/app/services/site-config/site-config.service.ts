@@ -26,7 +26,7 @@ export class SiteConfigService {
         // update site config with plot changes
         this._plotsService.getPlots$().subscribe(() => {
             const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
-            this.updateSiteConfig({plots: changedParams});
+            this.updateSiteConfig({ plots: changedParams.plots});
         });
     }
 
@@ -73,6 +73,7 @@ export class SiteConfigService {
 
     /** set the site config. Update the session storage and the URL with the new config */
     setSiteConfig( newConfig: ISiteConfig, updateUrl = true ): void {
+
         const jsonConfig: Object = this.parseConfigToJson( newConfig );
         // save our new config to session storage
         for ( const key in jsonConfig ) {

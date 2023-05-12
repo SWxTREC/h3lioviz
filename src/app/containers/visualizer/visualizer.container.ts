@@ -96,17 +96,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     ) {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
-        this._siteConfigService.config$.subscribe( config => {
-            this.siteConfig = config;
-            if ( !isEqual(this.timeTicks, config[ ConfigLabels.timeTicks ] )) {
-                this.timeTicks = config[ ConfigLabels.timeTicks ];
-            }
-            if ( this.runId$.value !== config[ ConfigLabels.runId ] ) {
-                this.runId$.next( config[ ConfigLabels.runId ] );
-            }
-        });
 
         const queryParamMap = this._activatedRoute.snapshot.queryParamMap;
+        // see if there is a site config, if so, use it
         if (queryParamMap.has('lz')) {
             // unpack the url into a site config object
             const expandedConfigString = decompressFromEncodedURIComponent(queryParamMap.get('lz'));
@@ -119,7 +111,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             });
             this.initializeSiteConfig( expandedConfig );
         } else {
-            // bootstrap the url config from sessionStorage first and then DEFAULT
+            // bootstrap the url config from sessionStorage first and then fall back to DEFAULT for value
             const configFromStorageOrDefault: ISiteConfig = {} as ISiteConfig;
             Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
                 const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
@@ -260,22 +252,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     /** Use the Url or Defaults to initialize the site config */
     initializeSiteConfig( config: ISiteConfig ) {
-        // this config is from the url or, if no config in url, the default config.
-        // for the case when there is no config in the url ( no 'lz'), but there is a config
-        // in session storage, replace default values with values found in session storage
-        Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
-            // if the parameter is the same as the default value
-            if ( isEqual( DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], config[ ConfigLabels[parameter]])) {
-                // check if it exists in session storage, if it does and it is different, replace with session storage value
-                const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
-                if ( !isEmpty(paramValue) && !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
-                    config[ ConfigLabels[parameter]] = paramValue;
-                }
-            }
-        });
-        // to pass to plot component on init only, further updates are done between plot component and site config service
-        this.plotConfig = config[ ConfigLabels.plots ];
+        // this runs once on init, do tasks that need doing here
+        this.siteConfig = config;
         this._siteConfigService.setSiteConfig( config );
+        if ( config[ ConfigLabels.runId ] ) {
+            this.runId$.next( config[ ConfigLabels.runId ] );
+        }
     }
 
     /* note window dimensions and keep track of viz dimensions
