@@ -253,6 +253,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     initializeSiteConfig( config: ISiteConfig ) {
         // this runs once on init, do tasks that need doing here
         this.siteConfig = config;
+        // setSiteConfig here instead of update since we are initializing
         this._siteConfigService.setSiteConfig( config );
         if ( config[ ConfigLabels.runId ] ) {
             this.runId$.next( config[ ConfigLabels.runId ] );

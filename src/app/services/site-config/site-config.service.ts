@@ -45,7 +45,6 @@ export class SiteConfigService {
         return JSON.parse(sessionStorage.getItem( parameter ));
     }
 
-
     /** given the current config, update the URL to shadow the config values */
     navigateToNewUrl() {
         const compressedConfig = this.getCompressedSiteConfig(this.getSiteConfig());

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import {
@@ -28,7 +28,7 @@ import { environment, localUrls } from 'src/environments/environment';
     templateUrl: './plots.component.html',
     styleUrls: [ './plots.component.scss' ]
 })
-export class PlotsComponent implements OnChanges, OnInit {
+export class PlotsComponent implements OnChanges {
     @Input() timeRange: number[];
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
@@ -71,10 +71,7 @@ export class PlotsComponent implements OnChanges, OnInit {
         });
     }
 
-    ngOnInit(): void {
-    }
-
-    ngOnChanges( changes: SimpleChanges ) {
+    ngOnChanges() {
         const plotsToSet = this.getPlotListByFormCategory( this.plotConfig );
         this.plotForm.setValue( plotsToSet );
     }
