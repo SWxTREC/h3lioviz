@@ -167,7 +167,7 @@ export interface IControlPanel {
 export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
     layers: true,
     contours: true,
-    colors: false
+    colors: true
 };
 
 export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =

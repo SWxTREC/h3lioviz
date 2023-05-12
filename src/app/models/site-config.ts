@@ -1,4 +1,4 @@
-import { IPlotParamsAll } from 'scicharts';
+import { IPlotParams } from 'scicharts';
 
 import {
     COLOR_FORM_DEFAULT_VALUES,
@@ -27,7 +27,7 @@ export interface ISiteConfig {
     cPanelExpansions: IControlPanel;
     layers: ILayers;
     opacities:  { [parameter: string]: [ number, number ] };
-    plots: IPlotParamsAll;
+    plots: IPlotParams[];
     runId: string;
     timeTicks: number[];
     timeIndexMap: { [parameter: string]: number };

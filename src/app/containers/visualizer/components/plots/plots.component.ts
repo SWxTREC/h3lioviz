@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 import {
@@ -6,7 +6,7 @@ import {
     ImageViewerService,
     IMenuOptions,
     IPlot,
-    IPlotParamsAll,
+    IPlotParams,
     PlotsService,
     UiOptionsService
 } from 'scicharts';
@@ -28,10 +28,10 @@ import { environment, localUrls } from 'src/environments/environment';
     templateUrl: './plots.component.html',
     styleUrls: [ './plots.component.scss' ]
 })
-export class PlotsComponent implements OnInit {
+export class PlotsComponent implements OnChanges, OnInit {
     @Input() timeRange: number[];
     @Input() runId: string;
-    @Input() plotConfig: IPlotParamsAll;
+    @Input() plotConfig: IPlotParams[];
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
@@ -72,10 +72,12 @@ export class PlotsComponent implements OnInit {
     }
 
     ngOnInit(): void {
+    }
+
+    ngOnChanges( changes: SimpleChanges ) {
         const plotsToSet = this.getPlotListByFormCategory( this.plotConfig );
         this.plotForm.setValue( plotsToSet );
     }
-
     createImageDataset( imageDatasetId: string )  {
         const datasetInfo = this.imageData[imageDatasetId];
         const newDataset: IDataset = {
@@ -212,9 +214,9 @@ export class PlotsComponent implements OnInit {
     }
 
     /** returns a value that can be used to set the plot form value */
-    getPlotListByFormCategory( plotConfig: IPlotParamsAll ) {
-        const plotListByCategory = plotConfig.plots.reduce( ( aggregator, plot) => {
-            plot.datasets.forEach( dataset => {
+    getPlotListByFormCategory( plotConfig: IPlotParams[] ) {
+        const plotListByCategory = plotConfig.reduce( ( aggregator, plotDatasets) => {
+            plotDatasets.datasets.forEach( dataset => {
                 if ( imageDatasetCatalog[dataset.datasetId] ) {
                     aggregator.image.push( dataset.datasetId );
                 }

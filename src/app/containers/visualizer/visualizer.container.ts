@@ -14,12 +14,12 @@ import { ActivatedRoute } from '@angular/router';
 import { SplitComponent } from 'angular-split';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
-import { isEqual } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 import { decompressFromEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { IPlotParamsAll } from 'scicharts';
+import { IPlotParams } from 'scicharts';
 import { ConfigLabels, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
 import {
     AwsService,
@@ -55,7 +55,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     loading = true;
     openPlots: boolean;
     openControls: boolean;
-    plotConfig: IPlotParamsAll;
+    plotConfig: IPlotParams[];
     previousVizWidth: number;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
@@ -98,10 +98,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._awsService.startUp();
         this._siteConfigService.config$.subscribe( config => {
             this.siteConfig = config;
-            this.timeTicks = this.siteConfig[ ConfigLabels.timeTicks ];
-            // get the last run id, if there is one, from siteConfig
-            const savedRunId = config[ ConfigLabels.runId ];
-            this.runId$.next( savedRunId );
+            if ( !isEqual(this.timeTicks, config[ ConfigLabels.timeTicks ] )) {
+                this.timeTicks = config[ ConfigLabels.timeTicks ];
+            }
+            if ( this.runId$.value !== config[ ConfigLabels.runId ] ) {
+                this.runId$.next( config[ ConfigLabels.runId ] );
+            }
         });
 
         const queryParamMap = this._activatedRoute.snapshot.queryParamMap;
@@ -242,9 +244,30 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
             this._siteConfigService.updateSiteConfig( { [ConfigLabels.timeTicks]: this.timeTicks });
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: defaultTimeIndex }});
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
         });
+    }
+
+    /** Use the Url or Defaults to initialize the site config */
+    initializeSiteConfig( config: ISiteConfig ) {
+        // this config is from the url or, if no config in url, the default config.
+        // for the case when there is no config in the url ( no 'lz'), but there is a config
+        // in session storage, replace default values with values found in session storage
+        Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
+            // if the parameter is the same as the default value
+            if ( isEqual( DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], config[ ConfigLabels[parameter]])) {
+                // check if it exists in session storage, if it does and it is different, replace with session storage value
+                const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
+                if ( !isEmpty(paramValue) && !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
+                    config[ ConfigLabels[parameter]] = paramValue;
+                }
+            }
+        });
+        // to pass to plot component on init only, further updates are done between plot component and site config service
+        this.plotConfig = config[ ConfigLabels.plots ];
+        this._siteConfigService.setSiteConfig( config );
     }
 
     /* note window dimensions and keep track of viz dimensions

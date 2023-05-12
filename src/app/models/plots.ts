@@ -5,7 +5,7 @@ import {
     DiscreteAxisRangeType,
     IDataset,
     IMenuOptions,
-    IPlotParamsAll,
+    IPlotParams,
     IUiFeatures,
     SeriesDisplayMode
 } from 'scicharts';
@@ -214,27 +214,23 @@ export const observedDatasetCatalog: { [parameter: string]: IDataset } = {
 export const datasetMapById: { [parameter: string]: IDataset } =
     Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
 
-export const DEFAULT_PLOT_CONFIG: IPlotParamsAll = {
-    // TODO replace 'density' with a default variable server name
-    plots: [
-        {
-            datasets: [
-                {
-                    datasetId: 'stereoa',
-                    rangeVars: [ 'density' ]
-                },
-                {
-                    datasetId: 'earth',
-                    rangeVars: [ 'density' ]
-                },
-                {
-                    datasetId: 'stereob',
-                    rangeVars: [ 'density' ]
-                }
-            ],
-            options: {}
-        }
+export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
+    {
+        datasets: [
+            {
+                datasetId: 'stereoa',
+                rangeVars: [ 'density' ]
+            },
+            {
+                datasetId: 'earth',
+                rangeVars: [ 'density' ]
+            },
+            {
+                datasetId: 'stereob',
+                rangeVars: [ 'density' ]
+            }
+        ],
+        options: {}
+    }
 
-    ],
-    v: ''
-};
+];
