@@ -119,8 +119,17 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             });
             this.initializeSiteConfig( expandedConfig );
         } else {
-            // bootstrap the url config
-            this.initializeSiteConfig( DEFAULT_SITE_CONFIG );
+            // bootstrap the url config from sessionStorage first and then DEFAULT
+            const configFromStorageOrDefault: ISiteConfig = {} as ISiteConfig;
+            Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
+                const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
+                if ( !isEmpty(paramValue) && !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
+                    configFromStorageOrDefault[ ConfigLabels[parameter]] = paramValue;
+                } else {
+                    configFromStorageOrDefault[ ConfigLabels[parameter] ] = DEFAULT_SITE_CONFIG[ ConfigLabels[parameter] ];
+                }
+            });
+            this.initializeSiteConfig( configFromStorageOrDefault );
         }
 
         this.subscriptions.push(
@@ -163,7 +172,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 if ( id != null && this.validConnection ) {
                     this.dialog.closeAll();
                     this.loadModel( id );
-                    this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: id });
                 }
             })
         );
@@ -319,10 +327,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     /* called only when both pvView and runId$.value are true */
     loadModel( runId: string ) {
         this.errorMessage = null;
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: runId });
+        // get current plotConfig
+        this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
+
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
 
         // check for a stored time index for this runId
-        const timeIndexMap = this.siteConfig[ ConfigLabels.timeIndexMap ];
+        const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
         const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : undefined;
 
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {

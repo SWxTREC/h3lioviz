@@ -232,5 +232,4 @@ export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
         ],
         options: {}
     }
-
 ];
