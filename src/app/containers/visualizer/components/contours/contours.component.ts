@@ -74,9 +74,9 @@ export class ContoursComponent implements OnInit, OnChanges {
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from siteConfig
             this.userContourRanges = this.siteConfig[ ConfigLabels.contourRanges ];
-            this.contours.setValue( this.siteConfig[ ConfigLabels.contourSettings ] );
             const initialContourVariable = this.siteConfig[ConfigLabels.contourSettings].contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
+            this.contours.setValue( this.siteConfig[ ConfigLabels.contourSettings ] );
         }
     }
 

@@ -140,7 +140,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         this.initVizDimensions();
-
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
@@ -244,13 +243,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
             this._siteConfigService.updateSiteConfig( { [ConfigLabels.timeTicks]: this.timeTicks });
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
-            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: defaultTimeIndex }});
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: timeIndex }});
         });
     }
 
-    /** Use the Url or Defaults to initialize the site config */
+    /** Use the config from Url -> Storage -> Defaults to initialize the site */
     initializeSiteConfig( config: ISiteConfig ) {
         // this runs once on init, do tasks that need doing here
         this.siteConfig = config;
@@ -382,7 +381,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
             if ( this.splitDirection === 'horizontal' ) {
                 // restore to previous, if no previous, use a default width
-                const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
+                const vizWidth = this.previousVizWidth || this.vizDimensions[0];
                 this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
             } else {
                 this.vizDimensions[0] = maximumVizWidth;
