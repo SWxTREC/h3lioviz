@@ -189,11 +189,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.errorMessage = socketErrorMessage;
             })
         );
+        this.openControls = this.siteConfig[ ConfigLabels.vPanelSettings ][0];
+        this.openPlots = this.siteConfig[ ConfigLabels.vPanelSettings ][1];
     }
 
     ngAfterViewInit(): void {
-        this.openControls = this.siteConfig[ ConfigLabels.vPanelSettings ][0];
-        this.openPlots = this.siteConfig[ ConfigLabels.vPanelSettings ][1];
         this.setControlPanel();
         this.setPlotsPanel();
         this.subscriptions.push( this._websocket.validConnection$.subscribe( validConnection => {

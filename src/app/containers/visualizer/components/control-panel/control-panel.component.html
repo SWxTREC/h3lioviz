@@ -1,6 +1,6 @@
-<mat-expansion-panel 
+<mat-expansion-panel
     class="control__expander"
-    [expanded]="expansionState.layers"
+    [expanded]="expansionState?.layers"
     (opened)="expansionState.layers = true"
     (closed)="expansionState.layers = false"
     >
@@ -11,9 +11,9 @@
     </mat-expansion-panel-header>
     <swt-layers [pvView]="pvView"></swt-layers>
 </mat-expansion-panel>
-<mat-expansion-panel 
+<mat-expansion-panel
     class="control__expander"
-    [expanded]="expansionState.contours"
+    [expanded]="expansionState?.contours"
     (opened)="expansionState.contours = true"
     (closed)="expansionState.contours = false"
     >
@@ -24,9 +24,9 @@
     </mat-expansion-panel-header>
     <swt-contours [pvView]="pvView"></swt-contours>
 </mat-expansion-panel>
-<mat-expansion-panel 
+<mat-expansion-panel
     class="control__expander"
-    [expanded]="expansionState.colors"
+    [expanded]="expansionState?.colors"
     (opened)="expansionState.colors = true"
     (closed)="expansionState.colors = false"
     >

@@ -1,6 +1,6 @@
+import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { clone, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -53,7 +53,7 @@ export class ContoursComponent implements OnInit, OnChanges {
         this._siteConfigService.config$.subscribe( (config: ISiteConfig ) => this.siteConfig = config );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.contours.addControl(controlName, new FormControl( this.siteConfig[ConfigLabels.contourSettings][controlName]));
+            this.contours.addControl(controlName, new FormControl( this.siteConfig[ConfigLabels.contourSettings]?.[controlName]));
         });
         // debounce render
         this.subscriptions.push(
