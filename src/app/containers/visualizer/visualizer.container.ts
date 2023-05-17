@@ -252,7 +252,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            this._siteConfigService.updateSiteConfig( { [ConfigLabels.timeTicks]: this.timeTicks });
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );

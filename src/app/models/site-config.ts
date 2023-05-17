@@ -29,7 +29,6 @@ export interface ISiteConfig {
     opacities:  { [parameter: string]: [ number, number ] };
     plots: IPlotParams[];
     runId: string;
-    timeTicks: number[];
     timeIndexMap: { [parameter: string]: number };
     vDimensions: [ number, number ];
     vPanelSettings: [ boolean, boolean ];
@@ -48,7 +47,6 @@ export enum ConfigLabels {
     opacities = 'opacities',
     plots = 'plots',
     runId = 'runId',
-    timeTicks = 'timeTicks',
     timeIndexMap = 'timeIndexMap',
     vDimensions = 'vDimensions',
     vPanelSettings = 'vPanelSettings',
@@ -67,7 +65,6 @@ export const DEFAULT_SITE_CONFIG: ISiteConfig = {
     opacities: DEFAULT_OPACITIES,
     plots: DEFAULT_PLOT_CONFIG,
     runId: undefined,
-    timeTicks: [],
     timeIndexMap: {},
     vDimensions: [ undefined, undefined ],
     vPanelSettings: [ false, true ],
