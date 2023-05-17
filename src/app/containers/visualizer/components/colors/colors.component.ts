@@ -1,6 +1,6 @@
-import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { cloneDeep } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';

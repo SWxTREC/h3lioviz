@@ -1,6 +1,6 @@
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { MaterialModule } from 'src/app/modules';
 
 import { ContoursComponent } from './contours.component';
