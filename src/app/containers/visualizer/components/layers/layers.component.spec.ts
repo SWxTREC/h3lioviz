@@ -1,7 +1,8 @@
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from 'src/app/modules';
 
 import { LayersComponent } from './layers.component';
@@ -17,7 +18,8 @@ describe('LayersComponent', () => {
                 BrowserAnimationsModule,
                 NgxSliderModule,
                 MaterialModule,
-                ReactiveFormsModule
+                ReactiveFormsModule,
+                RouterTestingModule
             ]
         })
     .compileComponents();

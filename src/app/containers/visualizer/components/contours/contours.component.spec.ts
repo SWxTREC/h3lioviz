@@ -1,6 +1,7 @@
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from 'src/app/modules';
 
 import { ContoursComponent } from './contours.component';
@@ -15,7 +16,8 @@ describe('ContoursComponent', () => {
             imports: [
                 MaterialModule,
                 NgxSliderModule,
-                ReactiveFormsModule
+                ReactiveFormsModule,
+                RouterTestingModule
             ]
 
         })
