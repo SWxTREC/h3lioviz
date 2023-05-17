@@ -51,7 +51,7 @@
                         class="viz__pv"
                         [class.viz__pv--empty]="(runId$ | async) == null"
                         [class.viz__pv--resizing]="resizing"
-                        [style.width]="(vizDimensions[0]) + 'px'"
+                        [style.width]="vizDimensions[0] + 'px'"
                         [style.height]="vizDimensions[1] + 'px'">
                     </div>
                 </div>

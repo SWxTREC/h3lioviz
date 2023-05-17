@@ -143,14 +143,16 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         const storedWindowDimensions = this.siteConfig?.wDimensions;
+        const hasStoredWindowDimensions = storedWindowDimensions?.every( value => value != null );
         this.windowDimensions = [ window.innerWidth, window.innerHeight ];
-        const windowSizeChanged = !isEqual( this.windowDimensions, storedWindowDimensions );
+        const windowSizeChanged = hasStoredWindowDimensions && !isEqual( this.windowDimensions, storedWindowDimensions );
         // if window size does not match, start vizDimensions from scratch
         if ( windowSizeChanged ) {
             this.windowResize$.next();
         } else {
             this.initVizDimensions();
         }
+
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
