@@ -33,6 +33,7 @@ export interface ISiteConfig {
     timeIndexMap: { [parameter: string]: number };
     vDimensions: [ number, number ];
     vPanelSettings: [ boolean, boolean ];
+    wDimensions: [ number, number ];
     zoomState: 'on' | 'off';
 }
 
@@ -51,6 +52,7 @@ export enum ConfigLabels {
     timeIndexMap = 'timeIndexMap',
     vDimensions = 'vDimensions',
     vPanelSettings = 'vPanelSettings',
+    wDimensions = 'wDimensions',
     zoomState = 'zoomState'
 }
 
@@ -69,5 +71,6 @@ export const DEFAULT_SITE_CONFIG: ISiteConfig = {
     timeIndexMap: {},
     vDimensions: [ undefined, undefined ],
     vPanelSettings: [ false, true ],
+    wDimensions: [ undefined, undefined ],
     zoomState: 'on'
 };

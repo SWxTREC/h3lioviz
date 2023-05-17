@@ -70,13 +70,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     timeTicks: number[];
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
-    // [ width, height ] for paraview resize, drag direction is variable so assign appropriately
+    // dimensions are [ width, height ] for paraview resize, drag direction is variable so assign appropriately
     vizDimensions: [ number, number ] = [ undefined, undefined ];
     vizPanelSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     windowResize$: Subject<void> = new Subject();
-    windowWidth: number;
+    // dimensions are [ width, height ]
+    windowDimensions: number[];
 
     @HostListener( 'window:resize')
     onResize() {
@@ -130,6 +131,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             ).subscribe(() => {
                 // TODO: refine this instead of reinitializing dimensions
                 this._siteConfigService.updateSiteConfig( { [ConfigLabels.vDimensions]: [ undefined, undefined ]} );
+                this.windowDimensions = [ window.innerWidth, window.innerHeight ];
+                this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
                 this.initVizDimensions();
                 this.pvViewResize();
                 this.determineShowTitle();
@@ -139,7 +142,15 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
-        this.initVizDimensions();
+        const storedWindowDimensions = this.siteConfig?.wDimensions;
+        this.windowDimensions = [ window.innerWidth, window.innerHeight ];
+        const windowSizeChanged = !isEqual( this.windowDimensions, storedWindowDimensions );
+        // if window size does not match, start vizDimensions from scratch
+        if ( windowSizeChanged ) {
+            this.windowResize$.next();
+        } else {
+            this.initVizDimensions();
+        }
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
@@ -221,7 +232,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     determineShowTitle() {
         this.showTitle =
             (this.splitDirection === 'horizontal' && this.vizDimensions[0] > 600) ||
-            (this.splitDirection === 'vertical' && this.windowWidth > 480 );
+            (this.splitDirection === 'vertical' && this.windowDimensions[0] > 480 );
     }
 
     dragEnd( event: any ) {
@@ -264,23 +275,21 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     * viz panel size (height or width, depending on direction) is calculated from relevant viz dimension
     */
     initVizDimensions() {
-        this.windowWidth = window.innerWidth;
-        const windowHeight: number = window.innerHeight;
-        const landscapeWindow: boolean = this.windowWidth > windowHeight;
+        const landscapeWindow: boolean = this.windowDimensions[0] > this.windowDimensions[1];
         // height of window whether landscape or portrait
-        this.componentMaxHeight = windowHeight - headerFooterHeight;
-        const storedDimensions = this.siteConfig?.vDimensions;
+        this.componentMaxHeight = this.windowDimensions[1] - headerFooterHeight;
+        const storedVizDimensions: [ number, number ] = this.siteConfig?.vDimensions;
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
-            const availableWindowWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            const availableWindowWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
             const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth;
-            if ( storedDimensions?.every( value => value != null ) ) {
-                this.vizDimensions = storedDimensions;
+            if ( storedVizDimensions?.every( value => value != null ) ) {
+                this.vizDimensions = storedVizDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
-                this.vizDimensions[1] = Math.min( storedDimensions[1], vizMaxHeight);
+                this.vizDimensions[1] = Math.min( storedVizDimensions[1], vizMaxHeight);
             } else {
                 // initialize to defaultVizWidth and vizMaxHeight
                 this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
@@ -291,13 +300,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.splitDirection = 'vertical';
             // width is limiting factor
             const defaultVizHeight = (this.componentMaxHeight * 0.5) - vizAccessoriesHeight;
-            if ( storedDimensions?.every( value => value != null ) ) {
-                this.vizDimensions = storedDimensions;
+            if ( storedVizDimensions?.every( value => value != null ) ) {
+                this.vizDimensions = storedVizDimensions;
                 // ensure new width is not greater than maxWidth for this window
-                this.vizDimensions[0] = Math.min( storedDimensions[0], this.windowWidth);
+                this.vizDimensions[0] = Math.min( storedVizDimensions[0], this.windowDimensions[0]);
             } else {
-                // initialize to this.windowWidth and defaultVizHeight
-                this.vizDimensions = [ this.windowWidth, defaultVizHeight ];
+                // initialize to window width and defaultVizHeight
+                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ];
             }
             // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
             this.vizPanelSize = this.vizDimensions[1] ?
@@ -363,7 +372,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // if horizontal panels and plots panel is open, plots panel will squish to accomodate the control panel
         // otherwise, if no plots panel, viz needs to be resized
         if ( this.splitDirection === 'horizontal' && !this.openPlots ) {
-            this.vizDimensions[0] = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            this.vizDimensions[0] = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
             this.pvViewResize();
             this.storeValidVizDimensions();
         }
@@ -379,7 +388,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const sizes = this.splitElement.getVisibleAreaSizes();
             // if two visible split areas, preserve the viz width so it can be restored
             this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
-            const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
             if ( this.splitDirection === 'horizontal' ) {
                 // restore to previous, if no previous, use a default width
                 const vizWidth = this.previousVizWidth || this.vizDimensions[0];
