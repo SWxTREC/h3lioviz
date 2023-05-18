@@ -81,6 +81,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     @HostListener( 'window:resize')
     onResize() {
+        this.windowDimensions = [ window.innerWidth, window.innerHeight ];
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
         this.windowResize$.next();
     }
 
@@ -131,8 +133,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             ).subscribe(() => {
                 // TODO: refine this instead of reinitializing dimensions
                 this._siteConfigService.updateSiteConfig( { [ConfigLabels.vDimensions]: [ undefined, undefined ]} );
-                this.windowDimensions = [ window.innerWidth, window.innerHeight ];
-                this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
                 this.initVizDimensions();
                 this.pvViewResize();
                 this.determineShowTitle();
@@ -143,9 +143,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnInit() {
         this._scripts.misc.ignoreMaxPageWidth( this );
         const storedWindowDimensions = this.siteConfig?.wDimensions;
-        const hasStoredWindowDimensions = storedWindowDimensions?.every( value => value != null );
         this.windowDimensions = [ window.innerWidth, window.innerHeight ];
-        const windowSizeChanged = hasStoredWindowDimensions && !isEqual( this.windowDimensions, storedWindowDimensions );
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
+        const windowSizeChanged = !isEqual( this.windowDimensions, storedWindowDimensions );
         // if window size does not match, start vizDimensions from scratch
         if ( windowSizeChanged ) {
             this.windowResize$.next();
@@ -279,14 +279,15 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const landscapeWindow: boolean = this.windowDimensions[0] > this.windowDimensions[1];
         // height of window whether landscape or portrait
         this.componentMaxHeight = this.windowDimensions[1] - headerFooterHeight;
-        const storedVizDimensions: [ number, number ] = this.siteConfig?.vDimensions;
+        // this can change if window is resized, so get from source
+        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions;
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
             const availableWindowWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
-            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth;
+            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth / 2;
             if ( storedVizDimensions?.every( value => value != null ) ) {
                 this.vizDimensions = storedVizDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
