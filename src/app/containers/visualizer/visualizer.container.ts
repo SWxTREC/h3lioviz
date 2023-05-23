@@ -138,10 +138,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.determineShowTitle();
             })
         );
-    }
-
-    ngOnInit() {
-        this._scripts.misc.ignoreMaxPageWidth( this );
         const storedWindowDimensions = this.siteConfig?.wDimensions;
         this.windowDimensions = [ window.innerWidth, window.innerHeight ];
         this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
@@ -152,6 +148,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         } else {
             this.initVizDimensions();
         }
+    }
+
+    ngOnInit() {
+        this._scripts.misc.ignoreMaxPageWidth( this );
 
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
