@@ -47,8 +47,8 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         displayName: 'Velocity',
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
-        defaultColormap: COLORMAPS.plasma,
-        defaultSubsetRange: [ 600, 900 ],
+        defaultColormap: COLORMAPS.rainbow,
+        defaultSubsetRange: [ 300, 900 ],
         entireRange: [ 200, 1600 ],
         step: 50
     },
@@ -67,7 +67,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         displayName: 'Ram pressure',
         units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
         defaultColorRange: [ 100000, 2500000 ],
-        defaultColormap: COLORMAPS.viridis,
+        defaultColormap: COLORMAPS.plasma,
         defaultSubsetRange: [ 500000, 10000000 ],
         entireRange: [ 100000, 10000000 ],
         step: 10000
@@ -127,7 +127,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         displayName: 'Cloud tracer',
         units: '—',
         defaultColorRange: [ 0.2, 0.9 ],
-        defaultColormap: COLORMAPS.plasma,
+        defaultColormap: COLORMAPS.divergent,
         defaultSubsetRange: [ 0.2, 0.9 ],
         entireRange: [ 0, 1 ],
         step: 0.1
@@ -141,9 +141,9 @@ export interface IColorSettings {
 }
 
 export const COLOR_FORM_DEFAULT_VALUES: IColorSettings = {
-    colorVariable: VARIABLE_CONFIG.density,
-    colormap: VARIABLE_CONFIG.density.defaultColormap,
-    opacity: [ 60, 80 ] as [ number, number ]
+    colorVariable: VARIABLE_CONFIG.velocity,
+    colormap: VARIABLE_CONFIG.velocity.defaultColormap,
+    opacity: [ 60, 90 ] as [ number, number ]
 };
 
 export const DEFAULT_COLORMAPS: { [parameter: string]: IColormapInfo }  =
@@ -185,8 +185,8 @@ export interface IContourSettings {
 
 export const CONTOUR_FORM_DEFAULT_VALUES: IContourSettings = {
     cmeContours: true,
-    contourVariable: VARIABLE_CONFIG.density,
-    numberOfContours: 3,
+    contourVariable: VARIABLE_CONFIG.velocity,
+    numberOfContours: 5,
     contourArea: 'cme'
 };
 
@@ -210,8 +210,8 @@ export interface ILayers {
 export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
     cme: false,
     latSlice: true,
-    lonSlice: false,
-    lonSliceType: 'solar-equator',
+    lonSlice: true,
+    lonSliceType: 'ecliptic',
     lonStreamlines: false,
     radialSlice: false,
     satellites: true,
