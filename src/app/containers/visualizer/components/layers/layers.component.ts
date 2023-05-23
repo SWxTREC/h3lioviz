@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { clone, snakeCase } from 'lodash';
+import { snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { LAYER_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
+import { ConfigLabels, LAYER_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
+import { SiteConfigService } from 'src/app/services';
 
 @Component({
     selector: 'swt-layers',
@@ -24,7 +25,9 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
     subscriptions: Subscription[] = [];
     variableConfigurations = VARIABLE_CONFIG;
 
-    constructor() {
+    constructor(
+        private _siteConfigService: SiteConfigService
+    ) {
         // initialize FormGroup with default layer names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             this.layers.addControl(controlName, new FormControl( LAYER_FORM_DEFAULT_VALUES[controlName]));
@@ -35,7 +38,7 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
-                sessionStorage.setItem('layers', JSON.stringify( this.layers.value ));
+                this._siteConfigService.updateSiteConfig( { [ConfigLabels.layers]: this.layers.value });
             })
         );
     }
@@ -46,8 +49,8 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
             this.session = this.pvView.get().session;
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
-            // once form is interacting with session via subscriptions, initialize the form from sessionStorage or defaults
-            const initialFormValues = clone(JSON.parse(sessionStorage.getItem('layers'))) || clone(LAYER_FORM_DEFAULT_VALUES);
+            // once form is interacting with session via subscriptions, initialize the form
+            const initialFormValues = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
             this.layers.setValue( initialFormValues );
         }
     }
@@ -79,7 +82,6 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
             })
         );
     }
-
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {

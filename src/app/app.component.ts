@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 import {
     LaspBaseAppSnippetsService
 } from 'lasp-base-app-snippets';
@@ -66,8 +68,12 @@ export class AppComponent {
     ];
 
     constructor(
+        private _domSanitizer: DomSanitizer,
+        private _matIconRegistry: MatIconRegistry,
         private _snippets: LaspBaseAppSnippetsService
     ) {
         this._snippets.appComponent.all({ googleAnalyticsId: environment.googleAnalyticsId });
+
+        this._matIconRegistry.addSvgIconSet( this._domSanitizer.bypassSecurityTrustResourceUrl('assets/chart/chart-icons.svg'));
     }
 }

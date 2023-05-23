@@ -10,14 +10,23 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
+import { ActivatedRoute } from '@angular/router';
 import { SplitComponent } from 'angular-split';
 import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
+import { isEmpty, isEqual } from 'lodash';
+import { decompressFromEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { IModelMetadata } from 'src/app/models';
-import { AwsService, CatalogService, WebsocketService } from 'src/app/services';
+import { IPlotParams } from 'scicharts';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
+import {
+    AwsService,
+    CatalogService,
+    SiteConfigService,
+    WebsocketService
+} from 'src/app/services';
 import { environment } from 'src/environments/environment';
 
 import { RunSelectorDialogComponent } from './components';
@@ -46,6 +55,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     loading = true;
     openPlots: boolean;
     openControls: boolean;
+    plotConfig: IPlotParams[];
     previousVizWidth: number;
     pvServerStarted = false;
     pvView: any = this._websocket.pvView;
@@ -53,67 +63,103 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     runTitle: string;
     showTitle: boolean;
+    siteConfig: ISiteConfig;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
     subscriptions: Subscription[] = [];
     timeIndex: number;
     timeTicks: number[];
     validConnection = this._websocket.validConnection$.value;
     version = environment.version;
-    // [ width, height ] for paraview resize, drag direction is variable so assign appropriately
+    // dimensions are [ width, height ] for paraview resize, drag direction is variable so assign appropriately
     vizDimensions: [ number, number ] = [ undefined, undefined ];
     vizPanelSize: number;
     waitingMessages: string[] = [ 'this can take a minute…', 'checking status…', 'looking for updates…' ];
     waitingMessage: string = this.waitingMessages[0];
     windowResize$: Subject<void> = new Subject();
-    windowWidth: number;
+    // dimensions are [ width, height ]
+    windowDimensions: number[];
 
     @HostListener( 'window:resize')
     onResize() {
-        // TODO: refine this instead of reinitializing dimensions
-        sessionStorage.removeItem( 'vizDimensions' );
+        this.windowDimensions = [ window.innerWidth, window.innerHeight ];
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
         this.windowResize$.next();
     }
 
     constructor(
         public dialog: MatDialog,
+        private _activatedRoute: ActivatedRoute,
         private _awsService: AwsService,
         private _catalogService: CatalogService,
         private _changeDetector: ChangeDetectorRef,
         private _laspNavService: LaspNavService,
         private _scripts: LaspBaseAppSnippetsService,
+        private _siteConfigService: SiteConfigService,
         private _websocket: WebsocketService
     ) {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
-        this.timeTicks = JSON.parse(sessionStorage.getItem('timeTicks')) || [];
+
+        const queryParamMap = this._activatedRoute.snapshot.queryParamMap;
+        // see if there is a site config, if so, use it
+        if (queryParamMap.has('lz')) {
+            // unpack the url into a site config object
+            const expandedConfigString = decompressFromEncodedURIComponent(queryParamMap.get('lz'));
+            const expandedConfig: ISiteConfig = JSON.parse(expandedConfigString, (key, value) => {
+                // NOTE, this function does not work if you have a config with a simple true/false boolean value
+                if (key !== '') {
+                    return JSON.parse(value);
+                }
+                return value;
+            });
+            this.initializeSiteConfig( expandedConfig );
+        } else {
+            // bootstrap the url config from sessionStorage first and then fall back to DEFAULT for value
+            const configFromStorageOrDefault: ISiteConfig = {} as ISiteConfig;
+            Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
+                const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
+                if ( !isEmpty(paramValue) && !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
+                    configFromStorageOrDefault[ ConfigLabels[parameter]] = paramValue;
+                } else {
+                    configFromStorageOrDefault[ ConfigLabels[parameter] ] = DEFAULT_SITE_CONFIG[ ConfigLabels[parameter] ];
+                }
+            });
+            this.initializeSiteConfig( configFromStorageOrDefault );
+        }
 
         this.subscriptions.push(
             this.windowResize$.pipe(
                 debounceTime( 300 )
             ).subscribe(() => {
+                // TODO: refine this instead of reinitializing dimensions
+                this._siteConfigService.updateSiteConfig( { [ConfigLabels.vDimensions]: [ undefined, undefined ]} );
                 this.initVizDimensions();
                 this.pvViewResize();
                 this.determineShowTitle();
             })
         );
-        const storedPanelSettings = JSON.parse( sessionStorage.getItem('panelSettings'));
-        this.openControls = storedPanelSettings ? storedPanelSettings[0] : false;
-        this.openPlots = storedPanelSettings ? storedPanelSettings[1] : true;
     }
 
     ngOnInit() {
-        this.initVizDimensions();
         this._scripts.misc.ignoreMaxPageWidth( this );
-        // get the last run id, if there is one, from sessionStorage
-        const savedRunId = JSON.parse( sessionStorage.getItem( 'runId' ) ) || null;
-        this.runId$.next( savedRunId );
+        const storedWindowDimensions = this.siteConfig?.wDimensions;
+        this.windowDimensions = [ window.innerWidth, window.innerHeight ];
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
+        const windowSizeChanged = !isEqual( this.windowDimensions, storedWindowDimensions );
+        // if window size does not match, start vizDimensions from scratch
+        if ( windowSizeChanged ) {
+            this.windowResize$.next();
+        } else {
+            this.initVizDimensions();
+        }
 
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
                 // if waiting for aws server, open the dialog so the user has something to do
                 setTimeout(() => {
-                    if ( (this.catalog && !this.runId$.value) || (this.catalog && !this.pvServerStarted) ) {
+                    if ( (this.catalog && !this.runId$.value) ||
+                        (this.catalog && !this.pvServerStarted) ) {
                         this.openDialog();
                     } else {
                         this.dialog.closeAll();
@@ -128,8 +174,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             ).subscribe( id => {
                 // if runId is selected and valid connection, load run data
                 if ( id != null && this.validConnection ) {
+                    this.dialog.closeAll();
                     this.loadModel( id );
-                    sessionStorage.setItem( 'runId', JSON.stringify(id) );
                 }
             })
         );
@@ -156,6 +202,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.errorMessage = socketErrorMessage;
             })
         );
+        this.openControls = this.siteConfig[ ConfigLabels.vPanelSettings ][0];
+        this.openPlots = this.siteConfig[ ConfigLabels.vPanelSettings ][1];
     }
 
     ngAfterViewInit(): void {
@@ -186,7 +234,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     determineShowTitle() {
         this.showTitle =
             (this.splitDirection === 'horizontal' && this.vizDimensions[0] > 600) ||
-            (this.splitDirection === 'vertical' && this.windowWidth > 480 );
+            (this.splitDirection === 'vertical' && this.windowDimensions[0] > 480 );
     }
 
     dragEnd( event: any ) {
@@ -206,34 +254,44 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            sessionStorage.setItem('timeTicks', JSON.stringify(this.timeTicks));
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: timeIndex }});
         });
+    }
+
+    /** Use the config from Url -> Storage -> Defaults to initialize the site */
+    initializeSiteConfig( config: ISiteConfig ) {
+        // this runs once on init, do tasks that need doing here
+        this.siteConfig = config;
+        // setSiteConfig here instead of update since we are initializing
+        this._siteConfigService.setSiteConfig( config );
+        if ( config[ ConfigLabels.runId ] ) {
+            this.runId$.next( config[ ConfigLabels.runId ] );
+        }
     }
 
     /* note window dimensions and keep track of viz dimensions
     * viz panel size (height or width, depending on direction) is calculated from relevant viz dimension
     */
     initVizDimensions() {
-        this.windowWidth = window.innerWidth;
-        const windowHeight: number = window.innerHeight;
-        const landscapeWindow: boolean = this.windowWidth > windowHeight;
+        const landscapeWindow: boolean = this.windowDimensions[0] > this.windowDimensions[1];
         // height of window whether landscape or portrait
-        this.componentMaxHeight = windowHeight - headerFooterHeight;
-        const storedDimensions = JSON.parse( sessionStorage.getItem( 'vizDimensions' ) );
+        this.componentMaxHeight = this.windowDimensions[1] - headerFooterHeight;
+        // this can change if window is resized, so get from source
+        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions;
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
-            const availableWindowWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
-            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth;
-            if ( storedDimensions ) {
-                this.vizDimensions = storedDimensions;
+            const availableWindowWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
+            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth / 2;
+            if ( storedVizDimensions?.every( value => value != null ) ) {
+                this.vizDimensions = storedVizDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
-                this.vizDimensions[1] = Math.min( storedDimensions[1], vizMaxHeight);
+                this.vizDimensions[1] = Math.min( storedVizDimensions[1], vizMaxHeight);
             } else {
                 // initialize to defaultVizWidth and vizMaxHeight
                 this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
@@ -244,13 +302,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.splitDirection = 'vertical';
             // width is limiting factor
             const defaultVizHeight = (this.componentMaxHeight * 0.5) - vizAccessoriesHeight;
-            if ( storedDimensions ) {
-                this.vizDimensions = storedDimensions;
+            if ( storedVizDimensions?.every( value => value != null ) ) {
+                this.vizDimensions = storedVizDimensions;
                 // ensure new width is not greater than maxWidth for this window
-                this.vizDimensions[0] = Math.min( storedDimensions[0], this.windowWidth);
+                this.vizDimensions[0] = Math.min( storedVizDimensions[0], this.windowDimensions[0]);
             } else {
-                // initialize to this.windowWidth and defaultVizHeight
-                this.vizDimensions = [ this.windowWidth, defaultVizHeight ];
+                // initialize to window width and defaultVizHeight
+                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ];
             }
             // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
             this.vizPanelSize = this.vizDimensions[1] ?
@@ -262,17 +320,21 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     /* called only when both pvView and runId$.value are true */
     loadModel( runId: string ) {
         this.errorMessage = null;
+        this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: runId });
+        // get current plotConfig
+        this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
+
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
 
         // check for a stored time index for this runId
-        const timeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap'));
+        const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
         const timeIndex: number = timeIndexMap && timeIndexMap[ runId ] ? timeIndexMap[ runId ] : undefined;
 
         this.pvView.get().session.call( 'pv.h3lioviz.load_model', [ runId ] ).then( () => {
             this.getTimeTicks( timeIndex );
         }).catch( (error: { data: { exception: string } }) => {
             this.errorMessage = 'select another value, ' +
-                    (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
+                (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
             // remove bad runId and allow user to try again…
             this.updateRunId( null );
         });
@@ -312,13 +374,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // if horizontal panels and plots panel is open, plots panel will squish to accomodate the control panel
         // otherwise, if no plots panel, viz needs to be resized
         if ( this.splitDirection === 'horizontal' && !this.openPlots ) {
-            this.vizDimensions[0] = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            this.vizDimensions[0] = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
             this.pvViewResize();
             this.storeValidVizDimensions();
         }
         this.determineShowTitle();
-        const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
-        sessionStorage.setItem('panelSettings', panelSettings );
+        const vPanelSettings = [ this.openControls, this.openPlots ];
+        this._siteConfigService.updateSiteConfig( { [ConfigLabels.vPanelSettings]: vPanelSettings} );
     }
 
     setPlotsPanel() {
@@ -328,10 +390,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const sizes = this.splitElement.getVisibleAreaSizes();
             // if two visible split areas, preserve the viz width so it can be restored
             this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
-            const maximumVizWidth = this.openControls ? this.windowWidth - this.controlPanelSize : this.windowWidth;
+            const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
             if ( this.splitDirection === 'horizontal' ) {
                 // restore to previous, if no previous, use a default width
-                const vizWidth = this.previousVizWidth || this.windowWidth * 0.35 - this.gutterSize;
+                const vizWidth = this.previousVizWidth || this.vizDimensions[0];
                 this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
             } else {
                 this.vizDimensions[0] = maximumVizWidth;
@@ -340,8 +402,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.determineShowTitle();
             this.pvViewResize();
             this.storeValidVizDimensions();
-            const panelSettings = JSON.stringify([ this.openControls, this.openPlots ]);
-            sessionStorage.setItem('panelSettings', panelSettings );
         }
     }
 
@@ -349,9 +409,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.loading = true;
         this.timeIndex = timeIndex;
         this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
-        const userTimeIndexMap: { [runId: string]: number } = JSON.parse(sessionStorage.getItem('timeIndexMap')) ?? {};
+        const userTimeIndexMap: { [runId: string]: number } = this.siteConfig[ConfigLabels.timeIndexMap] ?? {};
         userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
-        sessionStorage.setItem('timeIndexMap', JSON.stringify(userTimeIndexMap) );
+        this._siteConfigService.updateSiteConfig( { [ConfigLabels.timeIndexMap ]: userTimeIndexMap });
     }
 
     /* before storing vizDimensions, make sure there are two elements, each a valid number
@@ -371,7 +431,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     }
                 }
             });
-            sessionStorage.setItem('vizDimensions', JSON.stringify(this.vizDimensions));
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.vDimensions]: this.vizDimensions });
         }
     }
 

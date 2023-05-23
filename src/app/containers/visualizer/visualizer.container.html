@@ -51,14 +51,14 @@
                         class="viz__pv"
                         [class.viz__pv--empty]="(runId$ | async) == null"
                         [class.viz__pv--resizing]="resizing"
-                        [style.width]="(vizDimensions[0]) + 'px'"
+                        [style.width]="vizDimensions[0] + 'px'"
                         [style.height]="vizDimensions[1] + 'px'">
                     </div>
                 </div>
-                <swt-time-player *ngIf="timeTicks.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+                <swt-time-player *ngIf="timeTicks?.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
             </as-split-area>
             <as-split-area class="viz__panel" *ngIf="openPlots || splitDirection === 'vertical' " [size]="$any('*')" [order]="1">
-                <swt-plots *ngIf="timeTicks.length && (runId$ | async)" [runId]="runId$ | async" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+                <swt-plots *ngIf="timeTicks?.length && (runId$ | async)" [runId]="runId$ | async" [plotConfig]="plotConfig" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
             </as-split-area>
         </as-split>
     </div>

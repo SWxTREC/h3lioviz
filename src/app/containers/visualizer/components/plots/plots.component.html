@@ -1,6 +1,6 @@
 <div class="plots">
+    <h2 class="plots__header">Images/plots:</h2>
     <form class="plots__controls" [formGroup]="plotForm">
-        <h2 class="plots__header">Images/plots:</h2>
         <mat-form-field>
             <mat-label>Solar images</mat-label>
             <mat-select laspSelectAutoClose formControlName="image" multiple>
@@ -8,9 +8,15 @@
             </mat-select>
         </mat-form-field>
         <mat-form-field>
-            <mat-label>Solar wind variables</mat-label>
-            <mat-select laspSelectAutoClose formControlName="variable" multiple>
+            <mat-label>Model data</mat-label>
+            <mat-select laspSelectAutoClose formControlName="model" multiple>
                 <mat-option *ngFor="let variableOption of variableList" [value]="variableOption">{{variableOption}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Observed data</mat-label>
+            <mat-select laspSelectAutoClose formControlName="observed" multiple>
+                <mat-option *ngFor="let variableOption of observedVariableList" [value]="variableOption">{{variableOption}}</mat-option>
             </mat-select>
         </mat-form-field>
     </form>

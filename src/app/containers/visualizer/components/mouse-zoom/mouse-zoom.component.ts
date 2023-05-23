@@ -1,4 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
+import { ConfigLabels } from 'src/app/models';
+import { SiteConfigService } from 'src/app/services';
 
 @Component({
     selector: 'swt-mouse-zoom',
@@ -7,23 +9,23 @@ import { Component, Input, OnChanges } from '@angular/core';
 })
 export class MouseZoomComponent implements OnChanges {
     @Input() pvView: any;
-    zoomState: boolean;
+    zoomState: 'on' | 'off';
 
-    constructor() {
-        const storedZoomState = JSON.parse(sessionStorage.getItem('zoomState'));
-        this.zoomState = storedZoomState || true;
-    }
-    
+    constructor(
+        private _siteConfigService: SiteConfigService
+    ) {}
+
     ngOnChanges() {
         // set zoom once pvView is defined
         if ( this.pvView ) {
+            this.zoomState = this._siteConfigService.getSiteConfig()[ ConfigLabels.zoomState ];
             this.setZoom();
         }
     }
 
     setZoom() {
-        sessionStorage.setItem('zoomState', JSON.stringify(this.zoomState) );
-        if ( this.zoomState && this.pvView ) {
+        this._siteConfigService.updateSiteConfig( {[ConfigLabels.zoomState]: this.zoomState} );
+        if ( this.zoomState === 'on' && this.pvView ) {
             // turn it on
             this.pvView.setRpcWheelEvent( 'viewport.mouse.zoom.wheel' );
         } else {
@@ -33,7 +35,7 @@ export class MouseZoomComponent implements OnChanges {
     }
 
     toggleZoom() {
-        this.zoomState = !this.zoomState;
+        this.zoomState = this.zoomState === 'on' ? 'off' : 'on';
         this.setZoom();
     }
 }
