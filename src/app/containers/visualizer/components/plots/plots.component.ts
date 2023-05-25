@@ -11,7 +11,6 @@ import {
     UiOptionsService
 } from 'scicharts';
 import {
-    COLOR_FORM_DEFAULT_VALUES,
     DEFAULT_PLOT_OPTIONS,
     H3LIO_PRESET,
     IMAGE_DATASETS,
@@ -39,7 +38,6 @@ export class PlotsComponent implements OnChanges {
         model: new FormControl(),
         observed: new FormControl()
     });
-    selectedVariable = COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName;
     variableList: string[] = [ 'density', 'velocity', 'pressure', 'temperature', 'bx', 'by', 'bz' ];
     observedVariableList: string[] = [ 'density', 'speed', 'temperature', 'Bx', 'By', 'Bz' ];
     siteConfig: ISiteConfig;
