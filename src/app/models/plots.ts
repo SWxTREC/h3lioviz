@@ -11,6 +11,8 @@ import {
 } from 'scicharts';
 import { environment, localUrls } from 'src/environments/environment';
 
+import { COLOR_FORM_DEFAULT_VALUES } from './control-panel';
+
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
     dataDisplay: {
         seriesDisplayMode: SeriesDisplayMode.lines,
@@ -219,15 +221,15 @@ export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
         datasets: [
             {
                 datasetId: 'stereoa',
-                rangeVars: [ 'density' ]
+                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
             },
             {
                 datasetId: 'earth',
-                rangeVars: [ 'density' ]
+                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
             },
             {
                 datasetId: 'stereob',
-                rangeVars: [ 'density' ]
+                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
             }
         ],
         options: {}
