@@ -1,6 +1,6 @@
-import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { cloneDeep } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -60,7 +60,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     constructor(
         private _siteCofigService: SiteConfigService
     ) {
-        this._siteCofigService.config$.subscribe( config => this.siteConfig = config );
+        this._siteCofigService.config$.subscribe( () => this.siteConfig = this._siteCofigService.getSiteConfig() );
         // initialize FormGroup with default color menu names and values
         Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {
             this.colorForm.addControl(controlName, new FormControl( COLOR_FORM_DEFAULT_VALUES[controlName]));

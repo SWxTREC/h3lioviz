@@ -1,14 +1,12 @@
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assign } from 'lodash';
+import { assign, cloneDeep, defaultsDeep } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject } from 'rxjs';
 import { ParamsService, PlotsService } from 'scicharts';
-import {
-    DEFAULT_PLOT_OPTIONS
-} from 'src/app/models';
-import { ConfigLabels, ISiteConfig } from 'src/app/models/site-config';
+import { DEFAULT_PLOT_OPTIONS } from 'src/app/models';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, ISiteConfig } from 'src/app/models/site-config';
 
 @Injectable({
     providedIn: 'root'
@@ -32,7 +30,10 @@ export class SiteConfigService {
 
     /** return the site config */
     getSiteConfig(): ISiteConfig {
-        return this.config$.getValue();
+        const config = cloneDeep(this.config$.getValue());
+        // add default values not stored in the url
+        defaultsDeep(config, DEFAULT_SITE_CONFIG);
+        return config;
     }
 
     /** returns a compressed string of the current site config */
@@ -46,8 +47,8 @@ export class SiteConfigService {
     }
 
     /** given the current config, update the URL to shadow the config values */
-    navigateToNewUrl() {
-        const compressedConfig = this.getCompressedSiteConfig(this.getSiteConfig());
+    navigateToNewUrl(config: ISiteConfig) {
+        const compressedConfig = this.getCompressedSiteConfig(config);
         const jsonConfig = {lz: compressedConfig};
         const url = this.router.serializeUrl(
             this.router.createUrlTree([], {
@@ -72,8 +73,8 @@ export class SiteConfigService {
 
     /** set the site config. Update the session storage and the URL with the new config */
     setSiteConfig( newConfig: ISiteConfig, updateUrl = true ): void {
-
-        const jsonConfig: Object = this.parseConfigToJson( newConfig );
+        const minConfig = this._paramsService.removeDefaults(newConfig, DEFAULT_SITE_CONFIG) as ISiteConfig;
+        const jsonConfig: Object = this.parseConfigToJson( minConfig );
         // save our new config to session storage
         for ( const key in jsonConfig ) {
             if ( jsonConfig.hasOwnProperty( key ) ) {
@@ -82,9 +83,9 @@ export class SiteConfigService {
         }
 
         // alert components of changes to the site config
-        this.config$.next( newConfig );
+        this.config$.next( minConfig );
         if (updateUrl) {
-            this.navigateToNewUrl();
+            this.navigateToNewUrl(minConfig);
         }
     }
 

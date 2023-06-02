@@ -79,7 +79,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // dimensions are [ width, height ]
     windowDimensions: number[];
 
-    @HostListener( 'window:resize')
+    @HostListener('window:resize')
     onResize() {
         this.windowDimensions = [ window.innerWidth, window.innerHeight ];
         this._siteConfigService.updateSiteConfig({ [ConfigLabels.wDimensions]: this.windowDimensions });
