@@ -25,7 +25,7 @@ while [ $# -gt 0 ]; do
       ;;
 
     b | build)
-      npm i && ng build --configuration production --aot=false --build-optimizer=false --base-href '${NGINX_CONTEXT_ROOT}'
+      npm i && npx ng build --configuration production --aot=false --build-optimizer=false --base-href '${NGINX_CONTEXT_ROOT}'
       docker build --force-rm --tag ${REGISTRY}/${IMAGE}:${VERSION} .
       exit 0
       ;;

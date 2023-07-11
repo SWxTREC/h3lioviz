@@ -4,6 +4,9 @@ server {
     absolute_redirect off;
     root /usr/share/nginx/html/;
 
+    # add no-cache to urls of routes in the app
+    add_header Cache-Control "no-cache";
+
     location ${NGINX_CONTEXT_ROOT} {
         alias /usr/share/nginx/html/;
         index index.html;
@@ -15,6 +18,7 @@ server {
         #   the server -> root directive matches when hosted under /
         location ~ ^${NGINX_CONTEXT_ROOT}/(.+\..+)$ {
             alias /usr/share/nginx/html/$1;
+            add_header Cache-Control "max-age=3600, must-revalidate";
         }
 
     }
