@@ -4,6 +4,10 @@ Deployed site: <https://swx-trec.com/h3lioviz>
 
 This is a frontend for visualizing 3D heliosphere model output.
 
+Title: H3lioViz
+Description: Visualize model runs that propagate the solar wind through the three-dimensional heliosphere
+Tagline: Explore solar wind models in three dimensions
+
 ## Contacts
 
 * **Product Owner:**
