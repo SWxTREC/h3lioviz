@@ -14,7 +14,7 @@ Tagline: Explore solar wind models in three dimensions
     Greg Lucas, greg.lucas@lasp.colorado.edu
 * **Experienced Devs:**
     Front end: Jennifer Knuth, jennifer.knuth@lasp.colorado.edu
-    Back end: Greg Lucas, greg.lucase@lasp.coloardo.edu
+    Back end: Greg Lucas, greg.lucas@lasp.coloardo.edu
 
 ## Relevant JIRA Project(s)
 
