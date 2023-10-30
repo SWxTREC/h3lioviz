@@ -35,7 +35,7 @@ export class AppComponent {
     orgLogos: IImageLink[] = [
         {
             src: 'https://swx-trec.com/swx-trec-assets/general/swx-trec-logo-white.png',
-            href: 'https://www.colorado.edu/spaceweather/'
+            href: 'https://swx-trec.com'
         }
     ];
 
