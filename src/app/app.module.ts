@@ -1,11 +1,11 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { LaspBaseAppSnippetsModule } from 'lasp-base-app-snippets';
 import { LaspFooterModule } from 'lasp-footer';
 import { LaspNavModule } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
@@ -24,7 +24,7 @@ import { AwsService, ProfileNavService } from './services';
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
-        FlexLayoutModule,
+        LaspBaseAppSnippetsModule,
         LaspFooterModule,
         LaspNavModule,
         HttpClientModule,
