@@ -1,2 +1,2 @@
-@import 'node_modules/lasp-base-app-snippets/styles/app-component.scss';
-@include all();
+@use 'lasp-base-app-snippets/styles/app-component';
+@include app-component.all();
