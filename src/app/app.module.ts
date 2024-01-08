@@ -5,7 +5,6 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { LaspBaseAppSnippetsModule } from 'lasp-base-app-snippets';
 import { LaspFooterModule } from 'lasp-footer';
 import { LaspNavModule } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
@@ -24,7 +23,6 @@ import { AwsService, ProfileNavService } from './services';
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
-        LaspBaseAppSnippetsModule,
         LaspFooterModule,
         LaspNavModule,
         HttpClientModule,
