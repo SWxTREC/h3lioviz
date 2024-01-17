@@ -1,6 +1,5 @@
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { BrowserModule } from '@angular/platform-browser';
@@ -24,7 +23,6 @@ import { AwsService, ProfileNavService } from './services';
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
-        FlexLayoutModule,
         LaspFooterModule,
         LaspNavModule,
         HttpClientModule,
