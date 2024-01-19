@@ -28,7 +28,7 @@ import { AwsService, ProfileNavService } from './services';
         HttpClientModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
         MaterialModule,
-        RouterModule.forRoot( routes, { scrollPositionRestoration: 'enabled', relativeLinkResolution: 'legacy' } )
+        RouterModule.forRoot( routes, { scrollPositionRestoration: 'enabled' } )
     ],
     providers: [
         AuthGuard,
