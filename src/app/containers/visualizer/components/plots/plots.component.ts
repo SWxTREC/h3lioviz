@@ -123,7 +123,6 @@ export class PlotsComponent implements OnChanges {
     getImagePlot( imageIds: string[] ) {
         const imageDatasets = imageIds.map( imageId => this.createImageDataset( imageId ));
         const imagePlot: IPlot = {
-            collapsed: false,
             datasets: imageDatasets,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
@@ -138,7 +137,6 @@ export class PlotsComponent implements OnChanges {
     getModelPlot( groupVariable: string, index: number ) {
         const datasetGroup = this.createDatasetGroup( groupVariable );
         const modelPlot: IPlot = {
-            collapsed: false,
             datasets: datasetGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
             range: {
@@ -197,7 +195,6 @@ export class PlotsComponent implements OnChanges {
         const observedPlotOptions = DEFAULT_PLOT_OPTIONS as IMenuOptions;
         observedPlotOptions.yAxis.useMultipleAxes = true;
         const observedPlot: IPlot = {
-            collapsed: false,
             datasets: observedDatasets,
             initialOptions: observedPlotOptions,
             range: {

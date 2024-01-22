@@ -48,7 +48,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
             return value + '%';
         }
     };
-    renderDebouncer: Subject<string> = new Subject<string>();
+    renderDebouncer = new Subject<void>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];

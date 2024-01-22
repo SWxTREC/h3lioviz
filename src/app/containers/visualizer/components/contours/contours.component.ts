@@ -39,7 +39,7 @@ export class ContoursComponent implements OnInit, OnChanges {
         tickStep: INITIAL_TICK_STEP,
         ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
-    renderDebouncer: Subject<string> = new Subject<string>();
+    renderDebouncer = new Subject<void>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
