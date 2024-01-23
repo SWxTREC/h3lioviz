@@ -44,6 +44,8 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
 // set the UI features for H3lioViz
 export const H3LIO_PRESET: IUiFeatures = {
     toolbarButtons: [
+        ToolbarButtonId.displaySettings,
+        ToolbarButtonId.variables,
         ToolbarButtonId.downloadImage
     ],
     menuItems: {
@@ -53,7 +55,7 @@ export const H3LIO_PRESET: IUiFeatures = {
         globalSettings: false,
         limits: false,
         modifyDatasets: false,
-        overplotting: false
+        overplotting: true
     }
 };
 
