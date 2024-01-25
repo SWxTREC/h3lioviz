@@ -1,7 +1,6 @@
 import {
     AnalogAxisRangeType,
     AxisFormat,
-    DEFAULT_UI_OPTIONS,
     DiscreteAxisRangeType,
     IDataset,
     IMenuOptions,
