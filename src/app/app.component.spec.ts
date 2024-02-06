@@ -11,7 +11,7 @@ describe('AppComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             imports: [
-                RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+                RouterModule.forRoot(routes, {}),
                 LaspFooterModule,
                 LaspNavModule,
                 MaterialModule

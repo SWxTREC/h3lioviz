@@ -1,13 +1,13 @@
 import {
     AnalogAxisRangeType,
     AxisFormat,
-    DEFAULT_UI_OPTIONS,
     DiscreteAxisRangeType,
     IDataset,
     IMenuOptions,
     IPlotParams,
     IUiFeatures,
-    SeriesDisplayMode
+    SeriesDisplayMode,
+    ToolbarButtonId
 } from 'scicharts';
 import { environment, localUrls } from 'src/environments/environment';
 
@@ -42,21 +42,20 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
 
 // set the UI features for H3lioViz
 export const H3LIO_PRESET: IUiFeatures = {
-    featureList: DEFAULT_UI_OPTIONS.features.featureList,
-    toolbar: false,
-    filters: false,
-    metadata: false,
-    download: true,
-    globalSettings: false,
-    overplot: false,
-    limits: false,
-    events: false,
-    binnedData: false,
-    discreteData: false,
-    rangeSelector: false,
-    sliceSelector: false,
-    collapsible: false,
-    modifyDatasetsButton: false
+    toolbarButtons: [
+        ToolbarButtonId.displaySettings,
+        ToolbarButtonId.variables,
+        ToolbarButtonId.downloadImage
+    ],
+    menuItems: {
+        discreteData: false,
+        events: false,
+        filters: false,
+        globalSettings: false,
+        limits: false,
+        modifyDatasets: false,
+        overplotting: true
+    }
 };
 
 export const SATELLITE_NAMES = {
