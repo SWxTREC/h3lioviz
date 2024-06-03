@@ -23,13 +23,25 @@ Tagline: Explore solar wind models in three dimensions
 
 ## Related Projects
 
-NA
+GitHub organization: https://github.com/SWxTREC
 
-## Production URLs
+This is one of a suite of applications deployed to the SWx TREC Model Staging Platform at https://swx-trec.com.
+A definitive list of swx-trec apps can be found in the model file at https://bitbucket.lasp.colorado.edu/projects/WEBAPPS/repos/swx-trec/browse/src/app/models/swt-apps.ts as well as a list in Confluence at https://confluence.lasp.colorado.edu/x/6IOpCg
 
-<https://swx-trec.com/h3lioviz>
+## Design Source Files
+
+Find design source files in: smb://lasp-store/divisions/Mods/Data_Sys/Web/design/h3lioviz
+Shared assets for the SWT suite of applications are hosted in AWS at https://swx-trec.com/swx-trec-assets/general/
+
+## Deployed URLs
+
+Deployed site: https://swx-trec.com/h3lioviz
+Dev site: https://dev.swx-trec.com/h3lioviz
+Branch demos: https://dev.swx-trec.com/h3lioviz/`<branch-name>`/DEMO/
 
 ## Necessary Permissions
+
+Jenkins jobs are used to deploy the application and the application is built on internal libraries, so development needs to be done behind the firewall.
 
 Access to AWS S3 console is currently required to deploy.
 
@@ -101,6 +113,8 @@ When you are ready to push your image, contact the web team infrastructure group
 
 ## Deploy H3lioViz
 Be sure to `npm run lint && npm test` before merging to the `dev` branch.
+
+When a PR is created, the branch is served, and can be reviewed, outside of the LASP network at https://dev.swx-trec.com/h3lioviz/`<branch-name>`/DEMO/. The branch deploy will update with changes to the branch code.
 
 Merges to the `dev` branch will automatically be deployed to <https://dev.swx-trec.com/h3lioviz>. This is the `dev` deploy in the AWS environment and the contents of the `dev` branch will be reflected there.
 
