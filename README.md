@@ -39,6 +39,8 @@ This is a visualizer for the 3D heliosphere model built with Angular.
 
 ## Running H3lioViz Locally
 
+Use Node 18 when developing this project.
+
 See 'Development server' below.
 
 ### Project Dependencies

@@ -9,7 +9,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class OrientationMenuComponent implements OnDestroy {
     @Input() pvView: any;
-    renderDebouncer: Subject<string> = new Subject<string>();
+    renderDebouncer = new Subject<void>();
     subscriptions: Subscription[] = [];
 
     constructor() {
