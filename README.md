@@ -98,10 +98,11 @@ Cleaning up old images is also a good idea from time to time. To clean up your u
 When you are ready to push your image, contact the web team infrastructure group for credentials and instructions on how to log in. Once this is complete you can run `./dockerctl.sh p` to publish your image to the server.
 
 ## Deploy H3lioViz
+Be sure to `npm run lint && npm test` before merging to the `dev` branch.
 
 Merges to the `dev` branch will automatically be deployed to <https://dev.swx-trec.com/h3lioviz>. This is the `dev` deploy in the AWS environment and the contents of the `dev` branch will be reflected there.
 
-Be sure to `npm run lint && npm test` before merging to the `dev` branch.
+To manually trigger a deploy of the dev branch, run this job: https://jenkins-build.lasp.colorado.edu/job/swx-h3lioviz-dev/
 
 ### Version and release
 
