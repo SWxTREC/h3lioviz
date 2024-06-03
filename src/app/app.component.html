@@ -6,6 +6,16 @@
     smallLogoSrc="assets/images/swt-logo-small.png">
 </lasp-nav>
 
+<lasp-full-page-overlay
+    heading="This is the development version of the site"
+    moreInformation="Features here are being tested and are not indicative of how the official website will function."
+    redirectText="Take me to the official website!"
+    [redirectUrl]="prodUrl"
+    dismissText="Continue to the development site"
+    [showOverlay]="showBanner"
+    (overlayDismissed)="dismissBanner()"
+></lasp-full-page-overlay>
+
 <div class="page-content">
     <!-- Routed components go here -->
     <router-outlet></router-outlet>

@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { LaspFooterModule } from 'lasp-footer';
+import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 import { LaspNavModule } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
 
@@ -24,6 +25,7 @@ import { AwsService, ProfileNavService } from './services';
         BrowserAnimationsModule,
         FormsModule,
         LaspFooterModule,
+        LaspFullPageOverlayModule,
         LaspNavModule,
         HttpClientModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
