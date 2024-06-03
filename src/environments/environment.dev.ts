@@ -23,6 +23,7 @@ export const environment = {
             identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
         }
     },
+    dev: true,
     googleAnalyticsId: '', // intentionally empty; don't try to track usage during development
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
