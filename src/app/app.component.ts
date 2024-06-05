@@ -10,6 +10,7 @@ import {
     ISocialLink,
     IVersion
 } from 'lasp-footer';
+import packageInfo from 'package.json';
 
 import { environment } from '../environments/environment';
 
@@ -20,7 +21,12 @@ import { environment } from '../environments/environment';
     styleUrls: [ './app.component.scss' ]
 })
 export class AppComponent {
-
+    prodUrl = 'https://swx-trec.com/' + packageInfo.name;
+    isDeployedDev = environment.dev === true && environment.production === true;
+    storageTimestamp: number = +localStorage.getItem(packageInfo.name); // evaluates to 0 if storage is empty
+    dismissed = this.storageTimestamp + (1000 * 60 * 60 * 24 * 7) > Date.now();
+    // show banner if on deployed dev site and banner has not been dismissed by user in past week
+    showBanner = this.isDeployedDev && !this.dismissed;
     // please have no more than 7 items in the nav menu
     navItems: INavItem[] = [
         {
@@ -75,5 +81,10 @@ export class AppComponent {
         this._snippets.appComponent.all({ googleAnalyticsId: environment.googleAnalyticsId });
 
         this._matIconRegistry.addSvgIconSet( this._domSanitizer.bypassSecurityTrustResourceUrl('assets/chart/chart-icons.svg'));
+    }
+
+    dismissBanner() {
+        localStorage.setItem(packageInfo.name, JSON.stringify(Date.now()));
+        this.showBanner = false;
     }
 }
