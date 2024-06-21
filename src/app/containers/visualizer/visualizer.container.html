@@ -2,16 +2,16 @@
     <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="openControls = false; setControlPanel()">
         <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
     </mat-drawer>
-<div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
-    <ng-container *ngIf="errorMessage">
-        <p class="viz__error">{{ errorMessage }}</p>
-        <button mat-raised-button color="primary" (click)="refresh()">Retry connection</button>
-    </ng-container>
-    <swt-server-status *ngIf="!errorMessage"></swt-server-status>
-    <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
-    <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
-    <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
-</div>
+    <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
+        <ng-container *ngIf="errorMessage">
+            <p class="viz__error">{{ errorMessage }}</p>
+            <button mat-raised-button color="primary" (click)="refresh()">Retry connection</button>
+        </ng-container>
+        <swt-server-status *ngIf="!errorMessage"></swt-server-status>
+        <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
+        <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
+        <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
+    </div>
     <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
         <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
             <as-split-area

@@ -30,8 +30,10 @@ export interface ISiteConfig {
     plots: IPlotParams[];
     runId: string;
     timeIndexMap: { [parameter: string]: number };
+    // visualization dimensions
     vDimensions: [ number, number ];
     vPanelSettings: [ boolean, boolean ];
+    // window dimensions
     wDimensions: [ number, number ];
     zoomState: 'on' | 'off';
 }
