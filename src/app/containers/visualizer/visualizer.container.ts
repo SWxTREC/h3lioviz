@@ -118,7 +118,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const configFromStorageOrDefault: ISiteConfig = {} as ISiteConfig;
             Object.keys( DEFAULT_SITE_CONFIG ).forEach( parameter => {
                 const paramValue = this._siteConfigService.getParamFromStorage(ConfigLabels[parameter]);
-                if ( !isEmpty(paramValue) && !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue) ) {
+                if (
+                    !isEmpty(paramValue) &&
+                    !isEqual(DEFAULT_SITE_CONFIG[ ConfigLabels[parameter]], paramValue)
+                ) {
                     configFromStorageOrDefault[ ConfigLabels[parameter]] = paramValue;
                 } else {
                     configFromStorageOrDefault[ ConfigLabels[parameter] ] = DEFAULT_SITE_CONFIG[ ConfigLabels[parameter] ];
@@ -264,9 +267,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     /** Use the config from Url -> Storage -> Defaults to initialize the site */
     initializeSiteConfig( config: ISiteConfig ) {
         // this runs once on init, do tasks that need doing here
-        this.siteConfig = config;
         // setSiteConfig here instead of update since we are initializing
         this._siteConfigService.setSiteConfig( config );
+        // get full siteConfig
+        this.siteConfig = this._siteConfigService.getSiteConfig();
         if ( config[ ConfigLabels.runId ] ) {
             this.runId$.next( config[ ConfigLabels.runId ] );
         }
