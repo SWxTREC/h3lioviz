@@ -14,12 +14,15 @@ import { environment, localUrls } from 'src/environments/environment';
 import { COLOR_FORM_DEFAULT_VALUES } from './control-panel';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
+    annotations: { show: false },
+    comments: { hideWhenEmpty: true },
     dataDisplay: {
         seriesDisplayMode: SeriesDisplayMode.lines,
         allowGaps: true,
         thresholdRatio: 5,
         maxLegendPrecision: 0
     },
+    legend: 'minimal',
     useGlobalSettings: false,
     view: {
         navigator: false,
@@ -42,6 +45,8 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
 
 // set the UI features for H3lioViz
 export const H3LIO_PRESET: IUiFeatures = {
+    dragHandle: false,
+    panning: false,
     toolbarButtons: [
         ToolbarButtonId.displaySettings,
         ToolbarButtonId.variables,
@@ -231,6 +236,6 @@ export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
                 rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
             }
         ],
-        options: {}
+        options: DEFAULT_PLOT_OPTIONS
     }
 ];

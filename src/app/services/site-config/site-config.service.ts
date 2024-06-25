@@ -22,8 +22,10 @@ export class SiteConfigService {
         private _plotsService: PlotsService
     ) {
         // update site config with plot changes
-        this._plotsService.getPlots$().subscribe(() => {
+        this._plotsService.getPlots$().subscribe((plots) => {
             const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
+            // in stackedMode, remove the last plot (the x-axis plot) from the config
+            changedParams.plots.pop();
             this.updateSiteConfig({ plots: changedParams.plots});
         });
     }
@@ -81,7 +83,6 @@ export class SiteConfigService {
                 sessionStorage.setItem( key, jsonConfig[ key ] );
             }
         }
-
         // alert components of changes to the site config
         this.config$.next( minConfig );
         if (updateUrl) {
