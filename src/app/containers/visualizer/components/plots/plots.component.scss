@@ -3,8 +3,10 @@
     flex-direction: column;
     height: 100%;
     &__controls {
-        > *:not(last) {
-            margin-right: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        > * {
+            width: 30%
         }
     }
     &__filler {
