@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { cloneDeep } from 'lodash';
 import { debounceTime } from 'rxjs/operators';
 import {
     IDataset,
@@ -7,8 +8,10 @@ import {
     IMenuOptions,
     IPlot,
     IPlotParams,
+    MenuOptionsService,
     PlotsService,
-    UiOptionsService
+    UiOptionsService,
+    XRangeService
 } from 'scicharts';
 import {
     DEFAULT_PLOT_OPTIONS,
@@ -44,28 +47,39 @@ export class PlotsComponent implements OnChanges {
 
     constructor(
         private _imageViewerService: ImageViewerService,
+        private _menuOptionsService: MenuOptionsService,
         private _plotsService: PlotsService,
-        private _uiOptionsService: UiOptionsService
+        private _uiOptionsService: UiOptionsService,
+        private _xRangeService: XRangeService
     ) {
-        // this is needed to show values in the legend
-        this._plotsService.enableCrosshairSync();
-        this._imageViewerService.setImageViewerSync( true );
+        this._menuOptionsService.setGlobalMenuOptions( cloneDeep(DEFAULT_PLOT_OPTIONS) );
+        const uiOptions = this._uiOptionsService.getUiOptions();
+        uiOptions.minimumPlotHeight = 50;
+        uiOptions.stackedMode = true;
+        uiOptions.gridHeightCorrection = 200;
+        this._uiOptionsService.setUiOptions( uiOptions );
+        // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
+
+        this._plotsService.enableCrosshairSync();
+        this._xRangeService.enableZoomSyncByVariable( true, 'time' );
+        this._imageViewerService.setImageViewerSync( true );
+
         this.plotForm.valueChanges.pipe( debounceTime(1000) ).subscribe( newValue => {
-            // reset the plot list
-            this._plotsService.setPlots([]);
+            const plotList = [];
             if ( newValue.image?.length ) {
-                this.getImagePlot( newValue.image );
+                plotList.push(this.getImagePlot( newValue.image ));
             }
             if ( newValue.model?.length) {
                 newValue.model.forEach( (variable: string, index: number) => {
-                    this.getModelPlot(variable, index);
+                    plotList.push(this.getModelPlot(variable, index));
                 });
             }
             if ( newValue.observed?.length ) {
-                this.getObservedPlot( newValue.observed );
+                plotList.push(this.getObservedPlot( newValue.observed ));
             }
+            this._plotsService.setPlots( plotList );
         });
     }
 
@@ -131,7 +145,7 @@ export class PlotsComponent implements OnChanges {
             },
             type: 'IMAGE'
         };
-        this._plotsService.addPlot( imagePlot );
+        return imagePlot;
     }
 
     getModelPlot( groupVariable: string, index: number ) {
@@ -144,7 +158,7 @@ export class PlotsComponent implements OnChanges {
                 end: this.timeRange[1] * 1000
             }
         };
-        this._plotsService.addPlot( modelPlot );
+        return modelPlot;
     }
 
     createObservedDataset( instrument: string, variables: string[] ) {
@@ -202,7 +216,7 @@ export class PlotsComponent implements OnChanges {
                 end: this.timeRange[1] * 1000
             }
         };
-        this._plotsService.addPlot( observedPlot );
+        return observedPlot;
     }
 
     /** returns a value that can be used to set the plot form value */
