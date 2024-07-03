@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class DocsComponent implements OnInit {
     keyboardShortcuts: IKeyboard[] = KEYBOARD_SHORTCUTS;
-    isDev = environment.dev = true;
+    isDev = environment.dev === true;
     moreInfoHref = `https://${this.isDev ? 'dev' : ''}.swx-trec.com`;
 
     constructor() { }
