@@ -12,7 +12,7 @@
 // the initial variable declarations with the palettes need to be repeated from the theme file
 
 $primary:                   mat-palette($swt-blue, 400);
-$accent:                    mat-palette($left-planet, 500, 300, 700);
+$accent:                    mat-palette($swt-sky, 300, 500, 700);
 $warn:                      mat-palette($lasp-red, 400, 500, 700);
 
 $color-primary:             mat-color($primary);

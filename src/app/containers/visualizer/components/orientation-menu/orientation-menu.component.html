@@ -1,29 +1,31 @@
 <button mat-icon-button matTooltip="Orientation" class="orientation__icon mat-elevation-z2" #orientationTrigger="matMenuTrigger" [matMenuTriggerFor]="orientationMenu" aria-label="layers menu button">
     <mat-icon>language</mat-icon>
 </button>
-<mat-menu #orientationMenu class="orientation" xPosition="after">
-    <span class="orientation__header">
-        Snap to view:
-    </span>
-    <div class="form__row">
-        <div class="orientation__option">
-            <button class="mat-elevation-z2" mat-button sciStopClick>
-                <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
-            </button>
-            Ecliptic
+<mat-menu #orientationMenu xPosition="after">
+    <div class="orientation__menu" >
+        <span class="orientation__header">
+            Snap to view:
+        </span>
+        <div class="form__row">
+            <div class="orientation__option">
+                <button class="mat-elevation-z2" mat-button sciStopClick>
+                    <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
+                </button>
+                Ecliptic
+            </div>
+            <div class="orientation__option">
+                <button class="mat-elevation-z2" mat-button sciStopClick>
+                    <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
+                </button>
+                Meridional
+            </div>
+            <div class="orientation__option">
+                <button class="mat-elevation-z2" mat-button sciStopClick>
+                    <img src="assets/images/oblique.png" (click)="snapTo('initial')">
+                </button>
+                Oblique
+            </div>
         </div>
-        <div class="orientation__option">
-            <button class="mat-elevation-z2" mat-button sciStopClick>
-                <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
-            </button>
-            Meridional
-        </div>
-        <div class="orientation__option">
-            <button class="mat-elevation-z2" mat-button sciStopClick>
-                <img src="assets/images/oblique.png" (click)="snapTo('initial')">
-            </button>
-            Oblique
-        </div>
+        <button sciStopClick class="orientation__button" mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
     </div>
-    <button sciStopClick class="orientation__button" mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
 </mat-menu>
