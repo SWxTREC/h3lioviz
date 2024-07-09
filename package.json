@@ -16,7 +16,7 @@
     "lint:fix": "ng lint --fix",
     "lint:watch": "nodemon --exec \"ng lint\" --ext ts --ignore node_modules/",
     "e2e": "ng e2e",
-    "preversion": "ng lint && ng test -- --no-watch --no-progress",
+    "preversion": "ng lint && ng test --no-watch --no-progress",
     "postinstall": "ngcc",
     "postversion": "git push && git push --tags && git checkout dev && git merge origin/main && git push"
   },
