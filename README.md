@@ -133,4 +133,4 @@ This will:
 
 ### Deploy production to AWS
 
-To make a production build and deploy to AWS, run this Jenkins job https://jenkins-build.lasp.colorado.edu/job/swx-trec-prod/.
+To make a production build and deploy to AWS, run this Jenkins job https://jenkins-build.lasp.colorado.edu/job/swx-h3lioviz-prod/.
