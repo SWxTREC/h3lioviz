@@ -131,6 +131,6 @@ This will:
 * push the changes and the new tag to the remote repo
 * merge the version changes back into the dev branch
 
-### Deploy to AWS
+### Deploy production to AWS
 
-Run this Jenkins job https://jenkins-build.lasp.colorado.edu/job/swx-h3lioviz-prod/ to make a production build. Currently there is a manual step to deploy to the production AWS environment. Notify Brian McClellan or Greg Lucas to do this step. In future this will be automated.
+To make a production build and deploy to AWS, run this Jenkins job https://jenkins-build.lasp.colorado.edu/job/swx-trec-prod/.
