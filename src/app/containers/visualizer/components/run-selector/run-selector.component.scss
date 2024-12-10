@@ -4,17 +4,17 @@
     padding: 0.25rem 1rem;
     display: flex;
     flex-direction: column;
-    .mat-cell {
+    .mat-mdc-cell {
         padding: 4px;
     }
-    .mat-header-cell {
+    .mat-mdc-header-cell {
         padding: 4px;
     }
-    .mat-row:hover {
+    .mat-mdc-row:hover {
         background: #eee;
         cursor: pointer;
     }
-    .mat-row.highlighted {
+    .mat-mdc-row.highlighted {
       background: #ccc;
     }
 }

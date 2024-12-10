@@ -1,8 +1,8 @@
 @use '@angular/material' as mat;
 @import './theme-palette';
 
-@include mat.all-legacy-component-typographies();
-@include mat.legacy-core();
+@include mat.all-component-typographies();
+@include mat.core();
 $typography: mat.define-typography-config();
 
 $theme: mat.define-light-theme((
@@ -15,18 +15,5 @@ $theme: mat.define-light-theme((
     density: 0
 ));
 
-$theme-dark: mat.define-dark-theme((
-    color: (
-        primary: $primary-dark,
-        accent: $accent-dark,
-        warn: $warn-dark
-    ),
-    typography: $typography,
-    density: 0
-));
+@include mat.all-component-themes( $theme );
 
-@include mat.all-legacy-component-themes( $theme );
-
-.lasp-dark-theme {
-    @include mat.all-legacy-component-colors( $theme-dark );
-}

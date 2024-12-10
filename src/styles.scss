@@ -12,8 +12,8 @@
     'success-color': $color-success,
     'background-color': #53576D,
 
-    'link-color': mat-color( $primary, 200 ),
-    'heading-color': mat-color( $primary, 500 )
+    'link-color': $color-primary,
+    'heading-color': $color-primary
 ));
 
 // you can add color variables from other libraries/name-spaces here as well
@@ -31,7 +31,7 @@
     }
 }
 
-.mat-card-title {
+.mat-mdc-card-title {
     color: $color-primary;
 }
 
