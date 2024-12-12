@@ -1,52 +1,72 @@
 <mat-drawer-container [hasBackdrop]="splitDirection === 'vertical'">
     <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="openControls = false; setControlPanel()">
-        <swt-control-panel *ngIf="(runId$ | async)" [pvView]="pvView"></swt-control-panel>
+        @if ((runId$ | async)) {
+            <swt-control-panel [pvView]="pvView"></swt-control-panel>
+        }
     </mat-drawer>
-    <div *ngIf="!validConnection" class="viz__loading viz__loading--disconnect">
-        <ng-container *ngIf="errorMessage">
-            <p class="viz__error">{{ errorMessage }}</p>
-            <button mat-raised-button color="primary" (click)="refresh()">Retry connection</button>
-        </ng-container>
-        <swt-server-status *ngIf="!errorMessage"></swt-server-status>
-        <p *ngIf="!errorMessage && !pvServerStarted">{{waitingMessage}}</p>
-        <p *ngIf="!errorMessage && pvServerStarted">connecting to websocket…</p>
-        <mat-spinner *ngIf="!errorMessage" color="primary" diameter="40"></mat-spinner>
-    </div>
+    @if (!validConnection) {
+        <div class="viz__loading viz__loading--disconnect">
+            @if (errorMessage) {
+                <p class="viz__error">{{ errorMessage }}</p>
+                <button mat-raised-button color="primary" (click)="refresh()">Retry connection</button>
+            }
+            @if (!errorMessage) {
+                <swt-server-status></swt-server-status>
+            }
+            @if (!errorMessage && !pvServerStarted) {
+                <p>{{waitingMessage}}</p>
+            }
+            @if (!errorMessage && pvServerStarted) {
+                <p>connecting to websocket…</p>
+            }
+            @if (!errorMessage) {
+                <mat-spinner color="primary" diameter="40"></mat-spinner>
+            }
+        </div>
+    }
     <div class="viz" [style.height]="componentMaxHeight + 'px'" [class.viz__fade]="!validConnection">
         <as-split unit="pixel" [direction]="splitDirection" (dragEnd)="dragEnd($event)">
             <as-split-area
-            class="viz__panel viz__panel--full-width"
-            [size]="vizPanelSize"
-            [minSize]="controlPanelSize + 60"
-            [order]="0">
-                <mat-toolbar class="viz__toolbar" *ngIf="runId$ | async">
-                    <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
-                        {{ openControls ? 'Hide' : 'Show' }} Controls
-                    </button>
-                    <button mat-button matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
-                        {{ showTitle ? runTitle : 'Select' }}
-                            <mat-icon>
-                                keyboard_arrow_down
-                            </mat-icon>
-                    </button>
-                    <!-- remove div and reinstate button when plots are saved in a service -->
-                    <div></div>
-                    <!-- <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
-                        {{ openPlots ? 'Hide' : 'Show' }} Plots
-                    </button> -->
-                </mat-toolbar>
+                class="viz__panel viz__panel--full-width"
+                [size]="vizPanelSize"
+                [minSize]="controlPanelSize + 60"
+                [order]="0">
+                    @if (runId$ | async) {
+                        <mat-toolbar class="viz__toolbar">
+                            <button mat-raised-button color="primary" aria-label="toggle control panel" (click)="toggleControlPanel()">
+                                {{ openControls ? 'Hide' : 'Show' }} Controls
+                            </button>
+                            <button mat-button matTooltip="Select model run" matTooltipPosition="above" (click)="openDialog()">
+                                {{ showTitle ? runTitle : 'Select' }}
+                                <mat-icon>
+                                    keyboard_arrow_down
+                                </mat-icon>
+                            </button>
+                            <!-- remove div and reinstate button when plots are saved in a service -->
+                            <div></div>
+                            <!-- <button *ngIf="splitDirection === 'horizontal'" mat-raised-button color="primary" aria-label="toggle plots panel" (click)="togglePlotsPanel()">
+                                {{ openPlots ? 'Hide' : 'Show' }} Plots
+                            </button> -->
+                        </mat-toolbar>
+                    }
                 <div class="viz__container">
-                    <mat-hint *ngIf="validConnection" class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
-                    <div class="viz__overlay" *ngIf="runId$ | async">
-                        <div class="viz__menus">
-                            <swt-mouse-zoom [pvView]="pvView"></swt-mouse-zoom>
-                            <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
+                    @if (validConnection) {
+                        <mat-hint class="viz__error viz__error--warn">{{ errorMessage }}</mat-hint>
+                    }
+                    @if (runId$ | async) {
+                        <div class="viz__overlay">
+                            <div class="viz__menus">
+                                <swt-mouse-zoom [pvView]="pvView"></swt-mouse-zoom>
+                                <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
+                            </div>
+                            <swt-hints class="viz__hints"></swt-hints>
+                            @if (loading) {
+                                <div class="viz__loading">
+                                    <mat-spinner color="accent" diameter="40"></mat-spinner>
+                                </div>
+                            }
                         </div>
-                        <swt-hints class="viz__hints"></swt-hints>
-                        <div *ngIf="loading" class="viz__loading">
-                            <mat-spinner color="accent" diameter="40"></mat-spinner>
-                        </div>
-                    </div>
+                    }
                     <div #pvContent
                         class="viz__pv"
                         [class.viz__pv--empty]="(runId$ | async) == null"
@@ -55,11 +75,17 @@
                         [style.height]="vizDimensions[1] + 'px'">
                     </div>
                 </div>
-                <swt-time-player *ngIf="timeTicks?.length && (runId$ | async)" [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+                @if (timeTicks?.length && (runId$ | async)) {
+                    <swt-time-player [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+                }
             </as-split-area>
-            <as-split-area class="viz__panel" *ngIf="openPlots || splitDirection === 'vertical' " [size]="$any('*')" [order]="1">
-                <swt-plots *ngIf="timeTicks?.length && (runId$ | async)" [runId]="runId$ | async" [plotConfig]="plotConfig" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
-            </as-split-area>
+            @if (openPlots || splitDirection === 'vertical' ) {
+                <as-split-area class="viz__panel" [size]="$any('*')" [order]="1">
+                    @if (timeTicks?.length && (runId$ | async)) {
+                        <swt-plots [runId]="runId$ | async" [plotConfig]="plotConfig" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+                    }
+                </as-split-area>
+            }
         </as-split>
     </div>
 </mat-drawer-container>

@@ -14,13 +14,12 @@
 
         <h2>Keyboad tips for panning</h2>
         <dl>
-            <ng-container *ngFor="let shortcut of keyboardShortcuts">
+            @for (shortcut of keyboardShortcuts; track shortcut) {
                 <dt>{{shortcut.action}}</dt>
                 <dd>{{shortcut.instruction}}</dd>
-            </ng-container>
+            }
         </dl>
 
         <markdown [src]="'assets/markdown/DOCUMENTATION.md'"></markdown>
     </mat-card-content>
-
 </mat-card>

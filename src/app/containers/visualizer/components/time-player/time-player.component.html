@@ -7,8 +7,8 @@
         [min]="0"
         [max]="timeTicks.length - 1"
         aria-label="time-selector"
-     #ngSlider>
-     <input matSliderThumb (change)="newTimestep({ value: timeIndex })" #ngSliderThumb="matSliderThumb" [(value)]= "timeIndex" />
+        #ngSlider>
+        <input matSliderThumb (change)="newTimestep({ value: timeIndex })" #ngSliderThumb="matSliderThumb" [(value)]= "timeIndex" />
     </mat-slider>
     <div class="time-player__slider-labels">
         <div class="time-player__slider-label">
@@ -19,7 +19,11 @@
         </div>
     </div>
     <div class="time-player__controls" (click)="togglePlay()">
-        <mat-icon *ngIf="!playing">play_arrow</mat-icon>
-        <mat-icon *ngIf="playing">pause</mat-icon>
+        @if (!playing) {
+            <mat-icon>play_arrow</mat-icon>
+        }
+        @if (playing) {
+            <mat-icon>pause</mat-icon>
+        }
     </div>
 </div>

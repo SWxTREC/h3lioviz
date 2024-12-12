@@ -2,13 +2,15 @@
     <mat-checkbox class="form__spacer" color="primary" formControlName="cmeContours">
         Contour surfaces
     </mat-checkbox>
-    <ng-container *ngIf="contours.value.cmeContours">
+    @if (contours.value.cmeContours) {
         <mat-form-field>
             <mat-label>Contour variable</mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
-                <mat-option *ngFor="let variable of variableConfigurations | keyvalue" [value]="variable.value">
-                    {{ variable.value.displayName }}
-                </mat-option>
+                @for (variable of variableConfigurations | keyvalue; track variable) {
+                    <mat-option [value]="variable.value">
+                        {{ variable.value.displayName }}
+                    </mat-option>
+                }
             </mat-select>
         </mat-form-field>
         <mat-form-field>
@@ -30,5 +32,5 @@
                 {{ contourArray | json }}
             </div>
         </div>
-    </ng-container>
+    }
 </form>

@@ -2,27 +2,35 @@
     Select a model run:
 </h2>
 <table mat-table [dataSource]="tableData" matSort multiTemplateDataRows>
-    <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
-        <ng-container *ngIf="column !== 'more'">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column] }} </th>
-            <td mat-cell *matCellDef="let run" > {{ run[column] }} </td>
+    @for (column of displayedColumns; track column) {
+        <ng-container [matColumnDef]="column">
+            @if (column !== 'more') {
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column] }} </th>
+                <td mat-cell *matCellDef="let run" > {{ run[column] }} </td>
+            }
+            @if (column === 'more') {
+                <th mat-header-cell *matHeaderCellDef> More info </th>
+                <td mat-cell *matCellDef="let run" (click)="expandedRun = expandedRun === run ? null : run">
+                    @if (expandedRun !== run) {
+                        <mat-icon class="selector-table__info">info</mat-icon>
+                    }
+                    @if (expandedRun === run) {
+                        <mat-icon>keyboard_arrow_up</mat-icon>
+                    }
+                </td>
+            }
         </ng-container>
-        <ng-container *ngIf="column === 'more'">
-            <th mat-header-cell *matHeaderCellDef> More info </th>
-            <td mat-cell *matCellDef="let run" (click)="expandedRun = expandedRun === run ? null : run">
-                <mat-icon *ngIf="expandedRun !== run" class="selector-table__info">info</mat-icon>
-                <mat-icon *ngIf="expandedRun === run">keyboard_arrow_up</mat-icon>
-            </td>
-        </ng-container>
-    </ng-container>
+    }
     <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
     <ng-container matColumnDef="moreDetail">
         <td mat-cell *matCellDef="let run" [attr.colspan]="displayedColumns.length">
             <div class="selector-table__expand" [@detailExpand]="expandedRun === run ? 'expanded' : 'collapsed'" >
                 <div class="selector-table__more">
-                    <div *ngFor="let item of allMetadata" >
-                        <strong>{{ item }}{{ headers[item] ? ' ("' + headers[item] + '")' : null }}: </strong> {{ run[item ]}}
-                    </div>
+                    @for (item of allMetadata; track item) {
+                        <div >
+                            <strong>{{ item }}{{ headers[item] ? ' ("' + headers[item] + '")' : null }}: </strong> {{ run[item ]}}
+                        </div>
+                    }
                 </div>
             </div>
         </td>
@@ -32,7 +40,7 @@
     <tr mat-row *matRowDef="let run; columns: displayedColumns;"
         [class.highlighted]="selection.isSelected(run)"
         (click)="newSelection(run); expandedRun === run ? expandedRun = run : expandedRun = null"
-    >
+        >
     </tr>
     <tr mat-row *matRowDef="let detail; columns: ['moreDetail']" class="selector-table__detail"></tr>
 </table>
