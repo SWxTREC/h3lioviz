@@ -34,7 +34,7 @@ import { RunSelectorDialogComponent } from './components';
 // change these values if the height of the header or footer changes
 const headerFooterHeight = 44 + 28;
 // height of components attached to the viz, currently the player and the toolbar
-const vizAccessoriesHeight = 81 + 45;
+const vizAccessoriesHeight = 112 + 45;
 
 @Component({
     selector: 'swt-visualizer',

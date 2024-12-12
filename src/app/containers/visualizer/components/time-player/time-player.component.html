@@ -18,7 +18,7 @@
             {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
         </div>
     </div>
-    <div (click)="togglePlay()">
+    <div class="time-player__controls" (click)="togglePlay()">
         <mat-icon *ngIf="!playing">play_arrow</mat-icon>
         <mat-icon *ngIf="playing">pause</mat-icon>
     </div>
