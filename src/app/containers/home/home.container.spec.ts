@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
 import { AwsService, ProfileNavService } from 'src/app/services';
 
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.container';
+import { provideRouter } from '@angular/router';
 
 describe('HomeComponent', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,12 +25,12 @@ describe('HomeComponent', () => {
                 HomeRoutingModule,
                 HttpClientTestingModule,
                 MaterialModule,
-                RouterTestingModule
             ],
             declarations: [ HomeComponent ],
             providers: [
                 AwsService,
-                ProfileNavService
+                ProfileNavService,
+                provideRouter([])
             ]
         });
         httpClient = TestBed.inject(HttpClient);

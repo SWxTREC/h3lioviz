@@ -2,7 +2,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterTestingModule } from '@angular/router/testing';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
 import { LaspFooterModule } from 'lasp-footer';
@@ -22,6 +21,7 @@ import {
     TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
+import { provideRouter } from '@angular/router';
 
 describe('VisualizerComponent', () => {
     let component: VisualizerComponent;
@@ -45,7 +45,6 @@ describe('VisualizerComponent', () => {
                 BrowserAnimationsModule,
                 ComponentsModule,
                 HttpClientTestingModule,
-                RouterTestingModule,
                 ReactiveFormsModule,
                 LaspFooterModule,
                 MaterialModule,
@@ -54,7 +53,8 @@ describe('VisualizerComponent', () => {
             ],
             providers: [
                 AwsService,
-                ProfileNavService
+                ProfileNavService,
+                provideRouter([])
             ]
         })
     .compileComponents();

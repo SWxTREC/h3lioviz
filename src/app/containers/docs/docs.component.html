@@ -1,21 +1,26 @@
 <mat-card class="documentation">
-    <mat-card-title>Next Generation 3D Solar Wind Interactive Data Visualizations</mat-card-title>
-    <p>This website is part of an initial deployment and proof of concept to: </p>
-    <ul>
-        <li>develop an initial application to enable full 3D visualization of solar wind model output</li>
-        <li>deploy and run the solar wind models in the SWx TREC Cloud-based computing environment alongside the visualization tool</li>
-        <li>bring about effective collaborative use in forecasting offices</li>
-    </ul>
+    <mat-card-header>
+        <mat-card-title>Next Generation 3D Solar Wind Interactive Data Visualizations</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <p>This website is part of an initial deployment and proof of concept to: </p>
+        <ul>
+            <li>develop an initial application to enable full 3D visualization of solar wind model output</li>
+            <li>deploy and run the solar wind models in the SWx TREC Cloud-based computing environment alongside the visualization tool</li>
+            <li>bring about effective collaborative use in forecasting offices</li>
+        </ul>
 
-    <p>Further features and enhancements to come. Learn more and get in touch via the <a target="_blank" [href]="moreInfoHref">SWx TREC site</a>.</p>
+        <p>Further features and enhancements to come. Learn more and get in touch via the <a target="_blank" [href]="moreInfoHref">SWx TREC site</a>.</p>
 
-    <h2>Keyboad tips for panning</h2>
-    <dl>
-        <ng-container *ngFor="let shortcut of keyboardShortcuts">
-            <dt>{{shortcut.action}}</dt>
-            <dd>{{shortcut.instruction}}</dd>
-        </ng-container>
-    </dl>
+        <h2>Keyboad tips for panning</h2>
+        <dl>
+            <ng-container *ngFor="let shortcut of keyboardShortcuts">
+                <dt>{{shortcut.action}}</dt>
+                <dd>{{shortcut.instruction}}</dd>
+            </ng-container>
+        </dl>
 
-    <markdown [src]="'assets/markdown/DOCUMENTATION.md'"></markdown>
+        <markdown [src]="'assets/markdown/DOCUMENTATION.md'"></markdown>
+    </mat-card-content>
+
 </mat-card>

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
 import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
 import { LaspEnhancedSelectModule } from 'lasp-enhanced-select';
@@ -23,7 +24,6 @@ import {
 } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
 import { VisualizerComponent } from './visualizer.container';
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
     imports: [

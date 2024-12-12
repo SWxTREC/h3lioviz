@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from 'src/app/modules';
 
 import { MouseZoomComponent } from './mouse-zoom.component';
+import { provideRouter } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('MouseZoomComponent', () => {
     let component: MouseZoomComponent;
@@ -12,8 +13,11 @@ describe('MouseZoomComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [ MouseZoomComponent ],
             imports: [
-                MaterialModule,
-                RouterTestingModule
+                HttpClientTestingModule,
+                MaterialModule
+            ],
+            providers: [
+                provideRouter([])
             ]
         })
     .compileComponents();

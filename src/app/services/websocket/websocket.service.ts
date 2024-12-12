@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { environmentConfig } from 'src/environments/environment';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import vtkWSLinkClient from 'vtk.js/Sources/IO/Core/WSLinkClient';
 import vtkRemoteView from 'vtk.js/Sources/Rendering/Misc/RemoteView';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import SmartConnect from 'wslink/src/SmartConnect';
 
 import { AwsService } from '../aws/aws.service';
@@ -34,7 +36,7 @@ export class WebsocketService {
             }
         });
     }
-        
+
     connectToSocket(): void {
         // set up websocket
         vtkWSLinkClient.setSmartConnectClass(SmartConnect);
@@ -46,7 +48,7 @@ export class WebsocketService {
             const message = ( httpReq?.response?.error ) || `Connection error`;
             this.errorMessage$.next(message);
         });
-        
+
         // Close
         clientToConnect.onConnectionClose(( httpReq: { response: { error: any } } ) => {
             this.validConnection$.next( false );
@@ -67,7 +69,7 @@ export class WebsocketService {
             // validate connection after pvView is initialized
             this.validConnection$.next( true );
         });
-        
+
         const config = environmentConfig;
         // TODO?: after login, access clientId and client credentials to this config: config?
 

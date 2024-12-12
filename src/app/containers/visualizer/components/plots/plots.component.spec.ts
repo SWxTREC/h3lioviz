@@ -5,6 +5,7 @@ import { GridComponent } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { PlotsComponent } from './plots.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('PlotsComponent', () => {
     let component: PlotsComponent;
@@ -18,6 +19,7 @@ describe('PlotsComponent', () => {
             ],
             imports: [
                 BrowserAnimationsModule,
+                HttpClientTestingModule,
                 MaterialModule,
                 ReactiveFormsModule
             ]
