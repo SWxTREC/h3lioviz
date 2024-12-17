@@ -1,11 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterTestingModule } from '@angular/router/testing';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { MaterialModule } from 'src/app/modules';
 
 import { LayersComponent } from './layers.component';
+import { provideRouter } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('LayersComponent', () => {
     let component: LayersComponent;
@@ -16,10 +17,13 @@ describe('LayersComponent', () => {
             declarations: [ LayersComponent ],
             imports: [
                 BrowserAnimationsModule,
+                HttpClientTestingModule,
                 NgxSliderModule,
                 MaterialModule,
-                ReactiveFormsModule,
-                RouterTestingModule
+                ReactiveFormsModule
+            ],
+            providers: [
+                provideRouter([])
             ]
         })
     .compileComponents();

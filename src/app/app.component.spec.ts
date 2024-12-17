@@ -6,6 +6,7 @@ import { LaspNavModule, LaspNavService } from 'lasp-nav';
 import { AppComponent } from './app.component';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
+import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 
 describe('AppComponent', () => {
     beforeEach(waitForAsync(() => {
@@ -13,6 +14,7 @@ describe('AppComponent', () => {
             imports: [
                 RouterModule.forRoot(routes, {}),
                 LaspFooterModule,
+                LaspFullPageOverlayModule,
                 LaspNavModule,
                 MaterialModule
             ],

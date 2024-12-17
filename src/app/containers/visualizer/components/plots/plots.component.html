@@ -4,19 +4,25 @@
         <mat-form-field>
             <mat-label>Solar images</mat-label>
             <mat-select laspSelectAutoClose formControlName="image" multiple>
-                <mat-option *ngFor="let imageOption of imageList" [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
+                @for (imageOption of imageList; track imageOption) {
+                    <mat-option [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
         <mat-form-field>
             <mat-label>Model data</mat-label>
             <mat-select laspSelectAutoClose formControlName="model" multiple>
-                <mat-option *ngFor="let variableOption of variableList" [value]="variableOption">{{variableOption}}</mat-option>
+                @for (variableOption of variableList; track variableOption) {
+                    <mat-option [value]="variableOption">{{variableOption}}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
         <mat-form-field>
             <mat-label>Observed data</mat-label>
             <mat-select laspSelectAutoClose formControlName="observed" multiple>
-                <mat-option *ngFor="let variableOption of observedVariableList" [value]="variableOption">{{variableOption}}</mat-option>
+                @for (variableOption of observedVariableList; track variableOption) {
+                    <mat-option [value]="variableOption">{{variableOption}}</mat-option>
+                }
             </mat-select>
         </mat-form-field>
     </form>

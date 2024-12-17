@@ -54,8 +54,8 @@ export class AppComponent {
 
     socialLinks: ISocialLink[] = [
         {
-            name: 'twitter',
-            href: 'https://twitter.com/spaceweathercu'
+            name: 'bluesky',
+            href: 'https://bsky.app/profile/spaceweathertrec.bsky.social'
         }, {
             name: 'github',
             href: 'https://github.com/SWxTREC'

@@ -1,7 +1,9 @@
 import { HttpClient, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as CognitoIdentity from 'aws-sdk/clients/cognitoidentity';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 import * as CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import { LaspNavService } from 'lasp-nav';
 import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';

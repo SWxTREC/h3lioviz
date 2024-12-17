@@ -6,10 +6,10 @@
         color="primary"
         [min]="0"
         [max]="timeTicks.length - 1"
-        [(value)]= "timeIndex"
         aria-label="time-selector"
-        (change)="newTimestep($event)"
-    ></mat-slider>
+        #ngSlider>
+        <input matSliderThumb (change)="newTimestep({ value: timeIndex })" #ngSliderThumb="matSliderThumb" [(value)]= "timeIndex" />
+    </mat-slider>
     <div class="time-player__slider-labels">
         <div class="time-player__slider-label">
             {{  timeTicks[0] | amFromUnix | amUtc |  amDateFormat: 'YYYY-MM-DD HH:00'}}
@@ -18,8 +18,12 @@
             {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
         </div>
     </div>
-    <div (click)="togglePlay()">
-        <mat-icon *ngIf="!playing">play_arrow</mat-icon>
-        <mat-icon *ngIf="playing">pause</mat-icon>
+    <div class="time-player__controls" (click)="togglePlay()">
+        @if (!playing) {
+            <mat-icon>play_arrow</mat-icon>
+        }
+        @if (playing) {
+            <mat-icon>pause</mat-icon>
+        }
     </div>
 </div>

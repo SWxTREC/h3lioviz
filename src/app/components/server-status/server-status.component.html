@@ -1,6 +1,14 @@
 <div class="server__message ">
-    <mat-icon *ngIf="!serverStarted" class="server__status server__status--active">cloud_queue</mat-icon>
-    <mat-icon *ngIf="serverStarted" class="server__status server__status--started">cloud_done</mat-icon>
-    <p *ngIf="serverStarted">Server started</p>
-    <p *ngIf="!serverStarted">Waiting for server</p>
+    @if (!serverStarted) {
+        <mat-icon class="server__status server__status--active">cloud_queue</mat-icon>
+    }
+    @if (serverStarted) {
+        <mat-icon class="server__status server__status--started">cloud_done</mat-icon>
+    }
+    @if (serverStarted) {
+        <p>Server started</p>
+    }
+    @if (!serverStarted) {
+        <p>Waiting for server</p>
+    }
 </div>

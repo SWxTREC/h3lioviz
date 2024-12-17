@@ -1,7 +1,11 @@
 <div mat-dialog-content>
-    <swt-run-selector *ngIf="data.catalog" [runId]="data.runId" [catalog]="data.catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
+    @if (data.catalog) {
+        <swt-run-selector [runId]="data.runId" [catalog]="data.catalog" (updateRunId)="updateRunId($event)"></swt-run-selector>
+    }
 </div>
 <div mat-dialog-actions>
-    <button mat-button *ngIf="previousSelection" [mat-dialog-close]="previousSelection">Cancel</button>
+    @if (previousSelection) {
+        <button mat-button [mat-dialog-close]="previousSelection">Cancel</button>
+    }
     <button mat-raised-button color="primary" [disabled]="!data.runId" [mat-dialog-close]="data.runId">Select</button>
 </div>

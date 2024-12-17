@@ -10,11 +10,5 @@
         .mat-button-toggle {
             width: 50%;
         }
-        .mat-button-toggle-checked {
-            background-color: $color-primary;
-            &.mat-button-toggle-appearance-standard {
-                color: white;
-            }
-        }
     }
 }

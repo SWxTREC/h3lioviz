@@ -17,6 +17,11 @@
     }
 }
 ::ng-deep {
+    .grid-tile--type-XAXIS {
+        sci-toolbar-button {
+            display: none;
+        }
+    }
     .expand-close-button {
         display: none;
     }

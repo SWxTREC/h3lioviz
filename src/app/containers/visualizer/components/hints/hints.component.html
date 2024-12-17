@@ -1,3 +1,5 @@
 <div class="hints">
-    <small *ngFor="let shortcut of keyboardShortcuts" class="hint">{{shortcut.action}} <code>{{shortcut.instruction}}</code></small>
+    @for (shortcut of keyboardShortcuts; track shortcut) {
+        <small class="hint">{{shortcut.action}} <code>{{shortcut.instruction}}</code></small>
+    }
 </div>

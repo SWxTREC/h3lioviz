@@ -49,16 +49,14 @@ export const H3LIO_PRESET: IUiFeatures = {
     panning: false,
     toolbarButtons: [
         ToolbarButtonId.displaySettings,
-        ToolbarButtonId.variables,
+        ToolbarButtonId.toggleVariables,
         ToolbarButtonId.downloadImage
     ],
     menuItems: {
         discreteData: false,
         events: false,
-        filters: false,
         globalSettings: false,
         limits: false,
-        modifyDatasets: false,
         overplotting: true
     }
 };
