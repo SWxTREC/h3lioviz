@@ -24,7 +24,7 @@ if [ -z "${NGINX_CONTEXT_ROOT:-}" ] ; then
   export NGINX_CONTEXT_ROOT='/'
 fi
 # Render nginx configuration before angular stuff to avoid base-href conflicts
-envsubst "$VARS" < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/swp.conf
+envsubst "$VARS" < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/h3lioviz.conf
 # NGINX_CONTEXT_ROOT / angular base-href must end with a /
 if [[ ! "${NGINX_CONTEXT_ROOT}" =~ /$ ]] ; then
   export NGINX_CONTEXT_ROOT="${NGINX_CONTEXT_ROOT}/"
