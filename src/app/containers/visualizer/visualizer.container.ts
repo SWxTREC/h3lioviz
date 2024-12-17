@@ -291,7 +291,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             // height is limiting factor
             const vizMaxHeight = this.componentMaxHeight - vizAccessoriesHeight;
             const availableWindowWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
-            const defaultVizWidth = this.openPlots ? availableWindowWidth * 0.5 - this.gutterSize : availableWindowWidth / 2;
+            const gutterWidth = this.openPlots ? this.gutterSize : 0;
+            const defaultVizWidth = availableWindowWidth * 0.5 - gutterWidth;
             if ( storedVizDimensions?.every( value => value != null ) ) {
                 this.vizDimensions = storedVizDimensions;
                 // ensure new height is not greater than vizMaxHeight for this window
@@ -388,25 +389,29 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     setPlotsPanel() {
+        const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
         // plot panel only opens and closes in the horizontal direction
         if ( this.splitDirection === 'horizontal' ) {
             // Gets the sizes of the visible panels
             const sizes = this.splitElement.getVisibleAreaSizes();
-            // if two visible split areas, preserve the viz width so it can be restored
-            this.previousVizWidth = sizes.length === 2 ? Number(sizes[0]) : this.previousVizWidth ;
-            const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
-            if ( this.splitDirection === 'horizontal' ) {
-                // restore to previous, if no previous, use a default width
-                const vizWidth = this.previousVizWidth || this.vizDimensions[0];
-                this.vizDimensions[0] = this.openPlots ? vizWidth : maximumVizWidth;
-            } else {
-                this.vizDimensions[0] = maximumVizWidth;
-            }
+            const hasDefinedSize = sizes[0] && !isNaN( Number(sizes[0]));
+            // preserve the viz width so it can be restored
+            this.previousVizWidth = hasDefinedSize ? Number(sizes[0]) : this.previousVizWidth;
+            const validPreviousWidth =
+                this.previousVizWidth && this.previousVizWidth < maximumVizWidth - this.gutterSize ?
+                this.previousVizWidth : undefined;
+            // restore to a valid previousVizWidth, or default to half of maximumVizWidth
+            const availablePreviousWidth = validPreviousWidth || maximumVizWidth * 0.5;
+            this.vizDimensions[0] = this.openPlots ? availablePreviousWidth : maximumVizWidth;
             this.vizPanelSize = this.vizDimensions[0];
             this.determineShowTitle();
             this.pvViewResize();
             this.storeValidVizDimensions();
+        } else {
+            this.vizDimensions[0] = maximumVizWidth;
         }
+        const vPanelSettings = [ this.openControls, this.openPlots ];
+        this._siteConfigService.updateSiteConfig( { [ConfigLabels.vPanelSettings]: vPanelSettings} );
     }
 
     setTimestep( timeIndex: number ) {
@@ -446,6 +451,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     togglePlotsPanel() {
         this.openPlots = !this.openPlots;
+        this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
+
         this.setPlotsPanel();
     }
 
