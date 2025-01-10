@@ -103,7 +103,7 @@
               "browserTarget": "h3lioviz:build:production"
             },
             "dev": {
-              "browserTarget": "swt:build:dev"
+              "browserTarget": "h3lioviz:build:dev"
             }
           }
         },
