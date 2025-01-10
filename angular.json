@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "swt": {
+    "h3lioviz": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -32,7 +32,7 @@
             "customWebpackConfig": {
               "path": "./webpack.config.js"
             },
-            "outputPath": "dist/swt",
+            "outputPath": "dist/h3lioviz",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -96,21 +96,21 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "swt:build"
+            "browserTarget": "h3lioviz:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "swt:build:production"
+              "browserTarget": "h3lioviz:build:production"
             },
             "dev": {
-              "browserTarget": "swt:build:dev"
+              "browserTarget": "h3lioviz:build:dev"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "swt:build"
+            "buildTarget": "h3lioviz:build"
           }
         },
         "test": {
@@ -155,11 +155,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "swt:serve"
+            "devServerTarget": "h3lioviz:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "swt:serve:production"
+              "devServerTarget": "h3lioviz:serve:production"
             }
           }
         },
