@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
