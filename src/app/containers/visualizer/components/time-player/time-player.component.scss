@@ -20,6 +20,10 @@
             height: 40px;
             width: 40px;
         }
+        &--disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
     }
     &__slider {
         width: 100%;

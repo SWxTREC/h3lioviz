@@ -260,7 +260,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
-            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: timeIndex }});
         });
     }
 

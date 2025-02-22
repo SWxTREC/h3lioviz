@@ -16,7 +16,10 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
 
-    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    session: {
+        subscribe: (arg0: string, arg1: (image: any) => void) => Subscription;
+        call: (arg0: string, arg1: number[]) => Promise<any>;
+    };
     startTime: string;
     timestepDebouncer: Subject<number> = new Subject<number>();
 
@@ -26,7 +29,8 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         this.subscriptions.push(
             this.timestepDebouncer.pipe(
                 debounceTime(300)
-            ).subscribe((value) => this.updateTime.emit(value)));
+            ).subscribe((index) => this.updateTime.emit(index))
+        );
 
         this.subscriptions.push(
             this.playingDebouncer.pipe(
@@ -34,11 +38,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
             ).subscribe( (playing: boolean) => {
                 if ( playing ) {
                     // play when play button is pressed
-                    this.playTimesteps( this.timeIndex );
-                } else {
-                    // stop when the pause button is pressed
-                    const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2);
-                    this.updateTime.emit( this.timeIndex || defaultTimeIndex );
+                    this.playTimesteps();
                 }
             })
         );
@@ -51,6 +51,18 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
+            // subscribe to image changes to keep timeIndex in sync
+            this.subscriptions.push(
+                this.session.subscribe('viewport.image.push.subscription', () => {
+                    this.session.call('pv.time.index.get', []).then( (currentIndex) => {
+                        this.timeIndex = currentIndex;
+                        if ( this.timeIndex === this.timeTicks.length - 1 ) {
+                            // stop playing when end of time is reached
+                            this.playing = false;
+                        }
+                    });
+                })
+            );
         }
     }
 
@@ -69,23 +81,18 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         this.timestepDebouncer.next( index.value );
     }
 
-    playTimesteps( index: number ) {
-        const nextIndex = index + 1;
-        if ( nextIndex < this.timeTicks.length ) {
+    playTimesteps() {
+        const nextIndex = this.timeIndex + 1;
+        if ( this.playing && nextIndex < this.timeTicks.length) {
             this.session.call( 'pv.time.index.set', [ nextIndex ]).then( () => {
-                if ( this.playing ) {
-                    // increment timeIndex here, once graphics are loaded
-                    this.timeIndex = index;
-                    this.playTimesteps( nextIndex );
-                } else {
-                    this.updateTime.emit( index );
-                }
+                // once graphics are loaded, increment the time index and play the next timestep
+                this.playTimesteps();
             });
         } else {
-            // stop when last time step is reached
-            this.playing = false;
-            this.timeIndex = this.timeTicks.length - 1;
-            this.updateTime.emit( index );
+            // stop when end is reached or pause button is pressed
+            this.session.call('pv.time.stop', []).then( () => {
+                this.updateTime.emit( this.timeIndex );
+            });
         }
     }
 
