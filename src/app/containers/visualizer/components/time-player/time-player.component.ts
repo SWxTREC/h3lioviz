@@ -51,16 +51,19 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // subscribe to image changes to keep timeIndex in sync
+            // subscribe to image changes
             this.subscriptions.push(
                 this.session.subscribe('viewport.image.push.subscription', () => {
-                    this.session.call('pv.time.index.get', []).then( (currentIndex) => {
-                        this.timeIndex = currentIndex;
-                        if ( this.timeIndex === this.timeTicks.length - 1 ) {
+                    // keep timeIndex in sync while playing only
+                    if ( this.playing ) {
+                        this.session.call('pv.time.index.get', []).then( (currentIndex) => {
+                            this.timeIndex = currentIndex;
+                            if ( this.timeIndex === this.timeTicks.length - 1 ) {
                             // stop playing when end of time is reached
-                            this.playing = false;
-                        }
-                    });
+                                this.playing = false;
+                            }
+                        });
+                    }
                 })
             );
         }
