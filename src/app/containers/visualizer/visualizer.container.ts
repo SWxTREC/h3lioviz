@@ -192,9 +192,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.pvServerStarted = started;
                 if ( this.pvServerStarted === true && this.runId$.value ) {
                     this.dialog.closeAll();
-                }
-                if (waitingMessageInterval) {
-                    clearInterval(waitingMessageInterval);
+                    if (waitingMessageInterval) {
+                        clearInterval(waitingMessageInterval);
+                    }
                 }
             })
         );
