@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { provideRouter } from '@angular/router';
+
 import { ProfileNavService } from '..';
 
 import { AwsService } from './aws.service';
-import { provideRouter } from '@angular/router';
 
 describe('AwsService', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -22,7 +23,7 @@ describe('AwsService', () => {
             providers: [
                 ProfileNavService,
                 provideRouter([])
-             ]
+            ]
         });
         httpClient = TestBed.inject(HttpClient);
         httpTestingController = TestBed.inject(HttpTestingController);

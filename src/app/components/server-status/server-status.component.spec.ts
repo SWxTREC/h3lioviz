@@ -1,10 +1,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { MaterialModule } from 'src/app/modules';
 import { ProfileNavService } from 'src/app/services';
 
 import { ServerStatusComponent } from './server-status.component';
-import { provideRouter } from '@angular/router';
 
 describe('ServerStatusComponent', () => {
     let component: ServerStatusComponent;
@@ -15,7 +15,7 @@ describe('ServerStatusComponent', () => {
             declarations: [ ServerStatusComponent ],
             imports: [
                 HttpClientTestingModule,
-                MaterialModule,
+                MaterialModule
             ],
             providers: [
                 ProfileNavService,

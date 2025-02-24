@@ -1,9 +1,9 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { MaterialModule } from 'src/app/modules';
 
 import { MouseZoomComponent } from './mouse-zoom.component';
-import { provideRouter } from '@angular/router';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('MouseZoomComponent', () => {
     let component: MouseZoomComponent;

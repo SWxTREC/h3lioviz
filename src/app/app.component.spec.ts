@@ -1,12 +1,12 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
 import { LaspFooterModule } from 'lasp-footer';
+import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 import { LaspNavModule, LaspNavService } from 'lasp-nav';
 
 import { AppComponent } from './app.component';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
-import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 
 describe('AppComponent', () => {
     beforeEach(waitForAsync(() => {

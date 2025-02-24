@@ -47,10 +47,11 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
             this.session = this.pvView.get().session;
             // subscribe to image changes
             this.subscriptions.push(
+                // subscribe to image push events, triggered when a new image is received from paraview
                 this.session.subscribe('viewport.image.push.subscription', (thing) => {
                     // keep timeIndex in sync when new image is received
                     this.session.call('pv.time.index.get', []).then( (timeIndex) => {
-                        // stop playing when end of time is reached
+                        // stop playing if end of time is reached
                         if ( timeIndex === this.timeTicks.length - 1 ) {
                             this.playing = false;
                         }
@@ -86,7 +87,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
     }
 
     setTimeIndex( newIndex: number ) {
-        // this will drive the new image render subscription
+        // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
     }
 
