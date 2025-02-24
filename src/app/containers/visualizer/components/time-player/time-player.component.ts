@@ -45,7 +45,6 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
-            // subscribe to image changes
             this.subscriptions.push(
                 // subscribe to image push events, triggered when a new image is received from paraview
                 this.session.subscribe('viewport.image.push.subscription', (thing) => {
