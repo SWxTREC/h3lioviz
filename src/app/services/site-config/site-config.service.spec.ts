@@ -1,9 +1,10 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 
-import { SiteConfigService } from './site-config.service';
 import { provideRouter } from '@angular/router';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { SiteConfigService } from './site-config.service';
 
 describe('SiteConfigService', () => {
     let service: SiteConfigService;

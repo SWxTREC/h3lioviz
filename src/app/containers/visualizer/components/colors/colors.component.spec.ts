@@ -1,12 +1,12 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { MaterialModule } from 'src/app/modules';
 
 import { ColorsComponent } from './colors.component';
-import { provideRouter } from '@angular/router';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ColorsComponent', () => {
     let component: ColorsComponent;

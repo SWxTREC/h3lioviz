@@ -192,9 +192,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.pvServerStarted = started;
                 if ( this.pvServerStarted === true && this.runId$.value ) {
                     this.dialog.closeAll();
-                }
-                if (waitingMessageInterval) {
-                    clearInterval(waitingMessageInterval);
+                    if (waitingMessageInterval) {
+                        clearInterval(waitingMessageInterval);
+                    }
                 }
             })
         );
@@ -260,7 +260,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
-            this._siteConfigService.updateSiteConfig({ [ConfigLabels.timeIndexMap]: { [this.runId$.value]: timeIndex }});
         });
     }
 

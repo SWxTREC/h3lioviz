@@ -21,7 +21,7 @@ export class CatalogService {
             catalog.sort( ( a, b ) => moment(b['rundate_cal']).valueOf() - moment(a['rundate_cal']).valueOf() );
             this.catalog$.next(catalog);
             this.runTitles = Array.from(this.catalog$.value).reduce( (aggregator, run) => {
-                const time = moment.utc( run['rundate_cal'] ).format('YYYY-MM-DD HH:mm:ss');
+                const time = moment.utc( run['rundate_cal'] ).format('YYYY-MM-DD');
                 aggregator[ run['run_id'] ] = `${time} (${run.institute})`;
                 return aggregator;
             }, {});
