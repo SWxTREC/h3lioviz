@@ -4,7 +4,7 @@ import { FooterMode } from 'lasp-footer';
 export const routes: Routes = [
     {
         path: '',
-        title: 'H3lioViz: Interactive 3D Heliosphere Visualizer',
+        title: 'H3lioViz | Interactive 3D Heliosphere Visualizer',
         loadChildren: () => import( './containers/home/home.module').then( m => m.HomeModule )
     }, {
         path: 'docs',
