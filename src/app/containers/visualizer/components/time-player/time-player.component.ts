@@ -31,10 +31,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         private _plotsService: PlotsService,
         private _statusService: StatusService
     ) {
-        // keep track of the current plot ids
-        this.subscriptions.push(this._plotsService.getPlots$().subscribe(( plots: IPlot[] ) => {
-            this.plotIds = plots.filter( plot => plot.type !== 'XAXIS').map( plot => plot.plotId );
-        }));
         this.subscriptions.push(
             this.playingDebouncer.pipe(
                 debounceTime(300)
@@ -48,9 +44,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.subscriptions.push(
             this._statusService.allPlotsStable$.subscribe( ( allPlotsStable: boolean ) => {
                 if ( allPlotsStable ) {
-                    this.plotIds.forEach( (plotId: string) => {
-                        this._plotsService.setXyPosition( plotId, this.timeTicks[this.timeIndex] * 1000 );
-                    });
+                    const plotId = this._plotsService.getPlots$().value[0].plotId;
+                    this._plotsService.setXyPosition( plotId, this.timeTicks[this.timeIndex] * 1000 );
                 }
             })
         );
@@ -97,8 +92,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             if ( !this.playing ) {
                 const timestampInSeconds = plotClicked.xPosition / 1000;
                 const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
-                this.setTimeIndex( nearestTimeIndex );
-                // this.updateTime.emit( nearestTimeIndex );
+                this.updateTime.emit( nearestTimeIndex );
             }
         }));
     }
@@ -130,9 +124,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
         // update the crosshairs on the plots
-        this.plotIds.forEach( (plotId: string) => {
-            this._plotsService.setXyPosition( plotId, this.timeTicks[newIndex] * 1000 );
-        });
+        const plotId = this._plotsService.getPlots$().value[0].plotId;
+        this._plotsService.setXyPosition( plotId, this.timeTicks[newIndex] * 1000 );
     }
 
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
