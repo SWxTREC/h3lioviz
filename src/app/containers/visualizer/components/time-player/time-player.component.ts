@@ -1,13 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { IPlot, PlotsService, StatusService } from 'scicharts';
 
 @Component({
     selector: 'swt-time-player',
     templateUrl: './time-player.component.html',
     styleUrls: [ './time-player.component.scss' ]
 })
-export class TimePlayerComponent implements OnChanges, OnDestroy {
+export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() pvView: any;
     @Input() timeIndex: number;
     @Input() timeTicks: number[];
@@ -15,6 +16,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
 
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
+    plotIds: string[];
 
     session: {
         subscribe: (arg0: string, arg1: (image: any) => void) => Subscription;
@@ -25,7 +27,14 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
 
     subscriptions: Subscription[] = [];
 
-    constructor() {
+    constructor(
+        private _plotsService: PlotsService,
+        private _statusService: StatusService
+    ) {
+        // keep track of the current plot ids
+        this.subscriptions.push(this._plotsService.getPlots$().subscribe(( plots: IPlot[] ) => {
+            this.plotIds = plots.filter( plot => plot.type !== 'XAXIS').map( plot => plot.plotId );
+        }));
         this.subscriptions.push(
             this.playingDebouncer.pipe(
                 debounceTime(300)
@@ -33,6 +42,15 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
                 if ( playing ) {
                     // play when play button is pressed
                     this.playNextTimestep();
+                }
+            })
+        );
+        this.subscriptions.push(
+            this._statusService.allPlotsStable$.subscribe( ( allPlotsStable: boolean ) => {
+                if ( allPlotsStable ) {
+                    this.plotIds.forEach( (plotId: string) => {
+                        this._plotsService.setXyPosition( plotId, this.timeTicks[this.timeIndex] * 1000 );
+                    });
                 }
             })
         );
@@ -45,6 +63,7 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
+
             this.subscriptions.push(
                 // subscribe to image push events, triggered when a new image is received from paraview
                 this.session.subscribe('viewport.image.push.subscription', () => {
@@ -72,6 +91,18 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         }
     }
 
+    ngAfterViewInit(): void {
+        // when the user clicks on a plot, set the time index to the nearest tick
+        this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
+            if ( !this.playing ) {
+                const timestampInSeconds = plotClicked.xPosition / 1000;
+                const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
+                this.setTimeIndex( nearestTimeIndex );
+                // this.updateTime.emit( nearestTimeIndex );
+            }
+        }));
+    }
+
     ngOnDestroy(): void {
         // stop playing and set index when time player is destroyed
         this.playing = false;
@@ -85,19 +116,55 @@ export class TimePlayerComponent implements OnChanges, OnDestroy {
         this.setTimeIndex( newIndex.value );
     }
 
-    setTimeIndex( newIndex: number ) {
-        // setting the index will drive the image-push subscription
-        this.session.call('pv.time.index.set', [ newIndex ]);
-    }
-
     playNextTimestep() {
         const nextIndex = this.timeIndex + 1;
         if ( nextIndex === this.timeTicks.length ) {
             this.playing = false;
         }
-        if ( this.playing ) {
+        if ( this.playing === true) {
             this.setTimeIndex( nextIndex );
         }
+    }
+
+    setTimeIndex( newIndex: number ) {
+        // setting the index will drive the image-push subscription
+        this.session.call('pv.time.index.set', [ newIndex ]);
+        // update the crosshairs on the plots
+        this.plotIds.forEach( (plotId: string) => {
+            this._plotsService.setXyPosition( plotId, this.timeTicks[newIndex] * 1000 );
+        });
+    }
+
+    /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
+    findNearestValue( target: number, sortedList: number[] ): number {
+        if ( target < sortedList[0] ) {
+            return sortedList[0];
+        }
+        if ( target > sortedList[ sortedList.length - 1 ]) {
+            return sortedList[ sortedList.length - 1 ];
+        }
+
+        let low = 0;
+        let high = sortedList.length - 1;
+
+        while ( low <= high ) {
+            const mid = Math.floor( ( high + low ) / 2 );
+
+            if ( target < sortedList[ mid ] ) {
+                high = mid - 1;
+            } else if ( target > sortedList[ mid ]) {
+                low = mid + 1;
+            } else {
+                return sortedList[ mid ];
+            }
+        }
+        return ( sortedList[ low ] - target ) < ( target - sortedList[ high ] ) ? sortedList[ low ] : sortedList[ high ];
+    }
+
+    /** find the closest tick value to a given timestamp */
+    protected _getNearestTick( timestamp: number ): number {
+        const nearestTimestamp = this.findNearestValue( timestamp, this.timeTicks );
+        return this.timeTicks.indexOf( nearestTimestamp );
     }
 
     togglePlay() {
