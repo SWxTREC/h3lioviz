@@ -14,16 +14,13 @@ import { environment, localUrls } from 'src/environments/environment';
 import { COLOR_FORM_DEFAULT_VALUES } from './control-panel';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
-    annotations: { show: false },
-    comments: { hideWhenEmpty: true },
     dataDisplay: {
         seriesDisplayMode: SeriesDisplayMode.lines,
         allowGaps: true,
         thresholdRatio: 5,
         maxLegendPrecision: 0
     },
-    legend: 'minimal',
-    useGlobalSettings: false,
+    overrideGlobalSettings: true,
     view: {
         navigator: false,
         yAxes: true

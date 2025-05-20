@@ -57,6 +57,7 @@ export class PlotsComponent implements OnChanges {
         uiOptions.minimumPlotHeight = 50;
         uiOptions.stackedMode = true;
         uiOptions.gridHeightCorrection = 200;
+        uiOptions.legend = 'minimal';
         this._uiOptionsService.setUiOptions( uiOptions );
         // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
