@@ -15,6 +15,9 @@
     &__header {
         display: inline;
     }
+    &__static {
+        pointer-events: none;
+    }
 }
 ::ng-deep {
     .grid-tile.grid-tile--type-XAXIS {

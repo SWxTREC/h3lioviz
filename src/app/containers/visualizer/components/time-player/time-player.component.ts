@@ -2,6 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Ou
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, throttleTime } from 'rxjs/operators';
 import { PlotsService, StatusService } from 'scicharts';
+import { PlayingService } from 'src/app/services';
 
 @Component({
     selector: 'swt-time-player',
@@ -35,17 +36,22 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     private _xTimestampSubject: Subject<number> = new Subject<number>();
 
     constructor(
+        private _playingService: PlayingService,
         private _plotsService: PlotsService,
         private _statusService: StatusService
     ) {
+        this.subscriptions.push( this._playingService.playing$.subscribe( (playing: boolean) => {
+            this.playing = playing;
+            this.playingDebouncer.next( playing );
+        }));
+
         this.subscriptions.push(
             this.playingDebouncer.pipe(
-                debounceTime(300)
-            ).subscribe( (playing: boolean) => {
-                if ( playing ) {
-                    // play when play button is pressed
-                    this.playNextTimestep();
-                }
+                debounceTime(300),
+                filter( (playing: boolean) => playing === true )
+            ).subscribe( () => {
+                // play when play button is pressed
+                this.playNextTimestep();
             })
         );
         this.subscriptions.push(
@@ -60,7 +66,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     ngOnChanges(): void {
         // any time there are changes to the inputs, make sure playing is false
-        this.playing = false;
+        this._playingService.playing$.next(false);
 
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
@@ -73,7 +79,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                     this.session.call('pv.time.index.get', []).then( (timeIndex) => {
                         // stop playing if end of time is reached
                         if ( timeIndex === this.timeTicks.length - 1 ) {
-                            this.playing = false;
+                            this._playingService.playing$.next(false);
                         }
                         if ( this.playing ) {
                             this.timeIndex = timeIndex;
@@ -122,31 +128,29 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
         // when the user clicks on a plot, set the time index to the nearest tick
         this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
-            if ( !this.playing ) {
-                const timestampInSeconds = plotClicked.xPosition / 1000;
-                const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
-                this.updateTime.emit( nearestTimeIndex );
-            }
+            const timestampInSeconds = plotClicked.xPosition / 1000;
+            const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
+            this.updateTime.emit( nearestTimeIndex );
         }));
     }
 
     ngOnDestroy(): void {
         // stop playing and set index when time player is destroyed
-        this.playing = false;
+        this._playingService.playing$.next(false);
         this.updateTime.emit( this.timeIndex );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
     newTimestep(newIndex: { value: number }) {
         // stop playing when there is a click on the timeline
-        this.playing = false;
+        this._playingService.playing$.next(false);
         this.setTimeIndex( newIndex.value );
     }
 
     playNextTimestep() {
         const nextIndex = this.timeIndex + 1;
         if ( nextIndex === this.timeTicks.length ) {
-            this.playing = false;
+            this._playingService.playing$.next(false);
         }
         if ( this.playing === true) {
             this.setTimeIndex( nextIndex );
@@ -187,12 +191,14 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     hoverValue( event: MouseEvent ) {
-        this.timePlayerHover = true;
-        const xPosition: number = event.x;
-        const sliderWidth: number = (event.target as HTMLElement).clientWidth;
-        const timestamp: number =
-            this.timeTicks[ Math.round( ( xPosition / sliderWidth ) * ( this.timeTicks.length - 1 ) ) ] * 1000;
-        this._xTimestampSubject.next(timestamp);
+        if ( !this.playing ) {
+            this.timePlayerHover = true;
+            const xPosition: number = event.x;
+            const sliderWidth: number = (event.target as HTMLElement).clientWidth;
+            const timestamp: number =
+                this.timeTicks[ Math.round( ( xPosition / sliderWidth ) * ( this.timeTicks.length - 1 ) ) ] * 1000;
+            this._xTimestampSubject.next(timestamp);
+        }
     }
 
     mouseleave() {
@@ -200,8 +206,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     togglePlay() {
-        this.playing = !this.playing;
-        this.playingDebouncer.next( this.playing );
+        this._playingService.playing$.next(!this.playing);
     }
 
     /** find the closest tick value to a given timestamp */
