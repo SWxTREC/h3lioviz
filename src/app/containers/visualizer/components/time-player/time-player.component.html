@@ -7,8 +7,14 @@
         [min]="0"
         [max]="timeTicks.length - 1"
         aria-label="time-selector"
-        #ngSlider>
-        <input matSliderThumb (change)="newTimestep({ value: timeIndex })" #ngSliderThumb="matSliderThumb" [(value)]= "timeIndex" />
+        >
+        <input
+            matSliderThumb
+            [(value)]= "timeIndex"
+            (change)="newTimestep({ value: timeIndex })"
+            (mousemove)="hoverValue($event)"
+            />
+        <div class="time-player__crosshair" [style.left]="crosshairPositionPercent + '%'" tabindex="0"></div>
     </mat-slider>
     <div class="time-player__slider-labels">
         <div class="time-player__slider-label">

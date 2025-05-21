@@ -82,7 +82,11 @@
             @if (openPlots || splitDirection === 'vertical' ) {
                 <as-split-area class="viz__panel" [size]="$any('*')" [order]="1">
                     @if (timeTicks?.length && (runId$ | async)) {
-                        <swt-plots [runId]="runId$ | async" [plotConfig]="plotConfig" [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"></swt-plots>
+                        <swt-plots
+                            [runId]="runId$ | async"
+                            [plotConfig]="plotConfig"
+                            [timeRange]="[timeTicks[0], timeTicks[timeTicks.length-1]]"
+                        ></swt-plots>
                     }
                 </as-split-area>
             }

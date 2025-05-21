@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { IPlot, PlotsService, StatusService } from 'scicharts';
+import { debounceTime, filter, throttleTime } from 'rxjs/operators';
+import { PlotsService, StatusService } from 'scicharts';
 
 @Component({
     selector: 'swt-time-player',
@@ -14,9 +14,12 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     @Input() timeTicks: number[];
     @Output() updateTime = new EventEmitter();
 
+    crosshairPositionPercent: number;
+
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
-    plotIds: string[];
+    // since crosshairs are synced, only one plotId is needed
+    plotId: string;
 
     session: {
         subscribe: (arg0: string, arg1: (image: any) => void) => Subscription;
@@ -26,6 +29,10 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     timestepDebouncer: Subject<number> = new Subject<number>();
 
     subscriptions: Subscription[] = [];
+
+    // instead of directly updating the crosshair position, use these Subjects to throttle updates
+    private _xTimestampSubject: Subject<number> = new Subject<number>();
+    private _xPercentSubject: Subject<number> = new Subject<number>();
 
     constructor(
         private _plotsService: PlotsService,
@@ -44,8 +51,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.subscriptions.push(
             this._statusService.allPlotsStable$.subscribe( ( allPlotsStable: boolean ) => {
                 if ( allPlotsStable ) {
-                    const plotId = this._plotsService.getPlots$().value[0].plotId;
-                    this._plotsService.setXyPosition( plotId, this.timeTicks[this.timeIndex] * 1000 );
+                    this.plotId = this._plotsService.getPlots$().value[0].plotId;
+                    this._plotsService.setXyPosition( this.plotId, this.timeTicks[this.timeIndex] * 1000 );
                 }
             })
         );
@@ -87,6 +94,38 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     ngAfterViewInit(): void {
+        this.crosshairPositionPercent = this.timeIndex * 100 / ( this.timeTicks.length - 1 );
+
+        // throttle calls to setting the xPosition of crosshairs—from scicharts to h3lioviz
+        this.subscriptions.push(this._xTimestampSubject.pipe(
+            throttleTime(
+                1000/60, // 60Hz
+                undefined,
+                { leading: true, trailing: true }
+            )
+        ).subscribe( timestamp => {
+            this.crosshairPositionPercent = ( this._getNearestTick( timestamp / 1000 ) * 100 ) / ( this.timeTicks.length - 1 );
+        }));
+
+        // throttle calls to setting the xPosition of crosshairs—from h3lioviz to scicharts
+        this.subscriptions.push(this._xPercentSubject.pipe(
+            throttleTime(
+                1000/60, // 60Hz
+                undefined,
+                { leading: true, trailing: true }
+            )
+        ).subscribe( percent => {
+            this.crosshairPositionPercent = percent;
+            const timestamp = this.timeTicks[ Math.round( percent * ( this.timeTicks.length - 1 ) / 100 ) ] * 1000;
+            this._plotsService.setXyPosition( this.plotId, timestamp );
+        }));
+
+        this.subscriptions.push( this._plotsService.getXyPosition$().pipe(
+            filter( position => position != null )
+        ).subscribe( ( xyPosition ) => {
+            this._xTimestampSubject.next( xyPosition.xPosition );
+        }));
+
         // when the user clicks on a plot, set the time index to the nearest tick
         this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
             if ( !this.playing ) {
@@ -124,8 +163,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
         // update the crosshairs on the plots
-        const plotId = this._plotsService.getPlots$().value[0].plotId;
-        this._plotsService.setXyPosition( plotId, this.timeTicks[newIndex] * 1000 );
+        this._plotsService.setXyPosition( this.plotId, this.timeTicks[newIndex] * 1000 );
     }
 
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
@@ -154,14 +192,20 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         return ( sortedList[ low ] - target ) < ( target - sortedList[ high ] ) ? sortedList[ low ] : sortedList[ high ];
     }
 
-    /** find the closest tick value to a given timestamp */
-    protected _getNearestTick( timestamp: number ): number {
-        const nearestTimestamp = this.findNearestValue( timestamp, this.timeTicks );
-        return this.timeTicks.indexOf( nearestTimestamp );
+    hoverValue( event: MouseEvent ) {
+        const xPosition: number = event.x;
+        const sliderWidth: number = (event.target as HTMLElement).clientWidth;
+        this._xPercentSubject.next(( xPosition / sliderWidth ) * 100);
     }
 
     togglePlay() {
         this.playing = !this.playing;
         this.playingDebouncer.next( this.playing );
+    }
+
+    /** find the closest tick value to a given timestamp */
+    private _getNearestTick( timestamp: number ): number {
+        const nearestTimestamp = this.findNearestValue( timestamp, this.timeTicks );
+        return this.timeTicks.indexOf( nearestTimestamp );
     }
 }
