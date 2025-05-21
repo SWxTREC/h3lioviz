@@ -13,6 +13,7 @@
             [(value)]= "timeIndex"
             (change)="newTimestep({ value: timeIndex })"
             (mousemove)="hoverValue($event)"
+            (mouseleave)="mouseleave()"
             />
         <div class="time-player__crosshair" [style.left]="crosshairPositionPercent + '%'" tabindex="0"></div>
     </mat-slider>

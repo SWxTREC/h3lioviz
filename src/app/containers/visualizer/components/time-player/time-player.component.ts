@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, filter, throttleTime } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, throttleTime } from 'rxjs/operators';
 import { PlotsService, StatusService } from 'scicharts';
 
 @Component({
@@ -26,13 +26,13 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         call: (arg0: string, arg1: number[]) => Promise<any>;
     };
     startTime: string;
+    subscriptions: Subscription[] = [];
+    timePlayerHover = false;
     timestepDebouncer: Subject<number> = new Subject<number>();
 
-    subscriptions: Subscription[] = [];
 
-    // instead of directly updating the crosshair position, use these Subjects to throttle updates
+    // instead of directly updating the crosshair position, use this Subject to throttle updates
     private _xTimestampSubject: Subject<number> = new Subject<number>();
-    private _xPercentSubject: Subject<number> = new Subject<number>();
 
     constructor(
         private _plotsService: PlotsService,
@@ -96,7 +96,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     ngAfterViewInit(): void {
         this.crosshairPositionPercent = this.timeIndex * 100 / ( this.timeTicks.length - 1 );
 
-        // throttle calls to setting the xPosition of crosshairs—from scicharts to h3lioviz
+        // throttle calls to setting the xPosition of crosshairs
         this.subscriptions.push(this._xTimestampSubject.pipe(
             throttleTime(
                 1000/60, // 60Hz
@@ -105,25 +105,19 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             )
         ).subscribe( timestamp => {
             this.crosshairPositionPercent = ( this._getNearestTick( timestamp / 1000 ) * 100 ) / ( this.timeTicks.length - 1 );
-        }));
-
-        // throttle calls to setting the xPosition of crosshairs—from h3lioviz to scicharts
-        this.subscriptions.push(this._xPercentSubject.pipe(
-            throttleTime(
-                1000/60, // 60Hz
-                undefined,
-                { leading: true, trailing: true }
-            )
-        ).subscribe( percent => {
-            this.crosshairPositionPercent = percent;
-            const timestamp = this.timeTicks[ Math.round( percent * ( this.timeTicks.length - 1 ) / 100 ) ] * 1000;
-            this._plotsService.setXyPosition( this.plotId, timestamp );
+            // only update scicharts crosshair when the time player is being hovered
+            if ( this.timePlayerHover ) {
+                this._plotsService.setXyPosition( this.plotId, timestamp );
+            }
         }));
 
         this.subscriptions.push( this._plotsService.getXyPosition$().pipe(
-            filter( position => position != null )
+            filter( position => position != null ),
+            distinctUntilChanged( ( prev, curr ) => prev.xPosition === curr.xPosition )
         ).subscribe( ( xyPosition ) => {
-            this._xTimestampSubject.next( xyPosition.xPosition );
+            if ( !this.timePlayerHover ) {
+                this._xTimestampSubject.next( xyPosition.xPosition );
+            }
         }));
 
         // when the user clicks on a plot, set the time index to the nearest tick
@@ -193,9 +187,16 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     hoverValue( event: MouseEvent ) {
+        this.timePlayerHover = true;
         const xPosition: number = event.x;
         const sliderWidth: number = (event.target as HTMLElement).clientWidth;
-        this._xPercentSubject.next(( xPosition / sliderWidth ) * 100);
+        const timestamp: number =
+            this.timeTicks[ Math.round( ( xPosition / sliderWidth ) * ( this.timeTicks.length - 1 ) ) ] * 1000;
+        this._xTimestampSubject.next(timestamp);
+    }
+
+    mouseleave() {
+        this.timePlayerHover = false;
     }
 
     togglePlay() {
