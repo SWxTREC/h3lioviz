@@ -74,6 +74,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
 
+            // note that these paraview subscriptions are not able to use .pipe(), so no
+            // rxjs operators can be used and we rely on subscriptions.push()
             this.subscriptions.push(
                 // subscribe to image push events, triggered when a new image is received from paraview
                 this.session.subscribe('viewport.image.push.subscription', () => {
@@ -105,7 +107,9 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     ngAfterViewInit(): void {
         this.crosshairPositionPercent = this.timeIndex * 100 / ( this.timeTicks.length - 1 );
-        this.timeScale = d3.scaleLinear([ 0, 1 ], [ this.timeTicks[0], this.timeTicks[this.timeTicks.length - 1] ]);
+        this.timeScale = d3.scaleLinear()
+            .domain([ 0, 1 ])
+            .range([ this.timeTicks[0], this.timeTicks[this.timeTicks.length - 1] ]);
 
         // throttle calls to setting the xPosition of crosshairs
         this.subscriptions.push(this._xTimestampSubject.pipe(
@@ -123,6 +127,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             }
         }));
 
+        // subscribe to hovering on the scicharts plots
         this.subscriptions.push( this._plotsService.getXyPosition$().pipe(
             filter( position => position != null ),
             distinctUntilChanged( ( prev, curr ) => prev.xPosition === curr.xPosition )
@@ -132,7 +137,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             }
         }));
 
-        // when the user clicks on a plot, set the time index to the nearest tick
+        // when the user clicks on a scicharts plot, set the time player crosshair to the nearest tick
         this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
             const timestampInSeconds = plotClicked.xPosition / 1000;
             const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
@@ -145,30 +150,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this._playingService.playing$.next(false);
         this.updateTime.emit( this.timeIndex );
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
-    }
-
-    newTimestep(newIndex: { value: number }) {
-        // stop playing when there is a click on the timeline
-        this._playingService.playing$.next(false);
-        this.setTimeIndex( newIndex.value );
-    }
-
-    playNextTimestep() {
-        const nextIndex = this.timeIndex + 1;
-        if ( nextIndex === this.timeTicks.length ) {
-            this._playingService.playing$.next(false);
-        }
-        if ( this.playing === true) {
-            this.setTimeIndex( nextIndex );
-        }
-    }
-
-    setTimeIndex( newIndex: number ) {
-        // setting the index will drive the image-push subscription
-        this.session.call('pv.time.index.set', [ newIndex ]);
-        const timestamp = this.timeTicks[newIndex];
-        this._xTimestampSubject.next(timestamp);
-
     }
 
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
@@ -223,6 +204,29 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     mouseleave() {
         // turn off updates to scicharts
         this.timePlayerHover = false;
+    }
+
+    newTimestep(newIndex: { value: number }) {
+        // stop playing when there is a click on the timeline
+        this._playingService.playing$.next(false);
+        this.setTimeIndex( newIndex.value );
+    }
+
+    playNextTimestep() {
+        const nextIndex = this.timeIndex + 1;
+        if ( nextIndex === this.timeTicks.length ) {
+            this._playingService.playing$.next(false);
+        }
+        if ( this.playing === true) {
+            this.setTimeIndex( nextIndex );
+        }
+    }
+
+    setTimeIndex( newIndex: number ) {
+        // setting the index will drive the image-push subscription
+        this.session.call('pv.time.index.set', [ newIndex ]);
+        const timestamp = this.timeTicks[newIndex];
+        this._xTimestampSubject.next(timestamp);
     }
 
     togglePlay() {
