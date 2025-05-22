@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
+import * as d3 from 'd3';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, throttleTime } from 'rxjs/operators';
 import { PlotsService, StatusService } from 'scicharts';
@@ -29,6 +30,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     startTime: string;
     subscriptions: Subscription[] = [];
     timePlayerHover = false;
+    timeScale: d3.ScaleLinear<number, number>;
     timestepDebouncer: Subject<number> = new Subject<number>();
 
 
@@ -89,6 +91,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                             this.session.call('pv.time.stop', []).then( () => {
                                 this.session.call('pv.time.index.get', []).then( (currentIndex) => {
                                     this.timeIndex = currentIndex;
+                                    // update the crosshairs on the plots
+                                    this._plotsService.setXyPosition( this.plotId, this.timeTicks[currentIndex] * 1000 );
                                     this.updateTime.emit( currentIndex );
                                 });
                             });
@@ -101,6 +105,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     ngAfterViewInit(): void {
         this.crosshairPositionPercent = this.timeIndex * 100 / ( this.timeTicks.length - 1 );
+        this.timeScale = d3.scaleLinear([ 0, 1 ], [ this.timeTicks[0], this.timeTicks[this.timeTicks.length - 1] ]);
 
         // throttle calls to setting the xPosition of crosshairs
         this.subscriptions.push(this._xTimestampSubject.pipe(
@@ -110,10 +115,11 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                 { leading: true, trailing: true }
             )
         ).subscribe( timestamp => {
-            this.crosshairPositionPercent = ( this._getNearestTick( timestamp / 1000 ) * 100 ) / ( this.timeTicks.length - 1 );
+            const timeIndex = this._getNearestTick( timestamp );
+            this.crosshairPositionPercent = ( timeIndex * 100 ) / ( this.timeTicks.length - 1 );
             // only update scicharts crosshair when the time player is being hovered
             if ( this.timePlayerHover ) {
-                this._plotsService.setXyPosition( this.plotId, timestamp );
+                this._plotsService.setXyPosition( this.plotId, timestamp * 1000 );
             }
         }));
 
@@ -122,7 +128,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             distinctUntilChanged( ( prev, curr ) => prev.xPosition === curr.xPosition )
         ).subscribe( ( xyPosition ) => {
             if ( !this.timePlayerHover ) {
-                this._xTimestampSubject.next( xyPosition.xPosition );
+                this._xTimestampSubject.next( xyPosition.xPosition / 1000 );
             }
         }));
 
@@ -160,8 +166,9 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     setTimeIndex( newIndex: number ) {
         // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
-        // update the crosshairs on the plots
-        this._plotsService.setXyPosition( this.plotId, this.timeTicks[newIndex] * 1000 );
+        const timestamp = this.timeTicks[newIndex];
+        this._xTimestampSubject.next(timestamp);
+
     }
 
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
@@ -191,17 +198,30 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     hoverValue( event: MouseEvent ) {
+        // don't do mouse interaction when playing
         if ( !this.playing ) {
             this.timePlayerHover = true;
-            const xPosition: number = event.x;
-            const sliderWidth: number = (event.target as HTMLElement).clientWidth;
-            const timestamp: number =
-                this.timeTicks[ Math.round( ( xPosition / sliderWidth ) * ( this.timeTicks.length - 1 ) ) ] * 1000;
+            // this is hacky and relies on the .mdc-slider__input styles, if these styles change, this will likely break
+            // the idea is to get the bounding box and parse the style strings to determine an accurate x position of the mouse relative
+            // to the slider ( mouseXPosition - boundingBoxXPosition + leftStyles)
+            // and to get an accurate width of the slider ( clientWidth - paddingLeft - paddingRight )
+            const boundingBoxXPosition = (event.target as HTMLElement).getBoundingClientRect().x;
+            const transformLeft = parseInt((event.target as HTMLElement).style.left, 10);
+            const additionalPadding =
+                parseInt((event.target as HTMLElement).style.paddingLeft, 10) +
+                parseInt((event.target as HTMLElement).style.paddingRight, 10);
+            const additionalWidth = parseInt((event.target as HTMLElement).style.width.split('+')[1], 10);
+
+            const xPosition: number = event.x - boundingBoxXPosition + transformLeft;
+            const sliderWidth: number = (event.target as HTMLElement).clientWidth - additionalPadding - additionalWidth;
+            // use timeScale to convert the xPosition/sliderWidth ratio to a timestamp
+            const timestamp: number = this.timeScale( xPosition / sliderWidth );
             this._xTimestampSubject.next(timestamp);
         }
     }
 
     mouseleave() {
+        // turn off updates to scicharts
         this.timePlayerHover = false;
     }
 
