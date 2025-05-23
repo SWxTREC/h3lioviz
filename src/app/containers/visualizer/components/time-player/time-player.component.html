@@ -12,10 +12,11 @@
             matSliderThumb
             [(value)]= "timeIndex"
             (change)="newTimestep({ value: timeIndex })"
-            (mousemove)="hoverValue($event)"
+            (mousemove)="hoverTimeline($event)"
             (mouseleave)="mouseleave()"
             />
         <div class="time-player__crosshair" [style.left]="crosshairPositionPercent + '%'" tabindex="0"></div>
+        <div class="time-player__crosshair-label" [style.left]="crosshairPositionPercent + '%'" tabindex="0">{{ hoveredTime | amFromUnix | amUtc | amDateFormat: 'HH:00' }}</div>
     </mat-slider>
     <div class="time-player__slider-labels">
         <div class="time-player__slider-label">

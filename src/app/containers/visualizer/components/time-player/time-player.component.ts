@@ -2,7 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Ou
 import * as d3 from 'd3';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, throttleTime } from 'rxjs/operators';
-import { PlotsService, StatusService } from 'scicharts';
+import { ImageViewerService, IPlot, PlotsService, StatusService } from 'scicharts';
 import { PlayingService } from 'src/app/services';
 
 @Component({
@@ -17,12 +17,12 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     @Output() updateTime = new EventEmitter();
 
     crosshairPositionPercent: number;
-
+    hoveredTime: number;
+    hasImageDatasets: boolean;
     playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
     // since crosshairs are synced, only one plotId is needed
     plotId: string;
-
     session: {
         subscribe: (arg0: string, arg1: (image: any) => void) => Subscription;
         call: (arg0: string, arg1: number[]) => Promise<any>;
@@ -33,11 +33,11 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     timeScale: d3.ScaleLinear<number, number>;
     timestepDebouncer: Subject<number> = new Subject<number>();
 
-
     // instead of directly updating the crosshair position, use this Subject to throttle updates
     private _xTimestampSubject: Subject<number> = new Subject<number>();
 
     constructor(
+        private _imageViewerService: ImageViewerService,
         private _playingService: PlayingService,
         private _plotsService: PlotsService,
         private _statusService: StatusService
@@ -57,11 +57,21 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             })
         );
         this.subscriptions.push(
-            this._statusService.allPlotsStable$.subscribe( ( allPlotsStable: boolean ) => {
-                if ( allPlotsStable ) {
-                    this.plotId = this._plotsService.getPlots$().value[0].plotId;
-                    this._plotsService.setXyPosition( this.plotId, this.timeTicks[this.timeIndex] * 1000 );
-                }
+            this._plotsService.getPlots$().pipe( filter( plots => plots.length > 0 )).subscribe( ( plots: IPlot[] ) => {
+                this.plotId = plots[0].plotId;
+                const imageDatasets = plots.filter( ( plot ) => plot.type === 'IMAGE' );
+                this.hasImageDatasets = imageDatasets.length > 0;
+                this.subscriptions.push(
+                    this._statusService.getStatus$(this.plotId).subscribe( ( plotsStatus ) => {
+                        if ( plotsStatus >= 50 ) {
+                            if ( this.hasImageDatasets ) {
+                                this._imageViewerService.updateTimeSync({ timestamp: this.timeTicks[this.timeIndex] * 1000 });
+                            } else {
+                                this._plotsService.setXyPosition( this.plotId, this.timeTicks[this.timeIndex] * 1000 );
+                            }
+                        }
+                    })
+                );
             })
         );
     }
@@ -118,12 +128,13 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                 undefined,
                 { leading: true, trailing: true }
             )
-        ).subscribe( timestamp => {
-            const timeIndex = this._getNearestTick( timestamp );
+        ).subscribe( hoveredTime => {
+            const timeIndex = this._getNearestTick( hoveredTime );
+            this.hoveredTime = this.timeTicks[timeIndex];
             this.crosshairPositionPercent = ( timeIndex * 100 ) / ( this.timeTicks.length - 1 );
-            // only update scicharts crosshair when the time player is being hovered
-            if ( this.timePlayerHover ) {
-                this._plotsService.setXyPosition( this.plotId, timestamp * 1000 );
+            // only update scicharts crosshair when the time player is playing or being hovered
+            if ( this.playing || this.timePlayerHover ) {
+                this._plotsService.setXyPosition( this.plotId, hoveredTime * 1000 );
             }
         }));
 
@@ -137,11 +148,26 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             }
         }));
 
+        // when the user clicks on the image plot (or a plot), set the time player crosshair to the nearest tick
+        // the image service is also called whenever the user clicks on a plot, so this is the only update needed
+        // when an image dataset is present
+        this.subscriptions.push( this._imageViewerService.syncTime$.pipe(
+            filter( ( time ) => time != null ),
+            distinctUntilChanged( (prev, curr) => prev.timestamp === curr.timestamp )
+        ).subscribe( ( time ) => {
+            if ( this.hasImageDatasets && !this.timePlayerHover && !this.playing ) {
+                const nearestTimeIndex = this._getNearestTick( time.timestamp / 1000 );
+                this.updateTime.emit( nearestTimeIndex );
+            }
+        }));
+
         // when the user clicks on a scicharts plot, set the time player crosshair to the nearest tick
         this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
-            const timestampInSeconds = plotClicked.xPosition / 1000;
-            const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
-            this.updateTime.emit( nearestTimeIndex );
+            if ( !this.hasImageDatasets ) {
+                const timestampInSeconds = plotClicked.xPosition / 1000;
+                const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
+                this.updateTime.emit( nearestTimeIndex );
+            }
         }));
     }
 
@@ -178,7 +204,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         return ( sortedList[ low ] - target ) < ( target - sortedList[ high ] ) ? sortedList[ low ] : sortedList[ high ];
     }
 
-    hoverValue( event: MouseEvent ) {
+    hoverTimeline( event: MouseEvent ) {
         // don't do mouse interaction when playing
         if ( !this.playing ) {
             this.timePlayerHover = true;
@@ -196,8 +222,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             const xPosition: number = event.x - boundingBoxXPosition + transformLeft;
             const sliderWidth: number = (event.target as HTMLElement).clientWidth - additionalPadding - additionalWidth;
             // use timeScale to convert the xPosition/sliderWidth ratio to a timestamp
-            const timestamp: number = this.timeScale( xPosition / sliderWidth );
-            this._xTimestampSubject.next(timestamp);
+            const hoveredTimestamp: number = this.timeScale( xPosition / sliderWidth );
+            this._xTimestampSubject.next(hoveredTimestamp);
         }
     }
 
@@ -227,6 +253,9 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.session.call('pv.time.index.set', [ newIndex ]);
         const timestamp = this.timeTicks[newIndex];
         this._xTimestampSubject.next(timestamp);
+        if ( this.hasImageDatasets ) {
+            this._imageViewerService.updateTimeSync({ timestamp: timestamp * 1000 });
+        }
     }
 
     togglePlay() {
