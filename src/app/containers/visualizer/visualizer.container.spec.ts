@@ -5,9 +5,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
+import { Chart } from 'highcharts';
 import { LaspFooterModule } from 'lasp-footer';
 import { MomentModule } from 'ngx-moment';
-import { GridComponent } from 'scicharts';
+import { ChartModule, GridComponent } from 'scicharts';
 import { ComponentsModule } from 'src/app/modules';
 import { MaterialModule } from 'src/app/modules/material.module';
 import { AwsService, ProfileNavService } from 'src/app/services';
@@ -43,6 +44,7 @@ describe('VisualizerComponent', () => {
             imports: [
                 AngularSplitModule,
                 BrowserAnimationsModule,
+                ChartModule,
                 ComponentsModule,
                 HttpClientTestingModule,
                 ReactiveFormsModule,

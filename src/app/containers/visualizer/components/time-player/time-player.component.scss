@@ -78,6 +78,7 @@
         width: 100%;
     }
 }
+// Only have one set of player controls in the app, hide the ones in scicharts
 ::ng-deep {
     .image-viewer__controls {
         button {

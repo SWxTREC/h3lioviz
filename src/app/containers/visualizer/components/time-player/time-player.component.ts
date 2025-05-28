@@ -19,7 +19,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     crosshairPositionPercent: number;
     hoveredTime: number;
     hasImageDatasets: boolean;
-    playing = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
     // since crosshairs are synced, only one plotId is needed
     plotId: string;
@@ -35,33 +34,33 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     // instead of directly updating the crosshair position, use this Subject to throttle updates
     private _xTimestampSubject: Subject<number> = new Subject<number>();
+    // private _playing = false;
+    statusSubscription: any;
 
     constructor(
+        protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
-        private _playingService: PlayingService,
         private _plotsService: PlotsService,
         private _statusService: StatusService
     ) {
-        this.subscriptions.push( this._playingService.playing$.subscribe( (playing: boolean) => {
-            this.playing = playing;
-            this.playingDebouncer.next( playing );
+        this.subscriptions.push( this._playingService.playing$.pipe(
+            debounceTime(300),
+            filter( (playing: boolean) => playing === true )
+        ).subscribe( (playing: boolean) => {
+            this.playNextTimestep();
         }));
 
         this.subscriptions.push(
-            this.playingDebouncer.pipe(
-                debounceTime(300),
-                filter( (playing: boolean) => playing === true )
-            ).subscribe( () => {
-                // play when play button is pressed
-                this.playNextTimestep();
-            })
-        );
-        this.subscriptions.push(
             this._plotsService.getPlots$().pipe( filter( plots => plots.length > 0 )).subscribe( ( plots: IPlot[] ) => {
                 this.plotId = plots[0].plotId;
+                if ( this.statusSubscription ) {
+                    this.statusSubscription.unsubscribe();
+                }
                 const imageDatasets = plots.filter( ( plot ) => plot.type === 'IMAGE' );
                 this.hasImageDatasets = imageDatasets.length > 0;
-                this.subscriptions.push(
+                // TODO: until we can have a status from the statusService that does not require a plotId, use this subscription
+                // to set the crosshair position after the plots have rendered
+                this.statusSubscription =
                     this._statusService.getStatus$(this.plotId).subscribe( ( plotsStatus ) => {
                         if ( plotsStatus >= 50 ) {
                             if ( this.hasImageDatasets ) {
@@ -70,8 +69,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                                 this._plotsService.setXyPosition( this.plotId, this.timeTicks[this.timeIndex] * 1000 );
                             }
                         }
-                    })
-                );
+                    });
             })
         );
     }
@@ -95,7 +93,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                         if ( timeIndex === this.timeTicks.length - 1 ) {
                             this._playingService.playing$.next(false);
                         }
-                        if ( this.playing ) {
+                        if ( this._playingService.playing$.value === true ) {
                             this.timeIndex = timeIndex;
                             this.playNextTimestep();
                         } else {
@@ -133,7 +131,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             this.hoveredTime = this.timeTicks[timeIndex];
             this.crosshairPositionPercent = ( timeIndex * 100 ) / ( this.timeTicks.length - 1 );
             // only update scicharts crosshair when the time player is playing or being hovered
-            if ( this.playing || this.timePlayerHover ) {
+            if ( this._playingService.playing$.value === true || this.timePlayerHover ) {
                 this._plotsService.setXyPosition( this.plotId, hoveredTime * 1000 );
             }
         }));
@@ -155,7 +153,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             filter( ( time ) => time != null ),
             distinctUntilChanged( (prev, curr) => prev.timestamp === curr.timestamp )
         ).subscribe( ( time ) => {
-            if ( this.hasImageDatasets && !this.timePlayerHover && !this.playing ) {
+            if ( this.hasImageDatasets && !this.timePlayerHover && this._playingService.playing$.value === false ) {
                 const nearestTimeIndex = this._getNearestTick( time.timestamp / 1000 );
                 this.updateTime.emit( nearestTimeIndex );
             }
@@ -175,6 +173,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         // stop playing and set index when time player is destroyed
         this._playingService.playing$.next(false);
         this.updateTime.emit( this.timeIndex );
+        this.statusSubscription.unsubscribe();
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
@@ -206,7 +205,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     hoverTimeline( event: MouseEvent ) {
         // don't do mouse interaction when playing
-        if ( !this.playing ) {
+        if ( this._playingService.playing$.value === false ) {
             this.timePlayerHover = true;
             // this is hacky and relies on the .mdc-slider__input styles, if these styles change, this will likely break
             // the idea is to get the bounding box and parse the style strings to determine an accurate x position of the mouse relative
@@ -243,7 +242,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         if ( nextIndex === this.timeTicks.length ) {
             this._playingService.playing$.next(false);
         }
-        if ( this.playing === true) {
+        if ( this._playingService.playing$.value === true) {
             this.setTimeIndex( nextIndex );
         }
     }
@@ -259,7 +258,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     togglePlay() {
-        this._playingService.playing$.next(!this.playing);
+        const playingStatus = this._playingService.playing$.value;
+        this._playingService.playing$.next(!playingStatus);
     }
 
     /** find the closest tick value to a given timestamp */

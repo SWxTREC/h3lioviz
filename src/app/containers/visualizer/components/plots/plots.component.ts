@@ -41,7 +41,6 @@ export class PlotsComponent implements OnChanges {
 
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
-    playing: boolean;
     plotForm: FormGroup = new FormGroup({
         image: new FormControl(),
         model: new FormControl(),
@@ -52,9 +51,9 @@ export class PlotsComponent implements OnChanges {
     siteConfig: ISiteConfig;
 
     constructor(
+        protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
-        private _playingService: PlayingService,
         private _plotsService: PlotsService,
         private _statusService: StatusService,
         private _uiOptionsService: UiOptionsService,
@@ -73,12 +72,6 @@ export class PlotsComponent implements OnChanges {
         this._plotsService.enableCrosshairSync();
         this._xRangeService.enableZoomSyncByVariable( true, 'time' );
         this._imageViewerService.setImageViewerSync( true );
-
-        this._playingService.playing$.pipe(
-            takeUntilDestroyed()
-        ).subscribe( (playing: boolean) => {
-            this.playing = playing;
-        });
 
         // TODO: this is a workaround for not showing the sticky XAXIS plot on load: https://jira.lasp.colorado.edu/browse/SCICHARTS-452
         // can move setting stackedMode to the load of the component (with other options settings above) when this issue is fixed

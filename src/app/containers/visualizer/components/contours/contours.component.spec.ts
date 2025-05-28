@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { ContoursComponent } from './contours.component';
@@ -17,6 +18,7 @@ describe('ContoursComponent', () => {
             declarations: [ ContoursComponent ],
             imports: [
                 BrowserAnimationsModule,
+                ChartModule,
                 HttpClientTestingModule,
                 MaterialModule,
                 NgxSliderModule,
