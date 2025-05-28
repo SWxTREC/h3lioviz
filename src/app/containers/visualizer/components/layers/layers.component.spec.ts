@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { LayersComponent } from './layers.component';
@@ -17,6 +18,7 @@ describe('LayersComponent', () => {
             declarations: [ LayersComponent ],
             imports: [
                 BrowserAnimationsModule,
+                ChartModule,
                 HttpClientTestingModule,
                 NgxSliderModule,
                 MaterialModule,

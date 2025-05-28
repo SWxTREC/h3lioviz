@@ -2,13 +2,21 @@
     <div>{{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}</div>
     <mat-slider
         class="time-player__slider"
-        [class.time-player__slider--pulsing]="playing"
+        [class.time-player__slider--pulsing]="this._playingService.playing$ | async"
         color="primary"
         [min]="0"
         [max]="timeTicks.length - 1"
         aria-label="time-selector"
-        #ngSlider>
-        <input matSliderThumb (change)="newTimestep({ value: timeIndex })" #ngSliderThumb="matSliderThumb" [(value)]= "timeIndex" />
+        >
+        <input
+            matSliderThumb
+            [(value)]= "timeIndex"
+            (change)="newTimestep({ value: timeIndex })"
+            (mousemove)="hoverTimeline($event)"
+            (mouseleave)="mouseleave()"
+            />
+        <div class="time-player__crosshair" [style.left]="crosshairPositionPercent + '%'" tabindex="0"></div>
+        <div class="time-player__crosshair-label" [style.left]="crosshairPositionPercent + '%'" tabindex="0">{{ hoveredTime | amFromUnix | amUtc | amDateFormat: 'HH:00' }}</div>
     </mat-slider>
     <div class="time-player__slider-labels">
         <div class="time-player__slider-label">
@@ -19,11 +27,10 @@
         </div>
     </div>
     <div class="time-player__controls" [class.time-player__controls--disabled]="timeIndex === timeTicks.length - 1" (click)="togglePlay()">
-        @if (!playing) {
-            <mat-icon>play_arrow</mat-icon>
-        }
-        @if (playing) {
+        @if (this._playingService.playing$ | async) {
             <mat-icon>pause</mat-icon>
+        } @else {
+            <mat-icon>play_arrow</mat-icon>
         }
     </div>
 </div>

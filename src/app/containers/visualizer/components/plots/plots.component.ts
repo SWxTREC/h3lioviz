@@ -1,7 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { cloneDeep } from 'lodash';
 import { debounceTime } from 'rxjs/operators';
+
 import {
     IDataset,
     ImageViewerService,
@@ -10,6 +12,7 @@ import {
     IPlotParams,
     MenuOptionsService,
     PlotsService,
+    StatusService,
     UiOptionsService,
     XRangeService
 } from 'scicharts';
@@ -23,6 +26,7 @@ import {
     observedDatasetCatalog,
     SATELLITE_NAMES
 } from 'src/app/models';
+import { PlayingService } from 'src/app/services';
 import { environment, localUrls } from 'src/environments/environment';
 
 @Component({
@@ -34,6 +38,7 @@ export class PlotsComponent implements OnChanges {
     @Input() timeRange: number[];
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
+
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
@@ -46,17 +51,19 @@ export class PlotsComponent implements OnChanges {
     siteConfig: ISiteConfig;
 
     constructor(
+        protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
         private _plotsService: PlotsService,
+        private _statusService: StatusService,
         private _uiOptionsService: UiOptionsService,
         private _xRangeService: XRangeService
     ) {
         this._menuOptionsService.setGlobalMenuOptions( cloneDeep(DEFAULT_PLOT_OPTIONS) );
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
-        uiOptions.stackedMode = true;
         uiOptions.gridHeightCorrection = 200;
+        uiOptions.legend = 'minimal';
         this._uiOptionsService.setUiOptions( uiOptions );
         // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
@@ -66,7 +73,20 @@ export class PlotsComponent implements OnChanges {
         this._xRangeService.enableZoomSyncByVariable( true, 'time' );
         this._imageViewerService.setImageViewerSync( true );
 
-        this.plotForm.valueChanges.pipe( debounceTime(1000) ).subscribe( newValue => {
+        // TODO: this is a workaround for not showing the sticky XAXIS plot on load: https://jira.lasp.colorado.edu/browse/SCICHARTS-452
+        // can move setting stackedMode to the load of the component (with other options settings above) when this issue is fixed
+        this._statusService.allPlotsStable$.pipe(
+            takeUntilDestroyed()
+        ).subscribe( ( allPlotsStable: boolean ) => {
+            if ( allPlotsStable ) {
+                this._uiOptionsService.setUiOptions({ stackedMode: true });
+            }
+        });
+
+        this.plotForm.valueChanges.pipe(
+            debounceTime(1000),
+            takeUntilDestroyed()
+        ).subscribe( newValue => {
             const plotList = [];
             if ( newValue.image?.length ) {
                 plotList.push(this.getImagePlot( newValue.image ));
@@ -87,6 +107,7 @@ export class PlotsComponent implements OnChanges {
         const plotsToSet = this.getPlotListByFormCategory( this.plotConfig );
         this.plotForm.setValue( plotsToSet );
     }
+
     createImageDataset( imageDatasetId: string )  {
         const datasetInfo = this.imageData[imageDatasetId];
         const newDataset: IDataset = {

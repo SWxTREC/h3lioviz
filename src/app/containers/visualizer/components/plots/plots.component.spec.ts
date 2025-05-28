@@ -2,7 +2,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GridComponent } from 'scicharts';
+import { provideRouter } from '@angular/router';
+import { ChartModule, GridComponent } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { PlotsComponent } from './plots.component';
@@ -19,11 +20,14 @@ describe('PlotsComponent', () => {
             ],
             imports: [
                 BrowserAnimationsModule,
+                ChartModule,
                 HttpClientTestingModule,
                 MaterialModule,
                 ReactiveFormsModule
+            ],
+            providers: [
+                provideRouter([])
             ]
-
         })
             .compileComponents();
     });

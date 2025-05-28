@@ -9,6 +9,7 @@
 }
 
 .time-player {
+    position: relative;
     width: 100%;
     text-align: center;
     padding: 0.3rem 1rem;
@@ -25,6 +26,25 @@
             pointer-events: none;
         }
     }
+    &__crosshair {
+        position: absolute;
+        height: 3rem;
+        width: 0.12rem;
+        background-color: rgba(0, 0, 0, 0.25);
+        z-index: 5;
+        pointer-events: none;
+    }
+    &__crosshair-label {
+        position: absolute;
+        font-size: x-small;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.6);
+        z-index: 6;
+        pointer-events: none;
+        transform: translateX(-50%);
+        padding: 0.1rem 0.2rem;
+        border-radius: 5%;
+    }
     &__slider {
         width: 100%;
         &--pulsing {
@@ -37,6 +57,7 @@
                     opacity: 1;
                     animation: fade-less 2s linear infinite;
                 }
+                pointer-events: none;
             }
         }
     }
@@ -55,5 +76,19 @@
         position: relative;
         top: -2.3rem;
         width: 100%;
+    }
+}
+// Only have one set of player controls in the app, hide the ones in scicharts
+::ng-deep {
+    .image-viewer__controls {
+        button {
+            display: none;
+        }
+        span {
+            display: none;
+        }
+        .image-viewer__loop-controls {
+            display: none !important;
+        }
     }
 }

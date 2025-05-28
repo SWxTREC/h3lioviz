@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { ColorsComponent } from '../colors/colors.component';
@@ -26,6 +27,7 @@ describe('ControlPanelComponent', () => {
             ],
             imports: [
                 BrowserAnimationsModule,
+                ChartModule,
                 HttpClientTestingModule,
                 MaterialModule,
                 NgxSliderModule,

@@ -4,6 +4,8 @@ import { LaspFooterModule } from 'lasp-footer';
 import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 import { LaspNavModule, LaspNavService } from 'lasp-nav';
 
+import { ChartModule } from 'scicharts';
+
 import { AppComponent } from './app.component';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
@@ -12,6 +14,7 @@ describe('AppComponent', () => {
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             imports: [
+                ChartModule,
                 RouterModule.forRoot(routes, {}),
                 LaspFooterModule,
                 LaspFullPageOverlayModule,

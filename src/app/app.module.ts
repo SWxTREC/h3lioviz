@@ -10,6 +10,10 @@ import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
 import { LaspNavModule } from 'lasp-nav';
 import { MarkdownModule } from 'ngx-markdown';
 
+import { ChartModule } from 'scicharts';
+
+import { environment } from 'src/environments/environment';
+
 import { AppComponent } from './app.component';
 import { AuthGuard } from './guards/auth-guard.service';
 import { MaterialModule } from './modules';
@@ -23,6 +27,10 @@ import { AwsService, ProfileNavService } from './services';
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
+        ChartModule.forRoot({
+            sendAnalytics: environment.production && !environment.dev,
+            logAnalyticsCallsToConsole: false
+        }),
         FormsModule,
         LaspFooterModule,
         LaspFullPageOverlayModule,

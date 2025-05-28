@@ -22,7 +22,7 @@ export const environment = {
         }
     },
     dev: false,
-    googleAnalyticsId: 'GT-5NRMGGR',
+    googleAnalyticsId: 'GTM-NMJRJJHD',
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,
