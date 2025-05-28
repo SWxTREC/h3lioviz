@@ -27,6 +27,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         call: (arg0: string, arg1: number[]) => Promise<any>;
     };
     startTime: string;
+    statusSubscription: any;
     subscriptions: Subscription[] = [];
     timePlayerHover = false;
     timeScale: d3.ScaleLinear<number, number>;
@@ -34,8 +35,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     // instead of directly updating the crosshair position, use this Subject to throttle updates
     private _xTimestampSubject: Subject<number> = new Subject<number>();
-    // private _playing = false;
-    statusSubscription: any;
 
     constructor(
         protected _playingService: PlayingService,
