@@ -5,7 +5,8 @@ export const routes: Routes = [
     {
         path: '',
         title: 'H3lioViz | Interactive 3D Heliosphere Visualizer',
-        loadChildren: () => import( './containers/home/home.module').then( m => m.HomeModule )
+        loadChildren: () => import( './containers/home/home.module').then( m => m.HomeModule ),
+        pathMatch: 'full'
     }, {
         path: 'docs',
         title: 'Documentation | H3lioViz',

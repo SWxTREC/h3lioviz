@@ -122,12 +122,27 @@ To manually trigger a deploy of the dev branch, run this job: https://jenkins-bu
 
 ### Version and release
 
-Once <https://dev.swx-trec.com/h3lioviz> is tested and ready for a release, merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
+Once <https://dev.swx-trec.com/h3lioviz> is tested and ready for a release:
+
+#### Update HISTORY.md with changes
+
+Copy the previous release heading from assets/markdown/CHANGELOG.md to the top of assets/markdown/HISTORY.md.
+
+Above that, add the new features, changes, and fixes that have happened in the frontend and to the model since the last release.
+
+In the `package.json`, replace the `"startingVersion": "x.xx.x"`, with the previous release version as copied from the heading.
+
+Commit and push these updates.
+
+#### Version and deploy
+
+Merge `dev` into `main`. From the `main` branch, run `npm version <major | minor | patch>` where major indicates a breaking change, minor is noticeable but non-breaking interface change, and patch is a non-breaking, under-the-hood refinement.
 
 This will:
 
 * run the linter and unit tests and abort if they fail
 * increment the version, commit the change, and create a git tag
+* generate the changelog
 * push the changes and the new tag to the remote repo
 * merge the version changes back into the dev branch
 
