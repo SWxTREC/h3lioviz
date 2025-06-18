@@ -33,6 +33,7 @@ export const environment = {
     },
     dev: true,
     googleAnalyticsId: '', // intentionally empty; don't try to track usage during development
+    isDeployedDev: false,
     latisUrl: 'https://swp-dev.pdmz.lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: false,
     siteRootUrl: siteRootUrl,

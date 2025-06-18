@@ -24,6 +24,7 @@ export const environment = {
     dev: false,
     googleAnalyticsId: 'GTM-NMJRJJHD',
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
+    isDeployedDev: false,
     production: true,
     siteRootUrl: siteRootUrl,
     version: packageInfo.version
