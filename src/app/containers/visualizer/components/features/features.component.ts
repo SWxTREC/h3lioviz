@@ -1,24 +1,19 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { snakeCase } from 'lodash';
+import { assign, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { ConfigLabels, LAYER_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
+import { ConfigLabels, FEATURES, ILayers, LAYER_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
 @Component({
-    selector: 'swt-layers',
-    templateUrl: './layers.component.html',
-    styleUrls: [  '../form.scss', './layers.component.scss' ]
+    selector: 'swt-features',
+    templateUrl: './features.component.html',
+    styleUrls: [  '../form.scss', './features.component.scss' ]
 })
-export class LayersComponent implements OnChanges, OnDestroy, OnInit {
+export class FeaturesComponent implements OnChanges, OnDestroy, OnInit {
     @Input() pvView: any;
-    lonSliceAngle: string;
-    lonSliceOptions = {
-        validRange: [ -10, 10 ],
-        stepSize: 0.5
-    };
-    layers: FormGroup = new FormGroup({});
+    features: FormGroup = new FormGroup({});
     renderDebouncer = new Subject<void>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     showAngleAdjust = false;
@@ -28,9 +23,11 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        // initialize FormGroup with default layer names and values
+        // initialize FormGroup from layers with default feature names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.layers.addControl(controlName, new FormControl( LAYER_FORM_DEFAULT_VALUES[controlName]));
+            if ( FEATURES.includes( controlName ) ) {
+                this.features.addControl(controlName, new FormControl( LAYER_FORM_DEFAULT_VALUES[controlName]));
+            }
         });
         // debounce render
         this.subscriptions.push(
@@ -38,7 +35,10 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
                 debounceTime( 300 )
             ).subscribe(() => {
                 this.pvView.render();
-                this._siteConfigService.updateSiteConfig( { [ConfigLabels.layers]: this.layers.value });
+                const layersConfig: ILayers = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
+                // combine new feature values with existing layers config
+                const newLayersConfig = assign({}, layersConfig, this.features.value);
+                this._siteConfigService.updateSiteConfig( { [ConfigLabels.layers]: newLayersConfig });
             })
         );
     }
@@ -50,8 +50,12 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form
-            const initialFormValues = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
-            this.layers.setValue( initialFormValues );
+            const layers: ILayers = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
+            const initialFormValues = Object.keys(this.features.controls).reduce((aggregator, feature) => {
+                aggregator[feature] = layers[feature];
+                return aggregator;
+            }, {});
+            this.features.setValue( initialFormValues );
         }
     }
 
@@ -63,22 +67,12 @@ export class LayersComponent implements OnChanges, OnDestroy, OnInit {
 
     setFormSubscriptions() {
         // subscribe to any form change
-        this.subscriptions.push( this.layers.valueChanges
+        this.subscriptions.push( this.features.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
                 this.updateVisibilityControls( newFormValues );
                 // this will render every time any named control in the form is updated
                 this.renderDebouncer.next();
-            })
-        );
-        // subscribe to LON SLICE TYPE changes and render appropriately
-        this.subscriptions.push( this.layers.controls.lonSliceType.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newLonSliceType => {
-                if ( newLonSliceType === 'solar-equator' ) {
-                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'equator' ]);
-                } else {
-                    this.session.call('pv.h3lioviz.snap_solar_plane', [ 'ecliptic' ]);
-                }
             })
         );
     }

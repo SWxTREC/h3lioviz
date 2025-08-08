@@ -1,14 +1,14 @@
-<form [formGroup]="layers">
+<form [formGroup]="slices">
     <mat-list class="layers__list">
-        <mat-list-item>
+        <!-- <mat-list-item>
             <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
-        </mat-list-item>
+        </mat-list-item> -->
         <mat-list-item>
             <mat-checkbox color="primary" formControlName="lonSlice">
                 Equatorial slice
             </mat-checkbox>
         </mat-list-item>
-        @if (layers.value.lonSlice) {
+        @if (slices.value.lonSlice) {
             <mat-list-item class="layers__conditional-item">
                 <mat-radio-group class="layers__group" color="primary" formControlName="lonSliceType" aria-label="slice through either ecliptic or solar equator">
                     <mat-radio-button value="ecliptic">Ecliptic</mat-radio-button>
@@ -22,7 +22,7 @@
         <mat-list-item>
             <mat-checkbox color="primary" formControlName="radialSlice">Radial slice at 1AU</mat-checkbox>
         </mat-list-item>
-        <mat-list-item>
+        <!-- <mat-list-item>
             <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
         </mat-list-item>
         <mat-list-item>
@@ -30,6 +30,6 @@
         </mat-list-item>
         <mat-list-item>
             <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
-        </mat-list-item>
+        </mat-list-item> -->
     </mat-list>
 </form>

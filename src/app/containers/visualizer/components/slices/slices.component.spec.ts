@@ -7,42 +7,32 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
-import { ColorsComponent } from '../colors/colors.component';
-import { ContoursComponent } from '../contours/contours.component';
-import { SlicesComponent } from '../slices/slices.component';
+import { SlicesComponent } from './slices.component';
 
-import { ControlPanelComponent } from './control-panel.component';
-
-describe('ControlPanelComponent', () => {
-    let component: ControlPanelComponent;
-    let fixture: ComponentFixture<ControlPanelComponent>;
+describe('SlicesComponent', () => {
+    let component: SlicesComponent;
+    let fixture: ComponentFixture<SlicesComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [
-                ControlPanelComponent,
-                SlicesComponent,
-                ContoursComponent,
-                ColorsComponent
-            ],
+            declarations: [ SlicesComponent ],
             imports: [
                 BrowserAnimationsModule,
                 ChartModule,
                 HttpClientTestingModule,
-                MaterialModule,
                 NgxSliderModule,
+                MaterialModule,
                 ReactiveFormsModule
             ],
             providers: [
                 provideRouter([])
             ]
-
         })
     .compileComponents();
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ControlPanelComponent);
+        fixture = TestBed.createComponent(SlicesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

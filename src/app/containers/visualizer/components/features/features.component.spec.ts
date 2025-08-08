@@ -7,15 +7,15 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
-import { LayersComponent } from './layers.component';
+import { FeaturesComponent } from './features.component';
 
-describe('LayersComponent', () => {
-    let component: LayersComponent;
-    let fixture: ComponentFixture<LayersComponent>;
+describe('FeaturesComponent', () => {
+    let component: FeaturesComponent;
+    let fixture: ComponentFixture<FeaturesComponent>;
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ LayersComponent ],
+            declarations: [ FeaturesComponent ],
             imports: [
                 BrowserAnimationsModule,
                 ChartModule,
@@ -32,7 +32,7 @@ describe('LayersComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(LayersComponent);
+        fixture = TestBed.createComponent(FeaturesComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

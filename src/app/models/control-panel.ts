@@ -159,15 +159,19 @@ export const DEFAULT_COLOR_RANGES: { [parameter: string]: [ number, number ] } =
     }, {});
 
 export interface IControlPanel {
-    layers: boolean;
-    contours: boolean;
     colors: boolean;
+    contours: boolean;
+    features?: boolean;
+    slices?: boolean;
+    layers?: boolean;
 }
 
 export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
-    layers: true,
+    colors: true,
     contours: true,
-    colors: true
+    features: true,
+    layers: false,
+    slices: true
 };
 
 export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
@@ -206,6 +210,20 @@ export interface ILayers {
     satellites: boolean;
     satFieldlines: boolean;
 }
+
+export const SLICES = [
+    'latSlice',
+    'lonSlice',
+    'lonSliceType',
+    'radialSlice'
+];
+
+export const FEATURES = [
+    'cme',
+    'lonStreamlines',
+    'satellites',
+    'satFieldlines'
+];
 
 export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
     cme: false,
