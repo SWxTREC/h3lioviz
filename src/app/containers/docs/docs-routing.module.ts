@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { ChangelogComponent } from './components';
+import { ChangelogComponent } from './components/changelog/changelog.component';
 import { DocsComponent } from './docs.component';
 
 const routes: Routes = [
