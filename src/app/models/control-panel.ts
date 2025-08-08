@@ -169,8 +169,7 @@ export interface IControlPanel {
 export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
     colors: true,
     contours: true,
-    features: true,
-    layers: false,
+    features: false,
     slices: true
 };
 
