@@ -1,0 +1,23 @@
+.changelog {
+    ::ng-deep {
+        h2 {
+            pointer-events: none;
+            a {
+                all: unset;
+            }
+        }
+        ul {
+            pointer-events: none;
+            a {
+                display: none;
+            }
+        }
+    }
+    &__content {
+        ::ng-deep {
+            ul:last-of-type {
+                margin-bottom: 0px;
+            }
+        }
+    }
+}
