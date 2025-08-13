@@ -22,11 +22,10 @@ import { environment } from '../environments/environment';
 })
 export class AppComponent {
     prodUrl = 'https://swx-trec.com/' + packageInfo.name;
-    isDeployedDev = environment.dev === true && environment.production === true;
     storageTimestamp: number = +localStorage.getItem(packageInfo.name); // evaluates to 0 if storage is empty
     dismissed = this.storageTimestamp + (1000 * 60 * 60 * 24 * 7) > Date.now();
     // show banner if on deployed dev site and banner has not been dismissed by user in past week
-    showBanner = this.isDeployedDev && !this.dismissed;
+    showBanner = environment.isDeployedDev && !this.dismissed;
     // please have no more than 7 items in the nav menu
     navItems: INavItem[] = [
         {

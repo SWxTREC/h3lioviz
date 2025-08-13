@@ -25,6 +25,7 @@ export const environment = {
     },
     dev: true,
     googleAnalyticsId: '', // intentionally empty; don't try to track usage during development
+    isDeployedDev: true, // set to true if this is a deployed dev site
     latisUrl: 'https://lasp.colorado.edu/space-weather-portal/latis/dap/',
     production: true,
     siteRootUrl: siteRootUrl,

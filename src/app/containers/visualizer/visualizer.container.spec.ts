@@ -15,10 +15,10 @@ import { AwsService, ProfileNavService } from 'src/app/services';
 import {
     ColorsComponent,
     HintsComponent,
-    LayersComponent,
     MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
+    SlicesComponent,
     TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
@@ -32,7 +32,7 @@ describe('VisualizerComponent', () => {
             declarations: [
                 ColorsComponent,
                 HintsComponent,
-                LayersComponent,
+                SlicesComponent,
                 GridComponent,
                 OrientationMenuComponent,
                 MouseZoomComponent,

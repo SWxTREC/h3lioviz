@@ -1,21 +1,34 @@
 <mat-expansion-panel
     class="control__expander"
-    [expanded]="expansionState?.layers"
-    (opened)="expansionState.layers = true"
-    (closed)="expansionState.layers = false"
+    [expanded]="expansionState?.slices"
+    (opened)="expansionState.slices = true; updateConfig()"
+    (closed)="expansionState.slices = false; updateConfig()"
     >
     <mat-expansion-panel-header class="control__header">
         <mat-panel-title>
-            Layers
+            Slices
         </mat-panel-title>
     </mat-expansion-panel-header>
-    <swt-layers [pvView]="pvView"></swt-layers>
+    <swt-slices [pvView]="pvView"></swt-slices>
+</mat-expansion-panel>
+<mat-expansion-panel
+    class="control__expander"
+    [expanded]="expansionState?.features"
+    (opened)="expansionState.features = true; updateConfig()"
+    (closed)="expansionState.features = false; updateConfig()"
+    >
+    <mat-expansion-panel-header class="control__header">
+        <mat-panel-title>
+            Features
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <swt-features [pvView]="pvView"></swt-features>
 </mat-expansion-panel>
 <mat-expansion-panel
     class="control__expander"
     [expanded]="expansionState?.contours"
-    (opened)="expansionState.contours = true"
-    (closed)="expansionState.contours = false"
+    (opened)="expansionState.contours = true; updateConfig()"
+    (closed)="expansionState.contours = false; updateConfig()"
     >
     <mat-expansion-panel-header class="control__header">
         <mat-panel-title>
@@ -27,8 +40,8 @@
 <mat-expansion-panel
     class="control__expander"
     [expanded]="expansionState?.colors"
-    (opened)="expansionState.colors = true"
-    (closed)="expansionState.colors = false"
+    (opened)="expansionState.colors = true; updateConfig()"
+    (closed)="expansionState.colors = false; updateConfig()"
     >
     <mat-expansion-panel-header class="control__header">
       <mat-panel-title>

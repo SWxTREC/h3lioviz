@@ -13,13 +13,14 @@ import {
     ColorsComponent,
     ContoursComponent,
     ControlPanelComponent,
+    FeaturesComponent,
     HintsComponent,
-    LayersComponent,
     MouseZoomComponent,
     OrientationMenuComponent,
     PlotsComponent,
     RunSelectorComponent,
     RunSelectorDialogComponent,
+    SlicesComponent,
     TimePlayerComponent
 } from './components';
 import { VisualizerRoutingModule } from './visualizer-routing.module';
@@ -44,8 +45,9 @@ import { VisualizerComponent } from './visualizer.container';
         ColorsComponent,
         ContoursComponent,
         ControlPanelComponent,
+        FeaturesComponent,
         HintsComponent,
-        LayersComponent,
+        SlicesComponent,
         MouseZoomComponent,
         OrientationMenuComponent,
         PlotsComponent,

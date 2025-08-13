@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ConfigLabels, IControlPanel } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
@@ -7,7 +7,7 @@ import { SiteConfigService } from 'src/app/services';
     templateUrl: './control-panel.component.html',
     styleUrls: [ './control-panel.component.scss' ]
 })
-export class ControlPanelComponent implements OnDestroy, OnInit {
+export class ControlPanelComponent implements OnInit {
     @Input() pvView: any;
     expansionState: IControlPanel;
 
@@ -19,7 +19,7 @@ export class ControlPanelComponent implements OnDestroy, OnInit {
         this.expansionState = this._siteConfigService.getSiteConfig()[ ConfigLabels.cPanelExpansions ];
     }
 
-    ngOnDestroy(): void {
+    updateConfig(): void {
         this._siteConfigService.updateSiteConfig( { [ConfigLabels.cPanelExpansions]: this.expansionState });
     }
 

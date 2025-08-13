@@ -12,7 +12,7 @@
     'success-color': $color-success,
     'background-color': #53576D,
 
-    'link-color': $color-primary,
+    'link-color': darken( $color-accent, 20%),
     'heading-color': $color-primary
 ));
 
@@ -38,7 +38,6 @@
 body > * > .page-content > *:not(router-outlet) {
     padding: 0;
 }
-
 
 .ngx-slider[laspEnhancedNgxSlider]{
     @include global.custom-slider( $color-primary );

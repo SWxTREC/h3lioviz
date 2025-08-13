@@ -1,0 +1,16 @@
+<form [formGroup]="features">
+    <mat-list class="layers__list">
+        <mat-list-item>
+            <mat-checkbox color="primary" formControlName="cme">CME</mat-checkbox>
+        </mat-list-item>
+        <mat-list-item>
+            <mat-checkbox color="primary" formControlName="lonStreamlines">Magnetic fieldlines</mat-checkbox>
+        </mat-list-item>
+        <mat-list-item>
+            <mat-checkbox color="primary" formControlName="satFieldlines">Satellite fieldlines</mat-checkbox>
+        </mat-list-item>
+        <mat-list-item>
+            <mat-checkbox color="primary" formControlName="satellites">Satellites</mat-checkbox>
+        </mat-list-item>
+    </mat-list>
+</form>
