@@ -14,7 +14,7 @@
                 (click)="showAll = !showAll">
                 {{ showAll ? 'Fewer options' : 'More options…' }}
             </button>
-            @if(showAll || additionalVariableSelected) {
+            @if(showAll) {
                 @for (variable of additionalVariables; track variable) {
                     <mat-option [value]="variable">
                         {{ variable.displayName }}
