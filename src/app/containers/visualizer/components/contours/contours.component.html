@@ -16,7 +16,7 @@
                     mat-button
                     [disabled]="additionalVariableSelected"
                     (click)="showAll = !showAll">
-                    {{ showAll ? 'Show less' : 'Show more…' }}
+                    {{ showAll ? 'Fewer options' : 'More options…' }}
                 </button>
                 @if(showAll || additionalVariableSelected) {
                     @for (variable of additionalVariables; track variable) {
