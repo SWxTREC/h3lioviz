@@ -6,11 +6,26 @@
         <mat-form-field>
             <mat-label>Contour variable</mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
-                @for (variable of variableConfigurations | keyvalue; track variable) {
-                    <mat-option [value]="variable.value">
-                        {{ variable.value.displayName }}
+                @for (variable of focusVariables; track variable) {
+                    <mat-option [value]="variable">
+                        {{ variable.displayName }}
                     </mat-option>
                 }
+                <button
+                    class="contours__more"
+                    mat-button
+                    [disabled]="additionalVariableSelected"
+                    (click)="showAll = !showAll">
+                    {{ showAll ? 'Show less' : 'Show more…' }}
+                </button>
+                @if(showAll || additionalVariableSelected) {
+                    @for (variable of additionalVariables; track variable) {
+                        <mat-option [value]="variable">
+                            {{ variable.displayName }}
+                        </mat-option>
+                    }
+                }
+
             </mat-select>
         </mat-form-field>
         <mat-form-field>

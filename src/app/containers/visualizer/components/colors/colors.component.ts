@@ -6,9 +6,11 @@ import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
+    ADDITIONAL_VARIABLES,
     COLOR_FORM_DEFAULT_VALUES,
     COLORMAPS,
     ConfigLabels,
+    FOCUS_VARIABLES,
     ISiteConfig,
     IVariableInfo,
     VARIABLE_CONFIG
@@ -23,6 +25,8 @@ import { SiteConfigService } from 'src/app/services';
 export class ColorsComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;
 
+    additionalVariables = ADDITIONAL_VARIABLES;
+    additionalVariableSelected: boolean;
     defaultColorVariable: IVariableInfo = COLOR_FORM_DEFAULT_VALUES.colorVariable;
     colorbarLeftOffset = '0';
     colorbarRightOffset = '0';
@@ -37,6 +41,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     colormaps = COLORMAPS;
     colorRange: [ number, number ] = ( this.defaultColorVariable.defaultColorRange );
     colorVariableServerName: string = this.defaultColorVariable.serverName;
+    focusVariables = FOCUS_VARIABLES;
     opacityOptions: Options = {
         floor: 0,
         ceil: 100,
@@ -50,6 +55,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     };
     renderDebouncer = new Subject<void>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    showAll = false;
     siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];
     userColormaps: { [parameter: string]: { displayName: string; serverName: string } } = {};
@@ -137,6 +143,11 @@ export class ColorsComponent implements OnChanges, OnDestroy {
                     step: newColorVariable.step,
                     animate: false
                 };
+                this.additionalVariableSelected =
+                    !!this.additionalVariables.find(
+                        variable => variable.serverName === this.colorForm.controls.colorVariable.value.serverName
+                    );
+                this.additionalVariableSelected ? this.showAll = true : this.showAll = false;
                 this.updateColorRange( { value: variableColorRange[0], highValue: variableColorRange[1], pointerType: undefined });
             }));
         // subscribe to COLORMAP changes, set userColormap, and reset PV colormap
