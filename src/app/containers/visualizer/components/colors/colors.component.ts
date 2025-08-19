@@ -147,7 +147,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
                     !!this.additionalVariables.find(
                         variable => variable.serverName === this.colorForm.controls.colorVariable.value.serverName
                     );
-                this.additionalVariableSelected ? this.showAll = true : this.showAll = false;
+                this.showAll = this.additionalVariableSelected;
                 this.updateColorRange( { value: variableColorRange[0], highValue: variableColorRange[1], pointerType: undefined });
             }));
         // subscribe to COLORMAP changes, set userColormap, and reset PV colormap
