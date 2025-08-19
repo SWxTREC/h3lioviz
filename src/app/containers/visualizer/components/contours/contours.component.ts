@@ -5,8 +5,10 @@ import { clone, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
+    ADDITIONAL_VARIABLES,
     ConfigLabels,
     CONTOUR_FORM_DEFAULT_VALUES,
+    FOCUS_VARIABLES,
     INITIAL_TICK_STEP,
     ISiteConfig,
     IVariableInfo,
@@ -23,6 +25,8 @@ export class ContoursComponent implements OnInit, OnChanges {
     @Input() pvView: any;
     defaultContourVariable: IVariableInfo = CONTOUR_FORM_DEFAULT_VALUES.contourVariable;
 
+    additionalVariables = ADDITIONAL_VARIABLES;
+    additionalVariableSelected: boolean;
     // contourArray keeps track of the array of contour values sent to the server
     // the numbers are calculated from the contour range and the number of contours
     contourArray: number[] = [];
@@ -39,13 +43,14 @@ export class ContoursComponent implements OnInit, OnChanges {
         tickStep: INITIAL_TICK_STEP,
         ticksArray: [ this.defaultContourVariable.defaultSubsetRange[0] + INITIAL_TICK_STEP ]
     };
+    focusVariables = FOCUS_VARIABLES;
     renderDebouncer = new Subject<void>();
     session: { call: (arg0: string, arg1: any[]) => Promise<any> };
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
+    showAll = false;
     siteConfig: ISiteConfig;
-
 
     constructor(
         private _siteConfigService: SiteConfigService
@@ -137,6 +142,11 @@ export class ContoursComponent implements OnInit, OnChanges {
             .pipe( debounceTime( 300 ) ).subscribe( newContourVariable => {
                 const contourVariableServerName = newContourVariable.serverName;
                 const newContourRange = clone(this.userContourRanges[ contourVariableServerName ]);
+                this.additionalVariableSelected =
+                    !!this.additionalVariables.find(
+                        variable => variable.serverName === this.contours.controls.contourVariable.value.serverName
+                    );
+                this.showAll = this.additionalVariableSelected;
                 this.updateContourRange( newContourRange );
             })
         );

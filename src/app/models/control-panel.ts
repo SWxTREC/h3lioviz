@@ -44,7 +44,7 @@ export const COLORMAPS: { [param: string]: IColormapInfo } = {
 export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     velocity: {
         serverName: 'velocity',
-        displayName: 'Velocity',
+        displayName: 'Velocity (Vr)',
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
         defaultColormap: COLORMAPS.rainbow,
@@ -84,7 +84,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     },
     b: {
         serverName: 'b',
-        displayName: 'B',
+        displayName: 'Br',
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
@@ -133,6 +133,17 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         step: 0.1
     }
 };
+
+export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.density ];
+export const ADDITIONAL_VARIABLES = [
+    VARIABLE_CONFIG.temperature,
+    VARIABLE_CONFIG.pressure,
+    VARIABLE_CONFIG.dp,
+    VARIABLE_CONFIG.b,
+    VARIABLE_CONFIG.bx,
+    VARIABLE_CONFIG.by,
+    VARIABLE_CONFIG.bz
+];
 
 export interface IColorSettings {
     colorVariable: IVariableInfo;

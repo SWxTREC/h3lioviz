@@ -2,10 +2,24 @@
     <mat-form-field>
         <mat-label>Color variable</mat-label>
         <mat-select [compareWith]="compareObjectNames" formControlName="colorVariable">
-            @for (variable of variableConfigurations | keyvalue; track variable) {
-                <mat-option [value]="variable.value">
-                    {{ variable.value.displayName }}
+            @for (variable of focusVariables; track variable) {
+                <mat-option [value]="variable">
+                    {{ variable.displayName }}
                 </mat-option>
+            }
+            <button
+                class="colors__more"
+                mat-button
+                [disabled]="additionalVariableSelected"
+                (click)="showAll = !showAll">
+                {{ showAll ? 'Fewer options' : 'More options…' }}
+            </button>
+            @if (showAll) {
+                @for (variable of additionalVariables; track variable) {
+                    <mat-option [value]="variable">
+                        {{ variable.displayName }}
+                    </mat-option>
+                }
             }
         </mat-select>
     </mat-form-field>
