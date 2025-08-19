@@ -146,7 +146,7 @@ export class ContoursComponent implements OnInit, OnChanges {
                     !!this.additionalVariables.find(
                         variable => variable.serverName === this.contours.controls.contourVariable.value.serverName
                     );
-                this.additionalVariableSelected ? this.showAll = true : this.showAll = false;
+                this.showAll = this.additionalVariableSelected;
                 this.updateContourRange( newContourRange );
             })
         );
