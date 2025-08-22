@@ -41,12 +41,13 @@ export class PlotsComponent implements OnChanges {
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
 
-    additionalModelVariables = ADDITIONAL_VARIABLES;
+    additionalModelVariables = ADDITIONAL_VARIABLES
+        .filter( variable => [ 'temperature', 'pressure', 'bx', 'by', 'bz' ].includes(variable.serverName));
     additionalModelVariableSelected: boolean;
     additionalObservedVariableList: string[] = [ 'temperature', 'Bx', 'By', 'Bz' ];
     additionalObservedVariableSelected: boolean;
     focusModelVariables = FOCUS_VARIABLES;
-    focusObservedVariableList: string[] = [ 'density', 'speed' ];
+    focusObservedVariableList: string[] = [ 'speed', 'density' ];
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
