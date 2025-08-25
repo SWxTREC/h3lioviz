@@ -55,10 +55,12 @@ export class ContoursComponent implements OnInit, OnChanges {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        this._siteConfigService.config$.subscribe( () => this.siteConfig = this._siteConfigService.getSiteConfig() );
+        this._siteConfigService.config$.subscribe( ( siteConfig ) => this.siteConfig = siteConfig );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.contours.addControl(controlName, new FormControl( this.siteConfig[ConfigLabels.contourSettings]?.[controlName]));
+            this.contours.addControl(controlName, new FormControl(
+                this.siteConfig[ConfigLabels.contourSettings]?.[controlName] || CONTOUR_FORM_DEFAULT_VALUES[controlName])
+            );
         });
         // debounce render
         this.subscriptions.push(
@@ -79,7 +81,9 @@ export class ContoursComponent implements OnInit, OnChanges {
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from siteConfig
             this.userContourRanges = this.siteConfig[ ConfigLabels.contourRanges ];
-            const initialContourVariable = this.siteConfig[ConfigLabels.contourSettings].contourVariable.serverName;
+            const initialContourVariable =
+                this.siteConfig[ConfigLabels.contourSettings].contourVariable?.serverName ||
+                CONTOUR_FORM_DEFAULT_VALUES.contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
             this.contours.setValue( this.siteConfig[ ConfigLabels.contourSettings ] );
         }
@@ -102,7 +106,7 @@ export class ContoursComponent implements OnInit, OnChanges {
         const interval = this.getTickInterval();
         const indexArray = [ ...Array(numberOfContours).keys() ]; // [0, 1, 2, …]
         const contourArray =
-            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * interval)) );
+            indexArray.map( indexValue => +(this.contourRange[0] + (indexValue * interval)).toFixed(3) );
         return contourArray;
     }
 
@@ -186,7 +190,7 @@ export class ContoursComponent implements OnInit, OnChanges {
     updateVisibilityByContourArea() {
         const contourVariableName: IVariableInfo = this.contours.value.contourVariable.serverName;
         if ( !this.contours.value.cmeContours ) {
-            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+            // this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
         } else {
             // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
@@ -206,17 +210,20 @@ export class ContoursComponent implements OnInit, OnChanges {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
+            // value of the cme slice control in the slices menu
+            const cmeLayerConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ].cme;
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 if ( controlName === 'cmeContours' ) {
-                    // tie the threshold state to the cmeContours state and area selected
+                    const contourVisibilityState = cmeLayerConfig === true ? 'on' : 'off';
+                    // tie the threshold state to the contourVisibility state and area selected
                     if ( state === 'on' ) {
                         this.updateVisibilityByContourArea();
                     } else {
                         // turn both off
-                        this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
-                        this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', state ] );
+                        this.session.call( 'pv.h3lioviz.visibility', [ name, contourVisibilityState ] );
+                        this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', contourVisibilityState ] );
                     }
                 } else {
                     this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );

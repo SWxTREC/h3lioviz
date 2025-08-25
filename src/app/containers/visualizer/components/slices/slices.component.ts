@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { assign, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { ConfigLabels, ILayers, LAYER_FORM_DEFAULT_VALUES, SLICES, VARIABLE_CONFIG } from 'src/app/models';
+import { ConfigLabels, IContourSettings, ILayers, LAYER_FORM_DEFAULT_VALUES, SLICES, VARIABLE_CONFIG } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
 @Component({
@@ -41,9 +41,17 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
             ).subscribe(() => {
                 this.pvView.render();
                 const layersConfig: ILayers = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
+                const contoursConfig: IContourSettings = this._siteConfigService.getSiteConfig()[ ConfigLabels.contourSettings ];
+                if ( this.slices.value.cme === true ) {
+                    contoursConfig.cmeContours = true;
+                    contoursConfig.contourArea = 'cme';
+                }
                 // combine new slice values with existing layers config
                 const newLayersConfig = assign({}, layersConfig, this.slices.value);
-                this._siteConfigService.updateSiteConfig( { [ConfigLabels.layers]: newLayersConfig });
+                this._siteConfigService.updateSiteConfig( {
+                    [ConfigLabels.layers]: newLayersConfig,
+                    [ConfigLabels.contourSettings]: contoursConfig
+                });
             })
         );
     }
@@ -94,10 +102,21 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
-            if (typeof controlStates[ controlName ] === 'boolean') {
+            // never turn the 'cme' visibility on, use single 'dp' threshold instead
+            this.session.call( 'pv.h3lioviz.visibility', [ 'cme', 'off' ] );
+            if (controlName !== 'cme' && typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
+            }
+            if ( controlName === 'cme' ) {
+                if ( controlStates.cme === true) {
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+                    this.session.call('pv.h3lioviz.set_threshold', [ 'dp', [ 0, 0.001 ] ] );
+                } else {
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+                }
             }
         });
     }

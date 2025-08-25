@@ -1,6 +1,11 @@
 <form [formGroup]="slices">
     <mat-list class="layers__list">
         <mat-list-item>
+            <mat-checkbox color="primary" formControlName="cme">
+                CME isosurface
+            </mat-checkbox>
+        </mat-list-item>
+        <mat-list-item>
             <mat-checkbox color="primary" formControlName="lonSlice">
                 Equatorial slice
             </mat-checkbox>
