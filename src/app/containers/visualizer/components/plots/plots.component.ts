@@ -17,7 +17,9 @@ import {
     XRangeService
 } from 'scicharts';
 import {
+    ADDITIONAL_VARIABLES,
     DEFAULT_PLOT_OPTIONS,
+    FOCUS_VARIABLES,
     H3LIO_PRESET,
     IMAGE_DATASETS,
     imageDatasetCatalog,
@@ -39,6 +41,13 @@ export class PlotsComponent implements OnChanges {
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
 
+    additionalModelVariables = ADDITIONAL_VARIABLES
+        .filter( variable => [ 'temperature', 'pressure', 'bx', 'by', 'bz' ].includes(variable.serverName));
+    additionalModelVariableSelected: boolean;
+    additionalObservedVariableList: string[] = [ 'temperature', 'Bx', 'By', 'Bz' ];
+    additionalObservedVariableSelected: boolean;
+    focusModelVariables = FOCUS_VARIABLES;
+    focusObservedVariableList: string[] = [ 'speed', 'density' ];
     imageData = IMAGE_DATASETS;
     imageList: string[] = Object.keys(this.imageData);
     plotForm: FormGroup = new FormGroup({
@@ -46,8 +55,8 @@ export class PlotsComponent implements OnChanges {
         model: new FormControl(),
         observed: new FormControl()
     });
-    variableList: string[] = [ 'density', 'velocity', 'pressure', 'temperature', 'bx', 'by', 'bz' ];
-    observedVariableList: string[] = [ 'density', 'speed', 'temperature', 'Bx', 'By', 'Bz' ];
+    showAllModel = false;
+    showAllObserved = false;
     siteConfig: ISiteConfig;
 
     constructor(
@@ -99,6 +108,16 @@ export class PlotsComponent implements OnChanges {
             if ( newValue.observed?.length ) {
                 plotList.push(this.getObservedPlot( newValue.observed ));
             }
+            this.additionalModelVariableSelected =
+                    !!this.additionalModelVariables.find(
+                        variable => this.plotForm.controls.model.value.includes(variable.serverName)
+                    );
+            this.additionalObservedVariableSelected =
+                    !!this.plotForm.controls.observed.value.find(
+                        ( variable: string ) => this.additionalObservedVariableList.includes(variable)
+                    );
+            this.showAllModel = this.additionalModelVariableSelected;
+            this.showAllObserved = this.additionalObservedVariableSelected;
             this._plotsService.setPlots( plotList );
         });
     }
