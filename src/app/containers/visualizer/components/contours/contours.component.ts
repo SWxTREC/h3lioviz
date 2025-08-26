@@ -57,9 +57,12 @@ export class ContoursComponent implements OnInit, OnChanges {
     ) {
         this.subscriptions.push(
             this._siteConfigService.config$.subscribe( ( ) => {
-                // for some reason, setting this.siteConfig from the service in this way results in defined values
+                // setting this.siteConfig this way applies default values
                 this.siteConfig = this._siteConfigService.getSiteConfig();
+                const thresholdVisibility =
+                    this.siteConfig[ ConfigLabels.contourSettings ].cmeContours ?? CONTOUR_FORM_DEFAULT_VALUES.threshold;
                 // when cme isosurface is selected: disable contours
+                this.siteConfig[ ConfigLabels.contourSettings ].threshold = thresholdVisibility;
                 if ( this.siteConfig[ ConfigLabels.layers ].cme === true ) {
                     this.contours.disable({ emitEvent: false });
                 } else {
@@ -194,9 +197,9 @@ export class ContoursComponent implements OnInit, OnChanges {
 
     updateVisibilityByContourArea() {
         const contourVariableName: IVariableInfo = this.contours.value.contourVariable.serverName;
-        if ( !this.contours.value.cmeContours ) {
+        if ( !this.contours.value.threshold ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
-            if ( this.contours.controls.cmeContours.disabled ) {
+            if ( this.contours.controls.threshold.disabled ) {
                 // allow cme isosurface to turn on
                 this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
             } else {
@@ -215,7 +218,7 @@ export class ContoursComponent implements OnInit, OnChanges {
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                if ( controlName === 'cmeContours' ) {
+                if ( controlName === 'threshold' ) {
                     this.updateVisibilityByContourArea();
                 } else {
                     this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );

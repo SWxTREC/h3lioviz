@@ -191,17 +191,17 @@ export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
     }, {});
 
 export interface IContourSettings {
-    cmeContours: boolean;
+    cmeContours?: boolean; // deprecated
     contourVariable: IVariableInfo;
     numberOfContours: number;
-    contourArea: 'cme' | 'all';
+    contourArea?: 'cme' | 'all'; // deprecated
+    threshold: boolean;
 }
 
 export const CONTOUR_FORM_DEFAULT_VALUES: IContourSettings = {
-    cmeContours: false,
+    threshold: false,
     contourVariable: VARIABLE_CONFIG.density,
-    numberOfContours: 5,
-    contourArea: 'all'
+    numberOfContours: 5
 };
 
 export const DEFAULT_CONTOUR_RANGES: { [parameter: string]: [ number, number ] } =

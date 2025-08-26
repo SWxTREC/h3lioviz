@@ -1,11 +1,11 @@
 <form class="contours" [formGroup]="contours">
-    <mat-checkbox class="form__spacer" color="primary" formControlName="cmeContours">
-        @if ( contours.controls.cmeContours.disabled ) {
+    <mat-checkbox class="form__spacer" color="primary" formControlName="threshold">
+        @if ( contours.controls.threshold.disabled ) {
             Turn off CME isosurface slice to enable
         }
         Contour surfaces
     </mat-checkbox>
-    @if (contours.value.cmeContours) {
+    @if (contours.value.threshold) {
         <mat-form-field>
             <mat-label>Contour variable
             </mat-label>

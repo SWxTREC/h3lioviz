@@ -29,7 +29,7 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
         private _siteConfigService: SiteConfigService
     ) {
         this.subscriptions.push(this._siteConfigService.config$.subscribe( ( siteConfig ) => {
-            if ( siteConfig.contourSettings?.cmeContours === true ) {
+            if ( siteConfig.contourSettings?.threshold === true ) {
                 this.slices.controls.cme?.disable({ emitEvent: false });
             } else {
                 this.slices.controls.cme?.enable({ emitEvent: false });
