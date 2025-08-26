@@ -182,8 +182,8 @@ export const modelDatasetCatalog: { [parameter: string]: IDataset } =
             rangeVariables: [
                 'density',
                 'velocity',
-                'pressure',
                 'temperature',
+                'pressure',
                 'bx',
                 'by',
                 'bz'
