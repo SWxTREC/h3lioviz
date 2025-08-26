@@ -56,13 +56,13 @@ export class ContoursComponent implements OnInit, OnChanges {
         private _siteConfigService: SiteConfigService
     ) {
         this.subscriptions.push(
-            this._siteConfigService.config$.subscribe( ( ) => {
+            this._siteConfigService.config$.subscribe( () => {
                 // setting this.siteConfig this way applies default values
                 this.siteConfig = this._siteConfigService.getSiteConfig();
-                const thresholdVisibility =
-                    this.siteConfig[ ConfigLabels.contourSettings ].cmeContours ?? CONTOUR_FORM_DEFAULT_VALUES.threshold;
-                // when cme isosurface is selected: disable contours
+                const thresholdVisibility = this.siteConfig[ ConfigLabels.contourSettings ].threshold ||
+                    this.siteConfig[ ConfigLabels.contourSettings ].cmeContours || CONTOUR_FORM_DEFAULT_VALUES.threshold;
                 this.siteConfig[ ConfigLabels.contourSettings ].threshold = thresholdVisibility;
+                // when cme isosurface is selected: disable contours
                 if ( this.siteConfig[ ConfigLabels.layers ].cme === true ) {
                     this.contours.disable({ emitEvent: false });
                 } else {

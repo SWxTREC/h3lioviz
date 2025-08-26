@@ -63,10 +63,11 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     userOpacities: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
 
+
     constructor(
         private _siteCofigService: SiteConfigService
     ) {
-        this._siteCofigService.config$.subscribe( () => this.siteConfig = this._siteCofigService.getSiteConfig() );
+        this.subscriptions.push(this._siteCofigService.config$.subscribe( () => this.siteConfig = this._siteCofigService.getSiteConfig() ));
         // initialize FormGroup with default color menu names and values
         Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {
             this.colorForm.addControl(controlName, new FormControl( COLOR_FORM_DEFAULT_VALUES[controlName]));
