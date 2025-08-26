@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { assign, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { ConfigLabels, IContourSettings, ILayers, LAYER_FORM_DEFAULT_VALUES, SLICES, VARIABLE_CONFIG } from 'src/app/models';
+import { ConfigLabels, ILayers, LAYER_FORM_DEFAULT_VALUES, SLICES, VARIABLE_CONFIG } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
 @Component({
@@ -28,13 +28,13 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        this._siteConfigService.config$.subscribe( ( siteConfig ) => {
+        this.subscriptions.push(this._siteConfigService.config$.subscribe( ( siteConfig ) => {
             if ( siteConfig.contourSettings?.cmeContours === true ) {
                 this.slices.controls.cme?.disable({ emitEvent: false });
             } else {
                 this.slices.controls.cme?.enable({ emitEvent: false });
             }
-        });
+        }));
         // initialize FormGroup from layers with default slice names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             if ( SLICES.includes( controlName ) ) {

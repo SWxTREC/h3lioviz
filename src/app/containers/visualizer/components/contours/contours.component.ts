@@ -55,15 +55,18 @@ export class ContoursComponent implements OnInit, OnChanges {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        this._siteConfigService.config$.subscribe( ( ) => {
-            this.siteConfig = this._siteConfigService.getSiteConfig();
-            // when cme isosurface is selected: disable contours
-            if ( this.siteConfig[ ConfigLabels.layers ].cme === true ) {
-                this.contours.disable({ emitEvent: false });
-            } else {
-                this.contours.enable({ emitEvent: false });
-            }
-        });
+        this.subscriptions.push(
+            this._siteConfigService.config$.subscribe( ( ) => {
+                // for some reason, setting this.siteConfig from the service in this way results in defined values
+                this.siteConfig = this._siteConfigService.getSiteConfig();
+                // when cme isosurface is selected: disable contours
+                if ( this.siteConfig[ ConfigLabels.layers ].cme === true ) {
+                    this.contours.disable({ emitEvent: false });
+                } else {
+                    this.contours.enable({ emitEvent: false });
+                }
+            })
+        );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
             this.contours.addControl(controlName, new FormControl(
