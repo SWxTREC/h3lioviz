@@ -40,6 +40,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     };
     colormaps = COLORMAPS;
     colorRange: [ number, number ] = ( this.defaultColorVariable.defaultColorRange );
+    colorVariableRangeFromServer: [number, number];
     colorVariableServerName: string = this.defaultColorVariable.serverName;
     focusVariables = FOCUS_VARIABLES;
     opacityOptions: Options = {
@@ -54,7 +55,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         }
     };
     renderDebouncer = new Subject<void>();
-    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    session: any;
     showAll = false;
     siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];
@@ -121,9 +122,23 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     }
 
     setFormSubscriptions() {
+        // to get the variable range from the server, subscribe to viewport render
+        this.subscriptions.push(this.session.subscribe('viewport.image.push.subscription', ( newPvImage: { stale: any }[] ) => {
+            const notStale = !newPvImage[0].stale;
+            if ( notStale ) {
+                this.pvView.get().session.call(
+                    'pv.h3lioviz.get_variable_range', [ this.colorVariableServerName ]
+                ).then( (range: [number, number]) => {
+                    this.colorVariableRangeFromServer = range;
+                });
+            }
+        }));
+
         // subscribe to any form change
         this.subscriptions.push( this.colorForm.valueChanges
             .pipe( debounceTime( 300 ) ).subscribe( newFormValues => {
+                // reset color variable range from server
+                this.colorVariableRangeFromServer = undefined;
                 // this will render every time any named control in the form is updated
                 // the color range is tracked outside of the form in updateColorRange
                 this.renderDebouncer.next();
@@ -175,8 +190,10 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     }
 
     scaleColorRange() {
-        this.pvView.get().session.call( 'pv.h3lioviz.get_variable_range', [ this.colorVariableServerName ]).then( range => {
-            this.updateColorRange( { value: range[0], highValue: range[1], pointerType: undefined });
+        this.updateColorRange( {
+            value: this.colorVariableRangeFromServer[0],
+            highValue: this.colorVariableRangeFromServer[1],
+            pointerType: undefined
         });
     }
 

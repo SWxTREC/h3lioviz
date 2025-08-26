@@ -45,12 +45,13 @@ export class ContoursComponent implements OnInit, OnChanges {
     };
     focusVariables = FOCUS_VARIABLES;
     renderDebouncer = new Subject<void>();
-    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    session: { call: (arg0: string, arg1: any[]) => Promise<any>; subscribe: any };
     showAll = false;
     siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
+    contourVariableRangeFromServer: any;
 
     constructor(
         private _siteConfigService: SiteConfigService
@@ -111,7 +112,6 @@ export class ContoursComponent implements OnInit, OnChanges {
 
     contourRangeChange( event: ChangeContext ) {
         this.updateContourRange( [ event.value, event.highValue ] );
-        this.renderDebouncer.next();
     }
 
     getContourArray( contourRange: [number, number], numberOfContours: number ): number[] {
@@ -136,14 +136,27 @@ export class ContoursComponent implements OnInit, OnChanges {
     }
 
     setFormSubscriptions() {
+        // to get the variable range from the server, subscribe to viewport render
+        this.subscriptions.push(this.session.subscribe('viewport.image.push.subscription', ( newPvImage: { stale: any }[] ) => {
+            const notStale = !newPvImage[0].stale;
+            if ( notStale ) {
+                this.pvView.get().session.call(
+                    'pv.h3lioviz.get_variable_range', [ this.contours.controls.contourVariable.value.serverName ]
+                ).then( (range: [number, number]) => {
+                    this.contourVariableRangeFromServer = range;
+                });
+            }
+        }));
+
         // subscribe to any form change
         this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
-                this.updateVisibilityControls( newFormValues );
+                // reset contour variable range from server
+                this.contourVariableRangeFromServer = undefined;
                 // this will render every time any named control in the form is updated
                 // the contour range is tracked outside of the form and is updated and rendered in contourRangeChange()
-                this.renderDebouncer.next();
+                this.updateVisibilityControls( newFormValues );
             })
         );
         // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
@@ -168,6 +181,10 @@ export class ContoursComponent implements OnInit, OnChanges {
                 this.updateContourRange( newContourRange );
             })
         );
+    }
+
+    scaleContourRange() {
+        this.updateContourRange( this.contourVariableRangeFromServer);
     }
 
     updateContourRange( newRange: [number, number] ) {
@@ -211,6 +228,7 @@ export class ContoursComponent implements OnInit, OnChanges {
             this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
             this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
         }
+        this.renderDebouncer.next();
     }
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
