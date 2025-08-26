@@ -2,6 +2,9 @@
     <mat-list class="layers__list">
         <mat-list-item>
             <mat-checkbox color="primary" formControlName="cme">
+                @if ( slices.controls.cme.disabled ) {
+                    Turn off Contour surfaces<br> to enable
+                }
                 CME isosurface
             </mat-checkbox>
         </mat-list-item>

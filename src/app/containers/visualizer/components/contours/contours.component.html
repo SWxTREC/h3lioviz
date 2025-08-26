@@ -1,10 +1,14 @@
 <form class="contours" [formGroup]="contours">
     <mat-checkbox class="form__spacer" color="primary" formControlName="cmeContours">
+        @if ( contours.controls.cmeContours.disabled ) {
+            Turn off CME isosurface slice to enable
+        }
         Contour surfaces
     </mat-checkbox>
     @if (contours.value.cmeContours) {
         <mat-form-field>
-            <mat-label>Contour variable</mat-label>
+            <mat-label>Contour variable
+            </mat-label>
             <mat-select [compareWith]="compareObjectNames" formControlName="contourVariable">
                 @for (variable of focusVariables; track variable) {
                     <mat-option [value]="variable">
@@ -32,10 +36,6 @@
             <mat-label>Number of contours</mat-label>
             <input matInput type="number" min="2" max="10" formControlName="numberOfContours">
         </mat-form-field>
-        <mat-button-toggle-group class="contours__toggle-button form__spacer" formControlName="contourArea" aria-label="contour type, cme or all">
-            <mat-button-toggle value="cme">CME</mat-button-toggle>
-            <mat-button-toggle value="all">All</mat-button-toggle>
-        </mat-button-toggle-group>
         <div class="form__spacer" >
             <strong>Range of {{ contours.value.contourVariable.displayName }}</strong>
             <small innerHTML=" ({{contours.value.contourVariable.units}})"></small>

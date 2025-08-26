@@ -28,6 +28,13 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
+        this._siteConfigService.config$.subscribe( ( siteConfig ) => {
+            if ( siteConfig.contourSettings?.cmeContours === true ) {
+                this.slices.controls.cme?.disable({ emitEvent: false });
+            } else {
+                this.slices.controls.cme?.enable({ emitEvent: false });
+            }
+        });
         // initialize FormGroup from layers with default slice names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             if ( SLICES.includes( controlName ) ) {
@@ -41,16 +48,9 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
             ).subscribe(() => {
                 this.pvView.render();
                 const layersConfig: ILayers = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
-                const contoursConfig: IContourSettings = this._siteConfigService.getSiteConfig()[ ConfigLabels.contourSettings ];
-                if ( this.slices.value.cme === true ) {
-                    contoursConfig.cmeContours = true;
-                    contoursConfig.contourArea = 'cme';
-                }
-                // combine new slice values with existing layers config
                 const newLayersConfig = assign({}, layersConfig, this.slices.value);
                 this._siteConfigService.updateSiteConfig( {
-                    [ConfigLabels.layers]: newLayersConfig,
-                    [ConfigLabels.contourSettings]: contoursConfig
+                    [ConfigLabels.layers]: newLayersConfig
                 });
             })
         );
@@ -111,6 +111,7 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
             }
             if ( controlName === 'cme' ) {
                 if ( controlStates.cme === true) {
+                    // turn on single dp threshold
                     this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
                     this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
                     this.session.call('pv.h3lioviz.set_threshold', [ 'dp', [ 0, 0.001 ] ] );
