@@ -14,7 +14,7 @@ if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathSt
 
 export const environment = {
     aws: {
-        api: 'https://apigw.dev.swx-trec.com/h3lioviz/',
+        api: 'https://h3lioviz-api.dev.swx-trec.com/',
         cognito: {
             appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
             region: 'us-east-1',
