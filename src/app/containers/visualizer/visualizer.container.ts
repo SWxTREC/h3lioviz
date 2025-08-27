@@ -137,6 +137,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // TODO: refine this instead of reinitializing dimensions
                 this._siteConfigService.updateSiteConfig( { [ConfigLabels.vDimensions]: [ undefined, undefined ]} );
                 this.initVizDimensions();
+                this.setPlotsPanel();
                 this.pvViewResize();
                 this.determineShowTitle();
             })
