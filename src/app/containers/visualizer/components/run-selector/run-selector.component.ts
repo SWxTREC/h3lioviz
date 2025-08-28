@@ -59,15 +59,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
             more: 'More info'
         };
         this.displayedColumns = [
-            'program',
-            'version',
-            'institute',
+            'run_id',
             'rundate_cal',
-            'creation',
-            'resolution',
-            'cordata',
-            'observatory',
-            'corona',
             'more'
         ];
 

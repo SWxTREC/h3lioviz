@@ -70,7 +70,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         defaultColormap: COLORMAPS.plasma,
         defaultSubsetRange: [ 500000, 10000000 ],
         entireRange: [ 100000, 10000000 ],
-        step: 10000
+        step: 3000
     },
     temperature: {
         serverName: 'temperature',
@@ -80,7 +80,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         defaultColormap: COLORMAPS.inferno,
         defaultSubsetRange: [ 500000, 1000000 ],
         entireRange: [ 10000, 1000000 ],
-        step: 10000
+        step: 3000
     },
     b: {
         serverName: 'b',
@@ -124,13 +124,13 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     },
     dp: {
         serverName: 'dp',
-        displayName: 'Cloud tracer',
+        displayName: 'CME tracer',
         units: '—',
-        defaultColorRange: [ 0.2, 0.9 ],
+        defaultColorRange: [ 0.001, 0.05 ],
         defaultColormap: COLORMAPS.divergent,
-        defaultSubsetRange: [ 0.2, 0.9 ],
-        entireRange: [ 0, 1 ],
-        step: 0.1
+        defaultSubsetRange: [ 0.001, 0.05 ],
+        entireRange: [ 0, 0.1 ],
+        step: 0.001
     }
 };
 
@@ -179,7 +179,7 @@ export interface IControlPanel {
 
 export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
     colors: true,
-    contours: true,
+    contours: false,
     features: false,
     slices: true
 };
@@ -191,17 +191,17 @@ export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
     }, {});
 
 export interface IContourSettings {
-    cmeContours: boolean;
+    cmeContours?: boolean; // deprecated
     contourVariable: IVariableInfo;
     numberOfContours: number;
-    contourArea: 'cme' | 'all';
+    contourArea?: 'cme' | 'all'; // deprecated
+    threshold: boolean;
 }
 
 export const CONTOUR_FORM_DEFAULT_VALUES: IContourSettings = {
-    cmeContours: true,
-    contourVariable: VARIABLE_CONFIG.velocity,
-    numberOfContours: 5,
-    contourArea: 'cme'
+    threshold: false,
+    contourVariable: VARIABLE_CONFIG.density,
+    numberOfContours: 5
 };
 
 export const DEFAULT_CONTOUR_RANGES: { [parameter: string]: [ number, number ] } =
@@ -222,6 +222,7 @@ export interface ILayers {
 }
 
 export const SLICES = [
+    'cme',
     'latSlice',
     'lonSlice',
     'lonSliceType',
@@ -229,7 +230,6 @@ export const SLICES = [
 ];
 
 export const FEATURES = [
-    'cme',
     'lonStreamlines',
     'satellites',
     'satFieldlines'

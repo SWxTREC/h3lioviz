@@ -1,4 +1,7 @@
 .form {
+    &__hidden {
+        visibility: hidden;
+    }
     &__row {
         display: flex;
         align-items: center;
@@ -7,5 +10,8 @@
     }
     &__spacer {
         margin-bottom: 1rem;
+    }
+    &__right-align {
+        text-align: right;
     }
 }

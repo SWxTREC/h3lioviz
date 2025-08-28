@@ -19,7 +19,7 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-contours',
     templateUrl: './contours.component.html',
-    styleUrls: [  '../form.scss', './contours.component.scss' ]
+    styleUrls: [ '../form.scss', './contours.component.scss' ]
 })
 export class ContoursComponent implements OnInit, OnChanges {
     @Input() pvView: any;
@@ -45,20 +45,37 @@ export class ContoursComponent implements OnInit, OnChanges {
     };
     focusVariables = FOCUS_VARIABLES;
     renderDebouncer = new Subject<void>();
-    session: { call: (arg0: string, arg1: any[]) => Promise<any> };
+    session: { call: (arg0: string, arg1: any[]) => Promise<any>; subscribe: any };
+    showAll = false;
+    siteConfig: ISiteConfig;
     subscriptions: Subscription[] = [];
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
-    showAll = false;
-    siteConfig: ISiteConfig;
+    contourVariableRangeFromServer: any;
 
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        this._siteConfigService.config$.subscribe( () => this.siteConfig = this._siteConfigService.getSiteConfig() );
+        this.subscriptions.push(
+            this._siteConfigService.config$.subscribe( () => {
+                // setting this.siteConfig this way applies default values
+                this.siteConfig = this._siteConfigService.getSiteConfig();
+                const thresholdVisibility = this.siteConfig[ ConfigLabels.contourSettings ].threshold ||
+                    this.siteConfig[ ConfigLabels.contourSettings ].cmeContours || CONTOUR_FORM_DEFAULT_VALUES.threshold;
+                this.siteConfig[ ConfigLabels.contourSettings ].threshold = thresholdVisibility;
+                // when cme isosurface is selected: disable contours
+                if ( this.siteConfig[ ConfigLabels.layers ].cme === true ) {
+                    this.contours.disable({ emitEvent: false });
+                } else {
+                    this.contours.enable({ emitEvent: false });
+                }
+            })
+        );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.contours.addControl(controlName, new FormControl( this.siteConfig[ConfigLabels.contourSettings]?.[controlName]));
+            this.contours.addControl(controlName, new FormControl(
+                this.siteConfig[ ConfigLabels.contourSettings ][ controlName ]
+            ));
         });
         // debounce render
         this.subscriptions.push(
@@ -79,7 +96,7 @@ export class ContoursComponent implements OnInit, OnChanges {
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from siteConfig
             this.userContourRanges = this.siteConfig[ ConfigLabels.contourRanges ];
-            const initialContourVariable = this.siteConfig[ConfigLabels.contourSettings].contourVariable.serverName;
+            const initialContourVariable = this.siteConfig[ ConfigLabels.contourSettings ].contourVariable.serverName;
             this.contourRange = this.userContourRanges[ initialContourVariable ];
             this.contours.setValue( this.siteConfig[ ConfigLabels.contourSettings ] );
         }
@@ -95,14 +112,13 @@ export class ContoursComponent implements OnInit, OnChanges {
 
     contourRangeChange( event: ChangeContext ) {
         this.updateContourRange( [ event.value, event.highValue ] );
-        this.renderDebouncer.next();
     }
 
     getContourArray( contourRange: [number, number], numberOfContours: number ): number[] {
         const interval = this.getTickInterval();
         const indexArray = [ ...Array(numberOfContours).keys() ]; // [0, 1, 2, …]
         const contourArray =
-            indexArray.map( indexValue => Math.round(this.contourRange[0] + (indexValue * interval)) );
+            indexArray.map( indexValue => +(this.contourRange[0] + (indexValue * interval)).toFixed(3) );
         return contourArray;
     }
 
@@ -113,19 +129,34 @@ export class ContoursComponent implements OnInit, OnChanges {
     }
 
     saveUserSettings(): void {
-        this._siteConfigService.updateSiteConfig( { [ ConfigLabels.contourSettings ]: this.contours.value });
-        this._siteConfigService.updateSiteConfig( { [ ConfigLabels.contourRanges ]: this.userContourRanges });
+        this._siteConfigService.updateSiteConfig( {
+            [ ConfigLabels.contourSettings ]: this.contours.value,
+            [ ConfigLabels.contourRanges ]: this.userContourRanges
+        });
     }
 
     setFormSubscriptions() {
+        // to get the variable range from the server, subscribe to viewport render
+        this.subscriptions.push(this.session.subscribe('viewport.image.push.subscription', ( newPvImage: { stale: any }[] ) => {
+            const notStale = !newPvImage[0].stale;
+            if ( notStale ) {
+                this.pvView.get().session.call(
+                    'pv.h3lioviz.get_variable_range', [ this.contours.controls.contourVariable.value.serverName ]
+                ).then( (range: [number, number]) => {
+                    this.contourVariableRangeFromServer = range;
+                });
+            }
+        }));
+
         // subscribe to any form change
         this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
-                this.updateVisibilityControls( newFormValues );
+                // reset contour variable range from server
+                this.contourVariableRangeFromServer = undefined;
                 // this will render every time any named control in the form is updated
                 // the contour range is tracked outside of the form and is updated and rendered in contourRangeChange()
-                this.renderDebouncer.next();
+                this.updateVisibilityControls( newFormValues );
             })
         );
         // subscribe to CONTOUR NUMBER changes and call update contour function if more than 1 contour
@@ -150,12 +181,10 @@ export class ContoursComponent implements OnInit, OnChanges {
                 this.updateContourRange( newContourRange );
             })
         );
-        // subscribe to CONTOUR AREA changes and call update contour function
-        this.subscriptions.push( this.contours.controls.contourArea.valueChanges
-            .pipe( debounceTime( 300 ) ).subscribe( newContourArea => {
-                this.updateContourRange( this.contourRange );
-            })
-        );
+    }
+
+    scaleContourRange() {
+        this.updateContourRange( this.contourVariableRangeFromServer);
     }
 
     updateContourRange( newRange: [number, number] ) {
@@ -185,23 +214,21 @@ export class ContoursComponent implements OnInit, OnChanges {
 
     updateVisibilityByContourArea() {
         const contourVariableName: IVariableInfo = this.contours.value.contourVariable.serverName;
-        if ( !this.contours.value.cmeContours ) {
+        if ( !this.contours.value.threshold ) {
             this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
-            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
-        } else {
-            // TODO: do I need to clear one render from the backend? or can we consolidate on the backend as well?
-            if ( this.contours.value.contourArea === 'cme' ) {
-                // set the values for the cme
-                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'on' ] );
-                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
-                this.session.call('pv.h3lioviz.set_contours', [ contourVariableName, this.contourArray ]);
-            } else {
-                // set the values for the entire area
-                this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+            if ( this.contours.controls.threshold.disabled ) {
+                // allow cme isosurface to turn on
                 this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
-                this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
+            } else {
+                // turn contours off
+                this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
             }
+        } else {
+            this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+            this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+            this.session.call('pv.h3lioviz.set_threshold', [ contourVariableName, this.contourArray ] );
         }
+        this.renderDebouncer.next();
     }
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
@@ -209,15 +236,8 @@ export class ContoursComponent implements OnInit, OnChanges {
             if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
-                if ( controlName === 'cmeContours' ) {
-                    // tie the threshold state to the cmeContours state and area selected
-                    if ( state === 'on' ) {
-                        this.updateVisibilityByContourArea();
-                    } else {
-                        // turn both off
-                        this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
-                        this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', state ] );
-                    }
+                if ( controlName === 'threshold' ) {
+                    this.updateVisibilityByContourArea();
                 } else {
                     this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
                 }

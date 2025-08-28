@@ -28,6 +28,13 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
+        this.subscriptions.push(this._siteConfigService.config$.subscribe( ( siteConfig ) => {
+            if ( siteConfig.contourSettings?.threshold === true ) {
+                this.slices.controls.cme?.disable({ emitEvent: false });
+            } else {
+                this.slices.controls.cme?.enable({ emitEvent: false });
+            }
+        }));
         // initialize FormGroup from layers with default slice names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             if ( SLICES.includes( controlName ) ) {
@@ -41,9 +48,10 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
             ).subscribe(() => {
                 this.pvView.render();
                 const layersConfig: ILayers = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ];
-                // combine new slice values with existing layers config
                 const newLayersConfig = assign({}, layersConfig, this.slices.value);
-                this._siteConfigService.updateSiteConfig( { [ConfigLabels.layers]: newLayersConfig });
+                this._siteConfigService.updateSiteConfig( {
+                    [ConfigLabels.layers]: newLayersConfig
+                });
             })
         );
     }
@@ -94,10 +102,22 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
 
     updateVisibilityControls(controlStates: { [parameter: string]: any }) {
         Object.keys( controlStates ).forEach( controlName => {
-            if (typeof controlStates[ controlName ] === 'boolean') {
+            // never turn the 'cme' visibility on, use single 'dp' threshold instead
+            this.session.call( 'pv.h3lioviz.visibility', [ 'cme', 'off' ] );
+            if (controlName !== 'cme' && typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
                 this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
+            }
+            if ( controlName === 'cme' ) {
+                if ( controlStates.cme === true) {
+                    // turn on single dp threshold
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'cme_contours', 'off' ] );
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'on' ] );
+                    this.session.call('pv.h3lioviz.set_threshold', [ 'dp', [ 0, 0.001 ] ] );
+                } else {
+                    this.session.call( 'pv.h3lioviz.visibility', [ 'threshold', 'off' ] );
+                }
             }
         });
     }
