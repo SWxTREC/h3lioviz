@@ -323,6 +323,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     /* called only when both pvView and runId$.value are true */
     loadModel( runId: string ) {
+        this.loading = true;
         this.errorMessage = null;
         this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: runId });
         // get current plotConfig

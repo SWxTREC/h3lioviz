@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { assign, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { ConfigLabels, FEATURES, ILayers, LAYER_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
@@ -29,6 +29,20 @@ export class FeaturesComponent implements OnChanges, OnDestroy, OnInit {
                 this.features.addControl(controlName, new FormControl( LAYER_FORM_DEFAULT_VALUES[controlName]));
             }
         });
+
+        this.subscriptions.push(this._siteConfigService.config$.pipe(
+            // once connected to paraview, look for a change in runId only
+            filter( () => this.pvView != null ),
+            distinctUntilChanged( ( prev, curr ) =>
+                prev[ConfigLabels.runId] === curr[ConfigLabels.runId]
+            ),
+            debounceTime(300)
+        ).subscribe( ( siteConfig ) => {
+            // when a new run is selected, visibility controls need to be updated again
+            // but siteConfig is correct and does not need to be updated
+            this.updateVisibilityControls( this.features.value );
+        }));
+
         // debounce render
         this.subscriptions.push(
             this.renderDebouncer.pipe(

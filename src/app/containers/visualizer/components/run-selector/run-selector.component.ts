@@ -60,6 +60,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
         };
         this.displayedColumns = [
             'program',
+            'run_id',
             'version',
             'institute',
             'rundate_cal',
