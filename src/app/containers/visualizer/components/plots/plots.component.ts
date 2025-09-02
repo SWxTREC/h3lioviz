@@ -12,7 +12,6 @@ import {
     IPlotParams,
     MenuOptionsService,
     PlotsService,
-    StatusService,
     UiOptionsService,
     XRangeService
 } from 'scicharts';
@@ -64,7 +63,6 @@ export class PlotsComponent implements OnChanges {
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
         private _plotsService: PlotsService,
-        private _statusService: StatusService,
         private _uiOptionsService: UiOptionsService,
         private _xRangeService: XRangeService
     ) {
@@ -73,6 +71,7 @@ export class PlotsComponent implements OnChanges {
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
         uiOptions.legend = 'minimal';
+        uiOptions.stackedMode = true;
         this._uiOptionsService.setUiOptions( uiOptions );
         // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
@@ -81,16 +80,6 @@ export class PlotsComponent implements OnChanges {
         this._plotsService.enableCrosshairSync();
         this._xRangeService.enableZoomSyncByVariable( true, 'time' );
         this._imageViewerService.setImageViewerSync( true );
-
-        // TODO: this is a workaround for not showing the sticky XAXIS plot on load: https://jira.lasp.colorado.edu/browse/SCICHARTS-452
-        // can move setting stackedMode to the load of the component (with other options settings above) when this issue is fixed
-        this._statusService.allPlotsStable$.pipe(
-            takeUntilDestroyed()
-        ).subscribe( ( allPlotsStable: boolean ) => {
-            if ( allPlotsStable ) {
-                this._uiOptionsService.setUiOptions({ stackedMode: true });
-            }
-        });
 
         this.plotForm.valueChanges.pipe(
             debounceTime(1000),

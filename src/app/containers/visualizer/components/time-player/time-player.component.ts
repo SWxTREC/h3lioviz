@@ -136,7 +136,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }));
 
         // subscribe to hovering on the scicharts plots
-        this.subscriptions.push( this._plotsService.getXyPosition$().pipe(
+        this.subscriptions.push( this._plotsService.xyPosition$.pipe(
             filter( position => position != null ),
             distinctUntilChanged( ( prev, curr ) => prev.xPosition === curr.xPosition )
         ).subscribe( ( xyPosition ) => {
@@ -159,7 +159,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }));
 
         // when the user clicks on a scicharts plot, set the time player crosshair to the nearest tick
-        this.subscriptions.push(this._plotsService.getXyClicked$().subscribe(( plotClicked ) => {
+        this.subscriptions.push(this._plotsService.xyClicked$.subscribe(( plotClicked ) => {
             if ( !this.hasImageDatasets ) {
                 const timestampInSeconds = plotClicked.xPosition / 1000;
                 const nearestTimeIndex = this._getNearestTick( timestampInSeconds );
