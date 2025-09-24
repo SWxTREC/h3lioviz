@@ -44,7 +44,7 @@ export const COLORMAPS: { [param: string]: IColormapInfo } = {
 export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     velocity: {
         serverName: 'velocity',
-        displayName: 'Velocity (Vr)',
+        displayName: 'Speed',
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
         defaultColormap: COLORMAPS.rainbow,

@@ -180,15 +180,14 @@ export const modelDatasetCatalog: { [parameter: string]: IDataset } =
             url: urlBase, // + urlSuffix,
             name: 'Model data ' + SATELLITE_NAMES[satellite],
             rangeVariables: [
-                'density',
-                'velocity',
-                'temperature',
-                'pressure',
-                'bx',
-                'by',
-                'bz'
+                { name: 'density', displayName: 'density' },
+                { name: 'velocity', displayName: 'speed' },
+                { name: 'temperature', displayName: 'temperature' },
+                { name: 'pressure', displayName: 'pressure' },
+                { name: 'bx', displayName: 'bx' },
+                { name: 'by', displayName: 'by' },
+                { name: 'bz', displayName: 'bz' }
             ],
-            // selectedRangeVariables: [ variable ],
             domainVariables: [ 'time' ]
         };
         aggregator[ satellite ] = newDataset;
@@ -200,14 +199,12 @@ export const observedDatasetCatalog: { [parameter: string]: IDataset } = {
         url: environment.latisUrl + 'ace_mag_1m.jsond?',
         name: 'ACE Archived Real Time Data',
         rangeVariables: [ 'Bx', 'By', 'Bz' ],
-        // selectedRangeVariables: [ variableNameMap[variable] ],
         domainVariables: [ 'time' ]
     },
     ace_swepam_1m: {
         url: environment.latisUrl + 'ace_swepam_1m.jsond?',
         name: 'Archived real time ACE data',
         rangeVariables: [ 'density', 'speed', 'temperature' ],
-        // selectedRangeVariables: [ variableNameMap[variable] ],
         domainVariables: [ 'time' ]
     }
 };

@@ -147,15 +147,15 @@ export class PlotsComponent implements OnChanges {
                 url: urlBase + urlSuffix,
                 name: 'Model data ' + SATELLITE_NAMES[satellite],
                 rangeVariables: [
-                    'density',
-                    'velocity',
-                    'pressure',
-                    'temperature',
-                    'bx',
-                    'by',
-                    'bz'
+                    { name: 'velocity', displayName: 'speed'},
+                    { name: 'density', displayName: 'density'},
+                    { name: 'pressure', displayName: 'pressure'},
+                    { name: 'temperature', displayName: 'temperature'},
+                    { name: 'bx', displayName: 'bx'},
+                    { name: 'by', displayName: 'by'},
+                    { name: 'bz', displayName: 'bz'}
                 ],
-                selectedRangeVariables: [ variable ],
+                selectedRangeVariables: [ { name: variable, displayName: variable === 'velocity' ? 'speed' : variable } ],
                 domainVariables: [ 'time' ]
             };
             plotGroup.push( newDataset );
