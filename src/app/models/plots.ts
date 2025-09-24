@@ -3,6 +3,7 @@ import {
     AxisFormat,
     DiscreteAxisRangeType,
     IDataset,
+    IDatasetStrict,
     IMenuOptions,
     IPlotParams,
     IUiFeatures,
@@ -175,7 +176,7 @@ export const modelDatasetCatalog: { [parameter: string]: IDataset } =
     [ 'stereoa', 'earth', 'stereob' ].reduce( ( aggregator, satellite: string) => {
         const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
         // const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
-        const newDataset: IDataset = {
+        const newDataset: IDatasetStrict = {
         // TODO will need to add the suffix when called from the catalog later
             url: urlBase, // + urlSuffix,
             name: 'Model data ' + SATELLITE_NAMES[satellite],

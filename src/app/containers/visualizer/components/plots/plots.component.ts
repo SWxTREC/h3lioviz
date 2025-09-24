@@ -6,10 +6,12 @@ import { debounceTime } from 'rxjs/operators';
 
 import {
     IDataset,
+    IDatasetStrict,
     ImageViewerService,
     IMenuOptions,
     IPlot,
     IPlotParams,
+    IRangeVariable,
     MenuOptionsService,
     PlotsService,
     UiOptionsService,
@@ -142,7 +144,7 @@ export class PlotsComponent implements OnChanges {
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
             const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
             const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
-            const newDataset: IDataset = {
+            const newDataset: IDatasetStrict = {
                 uid: satellite,
                 url: urlBase + urlSuffix,
                 name: 'Model data ' + SATELLITE_NAMES[satellite],
@@ -197,6 +199,7 @@ export class PlotsComponent implements OnChanges {
                 url: environment.latisUrl + 'ace_mag_1m.jsond?',
                 name: 'ACE Archived Real Time Mag Data',
                 rangeVariables: [ 'Bx', 'By', 'Bz' ],
+                // simple strings and not IRangeVariable objects
                 selectedRangeVariables: variables,
                 domainVariables: [ 'time' ]
             };
@@ -208,6 +211,7 @@ export class PlotsComponent implements OnChanges {
                 url: environment.latisUrl + 'ace_swepam_1m.jsond?',
                 name: 'ACE Archived real time Swepam data',
                 rangeVariables: [ 'density', 'speed', 'temperature' ],
+                // simple strings and not IRangeVariable objects
                 selectedRangeVariables: variables,
                 domainVariables: [ 'time' ]
             };
@@ -236,7 +240,7 @@ export class PlotsComponent implements OnChanges {
                 }
             }).filter( dataset => dataset );
         const observedPlotOptions = DEFAULT_PLOT_OPTIONS as IMenuOptions;
-        observedPlotOptions.yAxis.useMultipleAxes = true;
+        observedPlotOptions.yAxis.useMultipleAxes = false;
         const observedPlot: IPlot = {
             datasets: observedDatasets,
             initialOptions: observedPlotOptions,
@@ -256,8 +260,9 @@ export class PlotsComponent implements OnChanges {
                     aggregator.image.push( dataset.datasetId );
                 }
                 if ( modelDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.model.push( ...dataset.rangeVars );
+                    aggregator.model.push( ...dataset.rangeVars.map((variable: IRangeVariable) => variable.name) );
                 }
+                // NOTE: observedDatasetCatalog has different range variable names (IDataset) than modelDatasetCatalog (IDatasetStrict)
                 if ( observedDatasetCatalog[dataset.datasetId] ) {
                     aggregator.observed.push( ...dataset.rangeVars );
                 }
