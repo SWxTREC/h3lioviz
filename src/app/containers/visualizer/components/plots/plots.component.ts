@@ -73,7 +73,8 @@ export class PlotsComponent implements OnChanges {
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
-        uiOptions.stackedMode = this.legendCardToggle.value;
+        uiOptions.legend = this.legendCardToggle.value === true ? 'auto' : 'minimal';
+        uiOptions.stackedMode = true;
         this._uiOptionsService.setUiOptions( uiOptions );
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
