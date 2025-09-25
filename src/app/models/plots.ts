@@ -2,7 +2,6 @@ import {
     AnalogAxisRangeType,
     AxisFormat,
     DiscreteAxisRangeType,
-    IDataset,
     IDatasetStrict,
     IMenuOptions,
     IPlotParams,
@@ -152,15 +151,14 @@ export const IMAGE_DATASETS = {
     }
 };
 
-export const imageDatasetCatalog: { [parameter: string]: IDataset } = Object.keys(IMAGE_DATASETS).reduce( (aggregator, dataset) => {
+export const imageDatasetCatalog: { [parameter: string]: IDatasetStrict } = Object.keys(IMAGE_DATASETS).reduce( (aggregator, dataset) => {
     const datasetInfo = IMAGE_DATASETS[dataset];
-    const scichartsDataset: IDataset = {
+    const scichartsDataset: IDatasetStrict = {
         url: environment.latisUrl + datasetInfo.id + '.jsond',
         name: datasetInfo.displayName,
         rangeVariables: [
-            'url'
+            { name: 'url', displayName: 'Image URL' }
         ],
-        selectedRangeVariables: [ 'url' ],
         domainVariables: [ 'time' ]
     };
     // some image datasets are converted to files because they are not standard types
@@ -172,7 +170,7 @@ export const imageDatasetCatalog: { [parameter: string]: IDataset } = Object.key
     return aggregator;
 }, {});
 
-export const modelDatasetCatalog: { [parameter: string]: IDataset } =
+export const modelDatasetCatalog: { [parameter: string]: IDatasetStrict } =
     [ 'stereoa', 'earth', 'stereob' ].reduce( ( aggregator, satellite: string) => {
         const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
         // const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
@@ -195,22 +193,30 @@ export const modelDatasetCatalog: { [parameter: string]: IDataset } =
         return aggregator;
     }, {});
 
-export const observedDatasetCatalog: { [parameter: string]: IDataset } = {
+export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
     ace_mag_1m: {
         url: environment.latisUrl + 'ace_mag_1m.jsond?',
         name: 'ACE Archived Real Time Data',
-        rangeVariables: [ 'Bx', 'By', 'Bz' ],
+        rangeVariables: [
+            { name: 'Bx'},
+            { name: 'By'},
+            { name: 'Bz'}
+        ],
         domainVariables: [ 'time' ]
     },
     ace_swepam_1m: {
         url: environment.latisUrl + 'ace_swepam_1m.jsond?',
         name: 'Archived real time ACE data',
-        rangeVariables: [ 'density', 'speed', 'temperature' ],
+        rangeVariables: [
+            { name: 'density'},
+            { name: 'speed'},
+            { name: 'temperature'}
+        ],
         domainVariables: [ 'time' ]
     }
 };
 
-export const datasetMapById: { [parameter: string]: IDataset } =
+export const datasetMapById: { [parameter: string]: IDatasetStrict } =
     Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
 
 export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
@@ -218,15 +224,15 @@ export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
         datasets: [
             {
                 datasetId: 'stereoa',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
+                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
             },
             {
                 datasetId: 'earth',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
+                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
             },
             {
                 datasetId: 'stereob',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
+                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
             }
         ],
         options: DEFAULT_PLOT_OPTIONS

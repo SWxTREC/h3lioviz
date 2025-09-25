@@ -1,11 +1,10 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, uniq } from 'lodash';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-    IDataset,
     IDatasetStrict,
     ImageViewerService,
     IMenuOptions,
@@ -56,6 +55,7 @@ export class PlotsComponent implements OnChanges {
         model: new FormControl(),
         observed: new FormControl()
     });
+    legendCardToggle = new FormControl( false );
     showAllModel = false;
     showAllObserved = false;
     siteConfig: ISiteConfig;
@@ -69,13 +69,12 @@ export class PlotsComponent implements OnChanges {
         private _xRangeService: XRangeService
     ) {
         this._menuOptionsService.setGlobalMenuOptions( cloneDeep(DEFAULT_PLOT_OPTIONS) );
+        // use methods to set uiOptions
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
-        uiOptions.legend = 'minimal';
-        uiOptions.stackedMode = true;
+        uiOptions.stackedMode = this.legendCardToggle.value;
         this._uiOptionsService.setUiOptions( uiOptions );
-        // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
 
@@ -83,17 +82,27 @@ export class PlotsComponent implements OnChanges {
         this._xRangeService.enableZoomSyncByVariable( true, 'time' );
         this._imageViewerService.setImageViewerSync( true );
 
+        this.legendCardToggle.valueChanges.pipe(
+            takeUntilDestroyed()
+        ).subscribe( showCards => {
+            if ( showCards ) {
+                this._uiOptionsService.setUiOptions({ legend: 'auto' });
+            } else {
+                this._uiOptionsService.setUiOptions({ legend: 'minimal' });
+            }
+        });
+
         this.plotForm.valueChanges.pipe(
             debounceTime(1000),
             takeUntilDestroyed()
-        ).subscribe( newValue => {
+        ).subscribe( (newValue: { image: string[]; model: string[]; observed: string[] }) => {
             const plotList = [];
             if ( newValue.image?.length ) {
                 plotList.push(this.getImagePlot( newValue.image ));
             }
             if ( newValue.model?.length) {
-                newValue.model.forEach( (variable: string, index: number) => {
-                    plotList.push(this.getModelPlot(variable, index));
+                newValue.model.forEach( (variable: string) => {
+                    plotList.push(this.getModelPlot(variable));
                 });
             }
             if ( newValue.observed?.length ) {
@@ -114,20 +123,20 @@ export class PlotsComponent implements OnChanges {
     }
 
     ngOnChanges() {
-        const plotsToSet = this.getPlotListByFormCategory( this.plotConfig );
-        this.plotForm.setValue( plotsToSet );
+        const plotsForForm = this.getPlotListByFormCategory( this.plotConfig );
+        this.plotForm.setValue( plotsForForm );
     }
 
     createImageDataset( imageDatasetId: string )  {
         const datasetInfo = this.imageData[imageDatasetId];
-        const newDataset: IDataset = {
+        const newDataset: IDatasetStrict = {
             uid: imageDatasetId,
             url: environment.latisUrl + datasetInfo.id + '.jsond',
             name: datasetInfo.displayName,
             rangeVariables: [
-                'url'
+                { name: 'url', displayName: 'Image URL' }
             ],
-            selectedRangeVariables: [ 'url' ],
+            selectedRangeVariables: [ { name: 'url' } ],
             domainVariables: [ 'time' ]
         };
         // some image datasets are converted to files because they are not standard types
@@ -138,7 +147,7 @@ export class PlotsComponent implements OnChanges {
         return newDataset;
     }
 
-    createDatasetGroup( variable: string )  {
+    createDatasetGroup( rangeVariable: IRangeVariable )  {
         const plotGroup = [];
         // push model data to plotGroup
         [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
@@ -157,7 +166,7 @@ export class PlotsComponent implements OnChanges {
                     { name: 'by', displayName: 'by'},
                     { name: 'bz', displayName: 'bz'}
                 ],
-                selectedRangeVariables: [ { name: variable, displayName: variable === 'velocity' ? 'speed' : variable } ],
+                selectedRangeVariables: [ rangeVariable ],
                 domainVariables: [ 'time' ]
             };
             plotGroup.push( newDataset );
@@ -179,8 +188,9 @@ export class PlotsComponent implements OnChanges {
         return imagePlot;
     }
 
-    getModelPlot( groupVariable: string, index: number ) {
-        const datasetGroup = this.createDatasetGroup( groupVariable );
+    getModelPlot( groupVariable: string ) {
+        const rangeVariable: IRangeVariable = modelDatasetCatalog['earth'].rangeVariables.find( v => v.name === groupVariable );
+        const datasetGroup = this.createDatasetGroup( rangeVariable );
         const modelPlot: IPlot = {
             datasets: datasetGroup,
             initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
@@ -192,46 +202,49 @@ export class PlotsComponent implements OnChanges {
         return modelPlot;
     }
 
-    createObservedDataset( instrument: string, variables: string[] ) {
+    createObservedDataset( instrument: string, rangeVariables: IRangeVariable[] ) {
         if ( instrument === 'mag' ) {
-            const archivedMagDataset: IDataset = {
+            const archivedMagDataset: IDatasetStrict = {
                 uid: 'ace_mag_1m',
                 url: environment.latisUrl + 'ace_mag_1m.jsond?',
                 name: 'ACE Archived Real Time Mag Data',
-                rangeVariables: [ 'Bx', 'By', 'Bz' ],
-                // simple strings and not IRangeVariable objects
-                selectedRangeVariables: variables,
+                rangeVariables: [ { name: 'Bx' }, { name: 'By' }, { name: 'Bz' } ],
+                selectedRangeVariables: rangeVariables,
                 domainVariables: [ 'time' ]
             };
             return archivedMagDataset;
         }
         if ( instrument === 'swepam' ) {
-            const archivedSwepamDataset: IDataset = {
+            const archivedSwepamDataset: IDatasetStrict = {
                 uid: 'ace_swepam_1m',
                 url: environment.latisUrl + 'ace_swepam_1m.jsond?',
                 name: 'ACE Archived real time Swepam data',
-                rangeVariables: [ 'density', 'speed', 'temperature' ],
-                // simple strings and not IRangeVariable objects
-                selectedRangeVariables: variables,
+                rangeVariables: [ { name: 'density' }, { name: 'speed' }, { name: 'temperature' } ],
+                selectedRangeVariables: rangeVariables,
                 domainVariables: [ 'time' ]
             };
             return archivedSwepamDataset;
         }
     }
 
-    getObservedPlot( variables: string[] ) {
-        const observedVariablesByInstrument = variables.reduce( ( aggregator, variable ) => {
+    getObservedPlot( variables: string[] ): IPlot {
+        const observedVariablesByInstrument: { [instrument: string]: IRangeVariable[] } = variables.reduce( ( aggregator, variable ) => {
             const mag = new Set([ 'Bx', 'By', 'Bz' ]);
             const swepam = new Set([ 'density', 'speed', 'temperature' ]);
-            if ( mag.has(variable)) {
-                aggregator.mag.push( variable );
+            // push the IRangeVariable to the correct instrument array
+            if ( mag.has( variable ) ) {
+                const rangeVariable: IRangeVariable =
+                observedDatasetCatalog['ace_mag_1m'].rangeVariables.find( vr => vr.name === variable );
+                aggregator.mag.push( rangeVariable );
             }
             if ( swepam.has( variable ) ) {
-                aggregator.swepam.push( variable );
+                const rangeVariable: IRangeVariable =
+                observedDatasetCatalog['ace_swepam_1m'].rangeVariables.find( vr => vr.name === variable );
+                aggregator.swepam.push( rangeVariable );
             }
             return aggregator;
         }, { mag: [], swepam: []});
-        const observedDatasets = Object.keys( observedVariablesByInstrument )
+        const observedDatasets: IDatasetStrict[] = Object.keys( observedVariablesByInstrument )
             .map( key => {
                 if ( observedVariablesByInstrument[key].length ) {
                     return this.createObservedDataset(key, observedVariablesByInstrument[key] );
@@ -260,15 +273,19 @@ export class PlotsComponent implements OnChanges {
                     aggregator.image.push( dataset.datasetId );
                 }
                 if ( modelDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.model.push( ...dataset.rangeVars.map((variable: IRangeVariable) => variable.name) );
+                    dataset.rangeVars.forEach( ( rangeVar: IRangeVariable ) => {
+                        aggregator.model.push( rangeVar.name );
+                    });
                 }
-                // NOTE: observedDatasetCatalog has different range variable names (IDataset) than modelDatasetCatalog (IDatasetStrict)
                 if ( observedDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.observed.push( ...dataset.rangeVars );
+                    dataset.rangeVars.forEach( ( rangeVar: IRangeVariable ) => {
+                        aggregator.observed.push( rangeVar.name );
+                    });
                 }
             });
+            // make sure there are no duplicates in the arrays
             Object.keys( aggregator ).forEach( key => {
-                aggregator[key] = Array.from(new Set( aggregator[key] ));
+                aggregator[key] = uniq( aggregator[key]);
             });
             return aggregator;
 

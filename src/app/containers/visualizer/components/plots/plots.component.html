@@ -58,6 +58,7 @@
             </mat-select>
         </mat-form-field>
     </form>
+    <mat-checkbox class="plots__option"[formControl]="legendCardToggle">Show legend cards</mat-checkbox>
     <sci-grid [class.plots__static]="_playingService.playing$ | async"></sci-grid>
     <div class="plots__filler"></div>
     <p>
