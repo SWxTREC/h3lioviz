@@ -24,9 +24,11 @@ export class SiteConfigService {
         // update site config with plot changes
         this._plotsService.getPlots$().subscribe((plots) => {
             const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
-            // in stackedMode, remove the last plot (the x-axis plot) from the config
-            changedParams.plots.pop();
-            this.updateSiteConfig({ plots: changedParams.plots});
+            if ( plots.some( p => p.type === 'XAXIS' ) ) {
+                // if in stackedMode, remove the last plot (the x-axis plot) from the config
+                changedParams.plots.pop();
+            }
+            this.updateSiteConfig({ plots: changedParams.plots });
         });
     }
 
