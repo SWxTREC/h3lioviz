@@ -34,6 +34,8 @@ export class SiteConfigService {
     getSiteConfig(): ISiteConfig {
         const config = cloneDeep(this.config$.getValue());
         // add default values not stored in the url
+        // if all plots are removed, this adds back the default plots
+        // not sure this is the desired behavior
         defaultsDeep(config, DEFAULT_SITE_CONFIG);
         return config;
     }

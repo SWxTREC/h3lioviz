@@ -198,9 +198,9 @@ export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
         url: environment.latisUrl + 'ace_mag_1m.jsond?',
         name: 'ACE Archived Real Time Data',
         rangeVariables: [
-            { name: 'Bx'},
-            { name: 'By'},
-            { name: 'Bz'}
+            { name: 'Bx', displayName: 'Bx' },
+            { name: 'By', displayName: 'By' },
+            { name: 'Bz', displayName: 'Bz' }
         ],
         domainVariables: [ 'time' ]
     },
@@ -208,9 +208,9 @@ export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
         url: environment.latisUrl + 'ace_swepam_1m.jsond?',
         name: 'Archived real time ACE data',
         rangeVariables: [
-            { name: 'density'},
-            { name: 'speed'},
-            { name: 'temperature'}
+            { name: 'density', displayName: 'density' },
+            { name: 'speed', displayName: 'speed' },
+            { name: 'temperature', displayName: 'temperature' }
         ],
         domainVariables: [ 'time' ]
     }
@@ -219,20 +219,21 @@ export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
 export const datasetMapById: { [parameter: string]: IDatasetStrict } =
     Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
 
+const defaultVariableServerName = COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName;
 export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
     {
         datasets: [
             {
                 datasetId: 'stereoa',
-                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
+                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
             },
             {
                 datasetId: 'earth',
-                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
+                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
             },
             {
                 datasetId: 'stereob',
-                rangeVars: [ { name: COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName } ]
+                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
             }
         ],
         options: DEFAULT_PLOT_OPTIONS
