@@ -4,7 +4,7 @@ set -eu
 VERSION=$(npm pkg get version | tr -d '"')
 REGISTRY=docker-registry.pdmz.lasp.colorado.edu/web # Default registry
 IMAGE=h3lioviz
-PORT=8080
+PORT=4200
 
 function print_usage() {
   printf "Usage: $0 [option]\n"
