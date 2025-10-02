@@ -43,11 +43,11 @@ Branch demos: https://dev.swx-trec.com/h3lioviz/`<branch-name>`/DEMO/
 
 Jenkins jobs are used to deploy the application and the application is built on internal libraries, so development needs to be done behind the firewall.
 
-Access to AWS S3 console is currently required to deploy.
-
 ## Architecture
 
 This is a visualizer for the 3D heliosphere model built with Angular.
+
+It connects via a websocket to a paraview server.
 
 ## Running H3lioViz Locally
 
@@ -67,7 +67,7 @@ To test with a local paraview server, follow the README instructions in the h3li
 
 ### Development server
 
-Run `npm start` for a frontend dev server (use `npm run start:prod` to connect to the deployed AWS backend). Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm run start:dev` or `npm run start:prod` to serve the frontend locally and connect to one of the deployed AWS backends. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ### Code scaffolding
 
@@ -78,6 +78,8 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ### Local build
 
 Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory. Run `npm run build:prod` for a production build.
+
+Because of the websocket, this project still uses the old webpack build engine and it does not have the additional `/browser` path in the dist folder that is created by the newer Angular application builder.
 
 ### Linting
 
@@ -101,7 +103,7 @@ You can run `./dockerctl.sh b` to build a new image locally
 
 ### Running a dev image locally
 
-Once you have built your image using the command above, you can `./dockerctl.sh r` to start a local development image. This image will be served at `http://localhost:8080/dev`
+Once you have built your image using the command above, you can `./dockerctl.sh r` to start a local development image. This image will be served at `http://localhost:4200` and connect to the websocket via port 8080
 
 To stop your image run `./dockerctl.sh s`
 
