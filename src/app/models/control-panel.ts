@@ -134,6 +134,13 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     }
 };
 
+export const MODEL_VARIABLES = [
+    VARIABLE_CONFIG.velocity,
+    VARIABLE_CONFIG.density,
+    VARIABLE_CONFIG.temperature,
+    VARIABLE_CONFIG.pressure,
+    VARIABLE_CONFIG.b
+];
 export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.density ];
 export const ADDITIONAL_VARIABLES = [
     VARIABLE_CONFIG.temperature,

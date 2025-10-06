@@ -12,48 +12,20 @@
         <mat-form-field>
             <mat-label>Model data</mat-label>
             <mat-select laspSelectAutoClose formControlName="model" multiple>
-                @for (variable of focusModelVariables; track variable) {
+                @for (variable of modelVariables; track variable) {
                     <mat-option [value]="variable.serverName">
                         {{ variable.displayName }}
                     </mat-option>
-                }
-                <button
-                    class="plots__more"
-                    mat-button
-                    [disabled]="additionalModelVariableSelected"
-                    (click)="showAllModel = !showAllModel">
-                    {{ showAllModel ? 'Fewer options' : 'More options…' }}
-                </button>
-                @if (showAllModel) {
-                    @for (variable of additionalModelVariables; track variable) {
-                        <mat-option [value]="variable.serverName">
-                            {{ variable.displayName }}
-                        </mat-option>
-                    }
                 }
             </mat-select>
         </mat-form-field>
         <mat-form-field>
             <mat-label>Observed data</mat-label>
             <mat-select laspSelectAutoClose formControlName="observed" multiple>
-                @for (variable of focusObservedVariableList; track variable) {
+                @for (variable of observedVariableList; track variable) {
                     <mat-option [value]="variable">
                         {{ variable | titlecase }}
                     </mat-option>
-                }
-                <button
-                    class="plots__more"
-                    mat-button
-                    [disabled]="additionalObservedVariableSelected"
-                    (click)="showAllObserved = !showAllObserved">
-                    {{ showAllObserved ? 'Fewer options' : 'More options…' }}
-                </button>
-                @if (showAllObserved) {
-                    @for (variable of additionalObservedVariableList; track variable) {
-                        <mat-option [value]="variable">
-                            {{ variable | titlecase }}
-                        </mat-option>
-                    }
                 }
             </mat-select>
         </mat-form-field>
