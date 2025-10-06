@@ -66,7 +66,7 @@ export class PlotsComponent implements OnChanges {
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
-        uiOptions.legend = this.legendCardToggle.value === true ? 'auto' : 'minimal';
+        uiOptions.legend = this.legendCardToggle.value === true ? 'left' : 'minimal';
         uiOptions.stackedMode = true;
         this._uiOptionsService.setUiOptions( uiOptions );
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
@@ -80,11 +80,34 @@ export class PlotsComponent implements OnChanges {
             takeUntilDestroyed()
         ).subscribe( showCards => {
             if ( showCards ) {
-                this._uiOptionsService.setUiOptions({ legend: 'auto' });
+                this._uiOptionsService.setUiOptions({ legend: 'left' });
             } else {
                 this._uiOptionsService.setUiOptions({ legend: 'minimal' });
             }
         });
+
+        // this.plotForm.controls.observed.valueChanges.pipe(
+        //     debounceTime(1000),
+        //     takeUntilDestroyed()
+        // ).subscribe( (newValue: string[]) => {
+        //     this.additionalObservedVariableSelected =
+        //         !!newValue.find(
+        //             ( variable: string ) => this.additionalObservedVariableList.includes(variable)
+        //         );
+        //     this.showAllObserved = this.additionalObservedVariableSelected;
+        // });
+
+        // this.plotForm.controls.model.valueChanges.pipe(
+        //     debounceTime(1000),
+        //     takeUntilDestroyed()
+        // ).subscribe( (newValue: string[]) => {
+
+        //     this.additionalModelVariableSelected =
+        //         !!this.additionalModelVariables.find(
+        //             variable => newValue.includes(variable.serverName)
+        //         );
+        //     this.showAllModel = this.additionalModelVariableSelected;
+        // });
 
         this.plotForm.valueChanges.pipe(
             debounceTime(1000),
@@ -120,7 +143,7 @@ export class PlotsComponent implements OnChanges {
             rangeVariables: [
                 { name: 'url', displayName: 'Image URL' }
             ],
-            selectedRangeVariables: [ { name: 'url' } ],
+            selectedRangeVariables: [ { name: 'url', displayName: 'Image URL' } ],
             domainVariables: [ 'time' ]
         };
         // some image datasets are converted to files because they are not standard types
@@ -192,7 +215,11 @@ export class PlotsComponent implements OnChanges {
                 uid: 'ace_mag_1m',
                 url: environment.latisUrl + 'ace_mag_1m.jsond?',
                 name: 'ACE Archived Real Time Mag Data',
-                rangeVariables: [ { name: 'Bx' }, { name: 'By' }, { name: 'Bz' } ],
+                rangeVariables: [
+                    { name: 'Bx', displayName: 'Bx' },
+                    { name: 'By', displayName: 'By' },
+                    { name: 'Bz', displayName: 'Bz' }
+                ],
                 selectedRangeVariables: rangeVariables,
                 domainVariables: [ 'time' ]
             };
@@ -203,7 +230,11 @@ export class PlotsComponent implements OnChanges {
                 uid: 'ace_swepam_1m',
                 url: environment.latisUrl + 'ace_swepam_1m.jsond?',
                 name: 'ACE Archived real time Swepam data',
-                rangeVariables: [ { name: 'density' }, { name: 'speed' }, { name: 'temperature' } ],
+                rangeVariables: [
+                    { name: 'density', displayName: 'Density' },
+                    { name: 'speed', displayName: 'Speed' },
+                    { name: 'temperature', displayName: 'Temperature' }
+                ],
                 selectedRangeVariables: rangeVariables,
                 domainVariables: [ 'time' ]
             };
