@@ -86,29 +86,6 @@ export class PlotsComponent implements OnChanges {
             }
         });
 
-        // this.plotForm.controls.observed.valueChanges.pipe(
-        //     debounceTime(1000),
-        //     takeUntilDestroyed()
-        // ).subscribe( (newValue: string[]) => {
-        //     this.additionalObservedVariableSelected =
-        //         !!newValue.find(
-        //             ( variable: string ) => this.additionalObservedVariableList.includes(variable)
-        //         );
-        //     this.showAllObserved = this.additionalObservedVariableSelected;
-        // });
-
-        // this.plotForm.controls.model.valueChanges.pipe(
-        //     debounceTime(1000),
-        //     takeUntilDestroyed()
-        // ).subscribe( (newValue: string[]) => {
-
-        //     this.additionalModelVariableSelected =
-        //         !!this.additionalModelVariables.find(
-        //             variable => newValue.includes(variable.serverName)
-        //         );
-        //     this.showAllModel = this.additionalModelVariableSelected;
-        // });
-
         this.plotForm.valueChanges.pipe(
             debounceTime(1000),
             takeUntilDestroyed()
