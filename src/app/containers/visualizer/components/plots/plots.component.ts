@@ -17,6 +17,7 @@ import {
     XRangeService
 } from 'scicharts';
 import {
+    ConfigLabels,
     DEFAULT_PLOT_OPTIONS,
     H3LIO_PRESET,
     IMAGE_DATASETS,
@@ -28,7 +29,7 @@ import {
     observedDatasetCatalog,
     SATELLITE_NAMES
 } from 'src/app/models';
-import { PlayingService } from 'src/app/services';
+import { PlayingService, SiteConfigService } from 'src/app/services';
 import { environment, localUrls } from 'src/environments/environment';
 
 @Component({
@@ -50,7 +51,7 @@ export class PlotsComponent implements OnChanges {
         model: new FormControl(),
         observed: new FormControl()
     });
-    legendCardToggle = new FormControl( false );
+    legendCardToggle = new FormControl();
     siteConfig: ISiteConfig;
 
     constructor(
@@ -58,6 +59,7 @@ export class PlotsComponent implements OnChanges {
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
         private _plotsService: PlotsService,
+        private _siteConfigService: SiteConfigService,
         private _uiOptionsService: UiOptionsService,
         private _xRangeService: XRangeService
     ) {
@@ -66,7 +68,6 @@ export class PlotsComponent implements OnChanges {
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
-        uiOptions.legend = this.legendCardToggle.value === true ? 'left' : 'minimal';
         uiOptions.stackedMode = true;
         this._uiOptionsService.setUiOptions( uiOptions );
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
@@ -81,10 +82,15 @@ export class PlotsComponent implements OnChanges {
         ).subscribe( showCards => {
             if ( showCards ) {
                 this._uiOptionsService.setUiOptions({ legend: 'left' });
+                this._siteConfigService.updateSiteConfig({ [ConfigLabels.legendCards]: true });
             } else {
                 this._uiOptionsService.setUiOptions({ legend: 'minimal' });
+                this._siteConfigService.updateSiteConfig({ [ConfigLabels.legendCards]: false });
             }
         });
+        // once, on init, set the legend toggle based on the site config
+        const legendConfig = this._siteConfigService.getSiteConfig().legendCards;
+        this.legendCardToggle.setValue( legendConfig );
 
         this.plotForm.valueChanges.pipe(
             debounceTime(1000),
