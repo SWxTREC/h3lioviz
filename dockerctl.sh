@@ -4,7 +4,8 @@ set -eu
 VERSION=$(npm pkg get version | tr -d '"')
 REGISTRY=docker-registry.pdmz.lasp.colorado.edu/web # Default registry
 IMAGE=h3lioviz
-PORT=8080
+# port 8080 is used by the websocket, so we use 4200 for the web server
+PORT=4200
 
 function print_usage() {
   printf "Usage: $0 [option]\n"
