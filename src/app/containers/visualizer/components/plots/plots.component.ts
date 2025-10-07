@@ -128,13 +128,22 @@ export class PlotsComponent implements OnChanges {
     addPlot( type: 'image' | 'model' | 'observed', datasetName: string ) {
         const datasets = [];
         if ( type === 'image' ) {
-            datasets.push(this.createImageDataset( datasetName ));
+            const imageDataset = this.createImageDataset( datasetName );
+            if ( imageDataset != null ) {
+                datasets.push(imageDataset);
+            }
         }
         if ( type === 'model' ) {
-            datasets.push(this.createModelDataset( [ datasetName ] ));
+            const modelDataset = this.createModelDataset( [ datasetName ] );
+            if ( modelDataset != null ) {
+                datasets.push( modelDataset );
+            }
         }
         if ( type === 'observed' ) {
-            datasets.push(this.createObservedDataset( [ datasetName ] ));
+            const observedDataset = this.createObservedDataset( [ datasetName ] );
+            if ( observedDataset != null ) {
+                datasets.push(observedDataset);
+            }
         }
         const plotType = type === 'image' ? 'IMAGE' : 'LINE';
         const newPlot: IPlotStrict = this.getPlot( plotType, datasets, cloneDeep(DEFAULT_PLOT_OPTIONS) );
@@ -157,20 +166,24 @@ export class PlotsComponent implements OnChanges {
 
     createImageDataset( imageDatasetId: string )  {
         const catalogDataset = imageDatasetCatalog[imageDatasetId];
-        const imageDataset: IDatasetStrict = {
-            uid: imageDatasetId,
-            url: environment.latisUrl + imageDatasetId + '.jsond',
-            name: catalogDataset.name,
-            rangeVariables: catalogDataset.rangeVariables,
-            selectedRangeVariables: catalogDataset.rangeVariables,
-            domainVariables: catalogDataset.domainVariables
-        };
-        // some image datasets are converted to files because they are not standard types
-        const needsType = !imageDatasetId.includes('image');
-        if ( needsType ) {
-            imageDataset.type = 'STRING_LIST';
+        if ( catalogDataset != null ) {
+            const imageDataset: IDatasetStrict = {
+                uid: imageDatasetId,
+                url: environment.latisUrl + imageDatasetId + '.jsond',
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: catalogDataset.rangeVariables,
+                domainVariables: catalogDataset.domainVariables
+            };
+            // some image datasets are converted to files because they are not standard types
+            const needsType = !imageDatasetId.includes('image');
+            if ( needsType ) {
+                imageDataset.type = 'STRING_LIST';
+            }
+            return imageDataset;
+        } else {
+            return null;
         }
-        return imageDataset;
     }
 
     createModelDataset( variables: string[] )  {
@@ -181,15 +194,19 @@ export class PlotsComponent implements OnChanges {
         const selectedVariables = variables
             .map( variable => catalogDataset.rangeVariables.find( rv => rv.name === variable ) )
             .filter( rv => !!rv );
-        const modelDataset: IDatasetStrict = {
-            uid: satellite,
-            url: urlBase + urlSuffix,
-            name: catalogDataset.name,
-            rangeVariables: catalogDataset.rangeVariables,
-            selectedRangeVariables: selectedVariables,
-            domainVariables: catalogDataset.domainVariables
-        };
-        return modelDataset;
+        if ( selectedVariables.length > 0 ) {
+            const modelDataset: IDatasetStrict = {
+                uid: satellite,
+                url: urlBase + urlSuffix,
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: selectedVariables,
+                domainVariables: catalogDataset.domainVariables
+            };
+            return modelDataset;
+        } else {
+            return null;
+        }
     }
 
     createObservedDataset( variables: string[] ) {
@@ -198,15 +215,19 @@ export class PlotsComponent implements OnChanges {
         const selectedRangeVariables = variables
             .map( variable => catalogDataset.rangeVariables.find( rv => rv.name === variable ) )
             .filter( rv => !!rv );
-        const archivedSwepamDataset: IDatasetStrict = {
-            uid: instrument,
-            url: environment.latisUrl + instrument + '.jsond?',
-            name: catalogDataset.name,
-            rangeVariables: catalogDataset.rangeVariables,
-            selectedRangeVariables: selectedRangeVariables,
-            domainVariables: catalogDataset.domainVariables
-        };
-        return archivedSwepamDataset;
+        if ( selectedRangeVariables.length > 0 ) {
+            const archivedSwepamDataset: IDatasetStrict = {
+                uid: instrument,
+                url: environment.latisUrl + instrument + '.jsond?',
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: selectedRangeVariables,
+                domainVariables: catalogDataset.domainVariables
+            };
+            return archivedSwepamDataset;
+        } else {
+            return null;
+        }
     }
 
     getPlot( plotType: 'IMAGE' | 'LINE', datasets: IDatasetStrict[], options: IMenuOptions ): IPlotStrict {
