@@ -1,4 +1,5 @@
 export * from './colors/colors.component';
+export * from './confirmation-dialog/confirmation-dialog.component';
 export * from './contours/contours.component';
 export * from './control-panel/control-panel.component';
 export * from './features/features.component';

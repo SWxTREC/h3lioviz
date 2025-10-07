@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { cloneDeep, defaultsDeep } from 'lodash';
 
 import {
@@ -30,6 +31,8 @@ import {
 import { PlayingService, SiteConfigService } from 'src/app/services';
 import { environment, localUrls } from 'src/environments/environment';
 
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+
 @Component({
     selector: 'swt-plots',
     templateUrl: './plots.component.html',
@@ -48,6 +51,7 @@ export class PlotsComponent implements OnChanges {
     siteConfig: ISiteConfig;
 
     constructor(
+        public confirmationDialog: MatDialog,
         protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
@@ -138,7 +142,17 @@ export class PlotsComponent implements OnChanges {
     }
 
     clearAllPlots() {
-        this._plotsService.removeAllPlots();
+        const dialogRef = this.confirmationDialog.open(
+            ConfirmationDialogComponent, {
+                width: '350px',
+                data: { title: 'Confirm clear all plots?', confirmButtonText: 'Clear all plots' }
+            });
+        dialogRef.afterClosed().subscribe((result: boolean) => {
+            if (result === true) {
+                this._plotsService.removeAllPlots();
+            }
+        });
+
     }
 
     createImageDataset( imageDatasetId: string )  {

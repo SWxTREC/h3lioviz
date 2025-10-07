@@ -11,6 +11,7 @@ import { ComponentsModule, MaterialModule } from 'src/app/modules';
 
 import {
     ColorsComponent,
+    ConfirmationDialogComponent,
     ContoursComponent,
     ControlPanelComponent,
     FeaturesComponent,
@@ -43,6 +44,7 @@ import { VisualizerComponent } from './visualizer.container';
     ],
     declarations: [
         ColorsComponent,
+        ConfirmationDialogComponent,
         ContoursComponent,
         ControlPanelComponent,
         FeaturesComponent,
