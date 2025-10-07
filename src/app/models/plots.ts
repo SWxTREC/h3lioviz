@@ -45,6 +45,7 @@ export const H3LIO_PRESET: IUiFeatures = {
     dragHandle: false,
     panning: false,
     toolbarButtons: [
+        ToolbarButtonId.remove,
         ToolbarButtonId.displaySettings,
         ToolbarButtonId.toggleVariables,
         ToolbarButtonId.downloadImage
@@ -224,15 +225,7 @@ export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
     {
         datasets: [
             {
-                datasetId: 'stereoa',
-                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
-            },
-            {
                 datasetId: 'earth',
-                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
-            },
-            {
-                datasetId: 'stereob',
                 rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
             }
         ],

@@ -5,9 +5,6 @@
     &__controls {
         display: flex;
         gap: 0.5rem;
-        > * {
-            width: 30%
-        }
     }
     &__filler {
         flex: 1 1 auto;
@@ -28,14 +25,6 @@
 ::ng-deep {
     .grid-tile.grid-tile--type-XAXIS {
         sci-toolbar-button {
-            display: none;
-        }
-    }
-    .expand-close-button {
-        display: none;
-    }
-    .title {
-        .mat-icon {
             display: none;
         }
     }

@@ -1,35 +1,48 @@
 <div class="plots">
-    <h2 class="plots__header">Images/plots:</h2>
-    <form class="plots__controls" [formGroup]="plotForm">
-        <mat-form-field>
-            <mat-label>Solar images</mat-label>
-            <mat-select laspSelectAutoClose formControlName="image" multiple>
-                @for (imageOption of imageList; track imageOption) {
-                    <mat-option [value]="imageOption">{{imageData[imageOption].displayName}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Model data</mat-label>
-            <mat-select laspSelectAutoClose formControlName="model" multiple>
-                @for (variable of modelVariables; track variable) {
-                    <mat-option [value]="variable.serverName">
-                        {{ variable.displayName }}
-                    </mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-label>Observed data</mat-label>
-            <mat-select laspSelectAutoClose formControlName="observed" multiple>
-                @for (variable of observedVariableList; track variable) {
-                    <mat-option [value]="variable">
-                        {{ variable | titlecase }}
-                    </mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-    </form>
+    <h2 class="plots__header">Add a timeseries dataset:</h2>
+    <div class="plots__controls">
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="imageMenu">
+            <mat-icon>add</mat-icon>
+            Solar Images
+        </button>
+        <mat-menu #imageMenu="matMenu" class="plots__menu">
+            @for (imageDataset of imageList; track imageDataset) {
+                <button mat-menu-item (click)="addPlot( 'image', imageDataset )">
+                    <mat-icon>add_box</mat-icon>
+                    {{imageDataset}}
+                </button>
+            }
+        </mat-menu>
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="modelMenu">
+            <mat-icon>add</mat-icon>
+            Model Data at Earth
+        </button>
+        <mat-menu #modelMenu="matMenu" class="plots__menu">
+            @for (modelVariable of modelVariables; track modelVariable) {
+                <button mat-menu-item (click)="addPlot( 'model', modelVariable.serverName )">
+                    <mat-icon>add_box</mat-icon>
+                    {{modelVariable.displayName}}
+                </button>
+            }
+        </mat-menu>
+        <button mat-raised-button color="primary" [matMenuTriggerFor]="observedMenu">
+            <mat-icon>add</mat-icon>
+            Observed Data at L1
+        </button>
+        <mat-menu #observedMenu="matMenu" class="plots__menu">
+            @for (observedVariable of observedVariableList; track observedVariable) {
+                <button mat-menu-item (click)="addPlot( 'observed', observedVariable )">
+                    <mat-icon>add_box</mat-icon>
+                    {{observedVariable}}
+                </button>
+            }
+        </mat-menu>
+        <div class="plots__filler"></div>
+        <button mat-raised-button color="warn" (click)="clearAllPlots()" >
+            <mat-icon>close</mat-icon>
+            Clear all plots
+        </button>
+    </div>
     <mat-checkbox class="plots__option"[formControl]="legendCardToggle">Show legend cards</mat-checkbox>
     <sci-grid [class.plots__static]="_playingService.playing$ | async"></sci-grid>
     <div class="plots__filler"></div>
