@@ -46,7 +46,6 @@ export class PlotsComponent implements OnChanges {
     modelVariables: IVariableInfo[] = MODEL_VARIABLES;
     observedVariableList: string[] = [ 'speed', 'density', 'temperature' ];
     imageData = IMAGE_DATASETS;
-    imageList: string[] = Object.keys(this.imageData);
     legendCardToggle = new FormControl();
     siteConfig: ISiteConfig;
 
@@ -161,7 +160,6 @@ export class PlotsComponent implements OnChanges {
                 this._plotsService.removeAllPlots();
             }
         });
-
     }
 
     createImageDataset( imageDatasetId: string )  {

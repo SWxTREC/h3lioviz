@@ -66,6 +66,30 @@ export const SATELLITE_NAMES = {
 };
 
 export const IMAGE_DATASETS = {
+    iswa_goesp_suvi_094_files_thinned: {
+        id: 'iswa_goesp_suvi_094_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 094'
+    },
+    iswa_goesp_suvi_131_files_thinned: {
+        id: 'iswa_goesp_suvi_131_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 131'
+    },
+    iswa_goesp_suvi_171_files_thinned: {
+        id: 'iswa_goesp_suvi_171_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 171'
+    },
+    iswa_goesp_suvi_195_files_thinned: {
+        id: 'iswa_goesp_suvi_195_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 195'
+    },
+    iswa_goesp_suvi_284_files_thinned: {
+        id: 'iswa_goesp_suvi_284_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 284'
+    },
+    iswa_goesp_suvi_304_files_thinned: {
+        id: 'iswa_goesp_suvi_304_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 304'
+    },
     sdo_aia_0094_image_files: {
         id: 'sdo_aia_0094_image_files',
         displayName: 'SDO AIA 094 (green)'
@@ -133,6 +157,10 @@ export const IMAGE_DATASETS = {
     sdo_hmiif_image_files: {
         id: 'sdo_hmiif_image_files',
         displayName: 'SDO HMI intensitygram flat'
+    },
+    iswa_ccor1_l3_image_files: {
+        id: 'iswa_ccor1_l3_image_files',
+        displayName: 'GOES CCOR-1'
     },
     soho_lasco_c2_files: {
         id: 'soho_lasco_c2_files',

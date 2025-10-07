@@ -1,6 +1,9 @@
 <mat-drawer-container [hasBackdrop]="splitDirection === 'vertical'">
     <mat-drawer class="drawer" #drawer [mode]="splitDirection === 'vertical' ? 'over' : 'side'" [style.width]="controlPanelSize + 'px'" (closedStart)="openControls = false; setControlPanel()">
-        @if ((runId$ | async)) {
+        @if ( !validConnection) {
+            <div class="viz__loading viz__loading--disconnect"></div>
+        }
+        @else if ((runId$ | async)) {
             <swt-control-panel [pvView]="pvView"></swt-control-panel>
         }
     </mat-drawer>

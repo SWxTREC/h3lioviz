@@ -6,10 +6,10 @@
             Solar Images
         </button>
         <mat-menu #imageMenu="matMenu" class="plots__menu">
-            @for (imageDataset of imageList; track imageDataset) {
-                <button mat-menu-item (click)="addPlot( 'image', imageDataset )">
+            @for (imageDataset of imageData | keyvalue; track imageDataset) {
+                <button mat-menu-item (click)="addPlot( 'image', imageDataset.value.id )">
                     <mat-icon>add_box</mat-icon>
-                    {{imageDataset}}
+                    {{imageDataset.value.displayName}}
                 </button>
             }
         </mat-menu>
