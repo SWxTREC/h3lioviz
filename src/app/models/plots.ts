@@ -42,7 +42,6 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
 
 // set the UI features for H3lioViz
 export const H3LIO_PRESET: IUiFeatures = {
-    dragHandle: false,
     panning: false,
     toolbarButtons: [
         ToolbarButtonId.remove,

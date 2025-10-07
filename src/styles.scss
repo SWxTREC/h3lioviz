@@ -11,17 +11,18 @@
     'info-color': $color-info,
     'success-color': $color-success,
     'background-color': #53576D,
-
     'link-color': darken( $color-accent, 20%),
     'heading-color': $color-primary
 ));
 
 // you can add color variables from other libraries/name-spaces here as well
-/*
 :root {
-    --library-variablename: #fff;
+    --scicharts-accent: #{$color-accent};
+    --scicharts-info: #{$color-info};
+    --scicharts-link: #{$color-link};
+    --scicharts-primary: #{$color-primary};
+    --scicharts-primary-contrast: #{$color-primary-contrast};
 }
-*/
 
 .lower-footer__partners {
     a {
