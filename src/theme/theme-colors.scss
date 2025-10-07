@@ -13,7 +13,7 @@
 
 $primary:                   mat.define-palette($swt-blue, 400);
 $accent:                    mat.define-palette($swt-sky, 300, 500, 700);
-$warn:                      mat.define-palette($lasp-red, 400, 500, 700);
+$warn:                      mat.define-palette($lasp-red, 300, 500, 700);
 
 $color-primary:             mat.get-color-from-palette($primary);
 $color-primary-contrast:    mat.get-color-from-palette($primary, default-contrast);
@@ -22,3 +22,19 @@ $color-warn:                mat.get-color-from-palette($warn);
 
 $color-info: #617cbc;
 $color-success: #80d5be;
+
+@include mat.all-component-typographies();
+@include mat.core();
+$typography: mat.define-typography-config();
+
+$theme: mat.define-light-theme((
+    color: (
+        primary: $primary,
+        accent: $accent,
+        warn: $warn
+    ),
+    typography: $typography,
+    density: 0
+));
+
+@include mat.all-component-themes( $theme );
