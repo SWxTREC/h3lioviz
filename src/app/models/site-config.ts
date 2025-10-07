@@ -72,7 +72,7 @@ export const DEFAULT_SITE_CONFIG: ISiteConfig = {
     runId: undefined,
     timeIndexMap: {},
     vDimensions: [ undefined, undefined ],
-    vPanelSettings: [ false, true ],
+    vPanelSettings: [ false, false ],
     wDimensions: [ undefined, undefined ],
     zoomState: 'on'
 };
