@@ -44,7 +44,7 @@ export class PlotsComponent implements OnChanges {
     @Input() plotConfig: IPlotParams[];
 
     modelVariables: IVariableInfo[] = MODEL_VARIABLES;
-    observedVariableList: string[] = [ 'speed', 'density', 'temperature' ];
+    observedVariableList: IRangeVariable[] = observedDatasetCatalog['ace_swepam_1m'].rangeVariables;
     imageData = IMAGE_DATASETS;
     legendCardToggle = new FormControl();
     siteConfig: ISiteConfig;

@@ -31,9 +31,9 @@
         </button>
         <mat-menu #observedMenu="matMenu" class="plots__menu">
             @for (observedVariable of observedVariableList; track observedVariable) {
-                <button mat-menu-item (click)="addPlot( 'observed', observedVariable )">
+                <button mat-menu-item (click)="addPlot( 'observed', observedVariable.name )">
                     <mat-icon>add_box</mat-icon>
-                    {{observedVariable}}
+                    {{observedVariable.displayName}}
                 </button>
             }
         </mat-menu>

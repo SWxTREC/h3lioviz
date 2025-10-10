@@ -11,7 +11,7 @@ import {
 } from 'scicharts';
 import { environment, localUrls } from 'src/environments/environment';
 
-import { COLOR_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from './control-panel';
+import { VARIABLE_CONFIG } from './control-panel';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
     dataDisplay: {
@@ -208,7 +208,7 @@ export const modelDatasetCatalog: { [parameter: string]: IDatasetStrict } =
             name: 'Model data ' + SATELLITE_NAMES[satellite],
             rangeVariables: [
                 { name: 'density', displayName: 'Density' },
-                { name: 'velocity', displayName: 'Speed' },
+                { name: 'velocity', displayName: 'Radial Velocity' },
                 { name: 'temperature', displayName: 'Temperature' },
                 { name: 'pressure', displayName: 'Pressure' },
                 { name: 'bx', displayName: 'Bx' },
@@ -237,7 +237,7 @@ export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
         name: 'Archived real time ACE data',
         rangeVariables: [
             { name: 'density', displayName: 'Density' },
-            { name: 'speed', displayName: 'Speed' },
+            { name: 'speed', displayName: 'Radial Velocity' },
             { name: 'temperature', displayName: 'Temperature' }
         ],
         domainVariables: [ 'time' ]

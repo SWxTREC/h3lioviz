@@ -44,7 +44,7 @@ export const COLORMAPS: { [param: string]: IColormapInfo } = {
 export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     velocity: {
         serverName: 'velocity',
-        displayName: 'Speed',
+        displayName: 'Radial Velocity',
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
         defaultColormap: COLORMAPS.rainbow,
@@ -135,8 +135,8 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
 };
 
 export const MODEL_VARIABLES = [
-    VARIABLE_CONFIG.velocity,
     VARIABLE_CONFIG.density,
+    VARIABLE_CONFIG.velocity,
     VARIABLE_CONFIG.temperature,
     VARIABLE_CONFIG.pressure
     // TODO: reenable this when variable data is available from backend
