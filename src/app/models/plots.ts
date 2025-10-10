@@ -11,7 +11,7 @@ import {
 } from 'scicharts';
 import { environment, localUrls } from 'src/environments/environment';
 
-import { COLOR_FORM_DEFAULT_VALUES } from './control-panel';
+import { COLOR_FORM_DEFAULT_VALUES, VARIABLE_CONFIG } from './control-panel';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
     dataDisplay: {
@@ -247,13 +247,21 @@ export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
 export const datasetMapById: { [parameter: string]: IDatasetStrict } =
     Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
 
-const defaultVariableServerName = COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName;
 export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
     {
         datasets: [
             {
                 datasetId: 'earth',
-                rangeVars: [ { name: defaultVariableServerName, displayName: defaultVariableServerName } ]
+                rangeVars: [ { name: VARIABLE_CONFIG.density.serverName, displayName: VARIABLE_CONFIG.density.displayName } ]
+            }
+        ],
+        options: DEFAULT_PLOT_OPTIONS
+    },
+    {
+        datasets: [
+            {
+                datasetId: 'earth',
+                rangeVars: [ { name: VARIABLE_CONFIG.velocity.serverName, displayName: VARIABLE_CONFIG.velocity.displayName } ]
             }
         ],
         options: DEFAULT_PLOT_OPTIONS
