@@ -1,11 +1,8 @@
 <form class="contours" [formGroup]="contours">
     <mat-checkbox class="form__spacer" color="primary" formControlName="threshold">
-        @if ( contours.controls.threshold.disabled ) {
-            Turn off CME isosurface slice to enable
-        }
-        Contour surfaces
+        Surface contour by variable
     </mat-checkbox>
-    @if (contours.value.threshold) {
+    @if ( contours.value.threshold ) {
         <mat-form-field>
             <mat-label>Contour variable
             </mat-label>
@@ -29,38 +26,12 @@
                         </mat-option>
                     }
                 }
-
             </mat-select>
         </mat-form-field>
-        <mat-form-field>
-            <mat-label>Number of contours</mat-label>
-            <input matInput type="number" min="2" max="10" formControlName="numberOfContours">
-        </mat-form-field>
         <div>
-            <strong>{{ contours.value.contourVariable.displayName }} range to display</strong>
+            <strong>Show {{ contours.value.contourVariable.displayName }} value</strong>
             <small innerHTML=" ({{contours.value.contourVariable.units}})"></small>
-            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourRange[0]" [highValue]="contourRange[1]" (userChange)="contourRangeChange($event)"></ngx-slider>
-        </div>
-        <div class="form__right-align">
-            <button
-                disabled="{{ !contourVariableRangeFromServer }}"
-                mat-raised-button color="primary"
-                (click)="scaleContourRange()"
-                >
-                Snap to data range
-            </button>
-            <div [class.form__hidden]="!contourVariableRangeFromServer">
-                {{ contours.value.contourVariable.displayName }} range in data:
-                @if ( contourVariableRangeFromServer?.[0] && contourVariableRangeFromServer?.[1]) {
-                    {{ contourVariableRangeFromServer[0] | number: '1.0-1' }} to {{ contourVariableRangeFromServer[1] | number: '1.0-2' }}
-                }
-            </div>
-        </div>
-        <div>
-            <strong>Contour surface values</strong>
-            <div>
-                {{ contourArray | json }}
-            </div>
+            <ngx-slider laspEnhancedNgxSlider [options]="contourOptions" [value]="contourValue" (userChange)="contourValueChange($event)"></ngx-slider>
         </div>
     }
 </form>

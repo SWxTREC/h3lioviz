@@ -47,21 +47,6 @@
         <img [src]="colorForm.value.colormap?.imgSrc" height="20" width="100%" [style.paddingRight]="colorbarRightOffset" [style.paddingLeft]="colorbarLeftOffset" [style.maxWidth]="'418px'">
         <ngx-slider laspEnhancedNgxSlider [options]="colorOptions" [value]="colorRange[0]" [highValue]="colorRange[1]" (userChange)="updateColorRange($event)"></ngx-slider>
     </div>
-    <div class="form__right-align">
-        <button
-            mat-raised-button color="primary"
-            (click)="scaleColorRange()"
-            >
-            Snap to data range
-        </button>
-        <div [class.form__hidden]="!colorVariableRangeFromServer">
-            {{ variableConfigurations[ colorVariableServerName ].displayName }} range in data:
-            @if ( colorVariableRangeFromServer?.[0] && colorVariableRangeFromServer?.[1]) {
-                {{ colorVariableRangeFromServer[0] | number: '1.0-1' }} to {{ colorVariableRangeFromServer[1] | number: '1.0-2' }}
-            }
-        </div>
-
-    </div>
     <div>
         <strong>Opacity gradient </strong>
         <ngx-slider laspEnhancedNgxSlider [options]="opacityOptions" ngDefaultControl formControlName="opacity"></ngx-slider>

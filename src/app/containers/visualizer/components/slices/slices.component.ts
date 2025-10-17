@@ -28,13 +28,6 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     constructor(
         private _siteConfigService: SiteConfigService
     ) {
-        this.subscriptions.push(this._siteConfigService.config$.subscribe( ( siteConfig ) => {
-            if ( siteConfig.contourSettings?.threshold === true ) {
-                this.slices.controls.cme?.disable({ emitEvent: false });
-            } else {
-                this.slices.controls.cme?.enable({ emitEvent: false });
-            }
-        }));
         // initialize FormGroup from layers with default slice names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             if ( SLICES.includes( controlName ) ) {
