@@ -164,10 +164,7 @@ export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
     }, {});
 
 export interface IContourSettings {
-    cmeContours?: boolean; // deprecated
     contourVariable: IVariableInfo;
-    numberOfContours?: number; // deprecated
-    contourArea?: 'cme' | 'all'; // deprecated
     threshold: boolean;
 }
 

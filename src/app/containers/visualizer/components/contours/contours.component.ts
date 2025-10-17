@@ -105,8 +105,6 @@ export class ContoursComponent implements OnChanges {
         this.subscriptions.push( this.contours.valueChanges
             .pipe( debounceTime( 300 ) )
             .subscribe( newFormValues => {
-                // reset contour variable range from server
-                // this.contourVariableRangeFromServer = undefined;
                 // this will render every time any named control in the form is updated
                 // the contour range is tracked outside of the form and is updated and rendered in contourRangeChange()
                 this.updateVisibilityControls( newFormValues );
