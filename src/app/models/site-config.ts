@@ -26,6 +26,7 @@ export interface ISiteConfig {
     contourSettings: IContourSettings;
     cPanelExpansions: IControlPanel;
     layers: ILayers;
+    legendCards?: boolean;
     opacities:  { [parameter: string]: [ number, number ] };
     plots: IPlotParams[];
     runId: string;
@@ -46,6 +47,7 @@ export enum ConfigLabels {
     contourSettings = 'contourSettings',
     cPanelExpansions = 'cPanelExpansions',
     layers = 'layers',
+    legendCards = 'legendCards',
     opacities = 'opacities',
     plots = 'plots',
     runId = 'runId',
@@ -64,12 +66,13 @@ export const DEFAULT_SITE_CONFIG: ISiteConfig = {
     contourSettings: CONTOUR_FORM_DEFAULT_VALUES,
     cPanelExpansions: DEFAULT_CONTROL_PANEL_EXPANSIONS,
     layers: LAYER_FORM_DEFAULT_VALUES,
+    legendCards: false,
     opacities: DEFAULT_OPACITIES,
     plots: DEFAULT_PLOT_CONFIG,
     runId: undefined,
     timeIndexMap: {},
     vDimensions: [ undefined, undefined ],
-    vPanelSettings: [ false, true ],
+    vPanelSettings: [ false, false ],
     wDimensions: [ undefined, undefined ],
     zoomState: 'on'
 };

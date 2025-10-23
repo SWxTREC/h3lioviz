@@ -44,7 +44,7 @@ export const COLORMAPS: { [param: string]: IColormapInfo } = {
 export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     velocity: {
         serverName: 'velocity',
-        displayName: 'Velocity (Vr)',
+        displayName: 'Radial Velocity',
         units: 'km/s',
         defaultColorRange: [ 300, 900 ],
         defaultColormap: COLORMAPS.rainbow,
@@ -134,15 +134,22 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     }
 };
 
-export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.density ];
+export const MODEL_VARIABLES = [
+    VARIABLE_CONFIG.density,
+    VARIABLE_CONFIG.velocity,
+    VARIABLE_CONFIG.temperature,
+    VARIABLE_CONFIG.pressure
+    // TODO: reenable this when variable data is available from backend
+    // VARIABLE_CONFIG.b
+];
+export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.density, VARIABLE_CONFIG.pressure ];
 export const ADDITIONAL_VARIABLES = [
     VARIABLE_CONFIG.temperature,
-    VARIABLE_CONFIG.pressure,
-    VARIABLE_CONFIG.dp,
-    VARIABLE_CONFIG.b,
-    VARIABLE_CONFIG.bx,
-    VARIABLE_CONFIG.by,
-    VARIABLE_CONFIG.bz
+    // VARIABLE_CONFIG.dp,
+    VARIABLE_CONFIG.b
+    // VARIABLE_CONFIG.bx,
+    // VARIABLE_CONFIG.by,
+    // VARIABLE_CONFIG.bz
 ];
 
 export interface IColorSettings {

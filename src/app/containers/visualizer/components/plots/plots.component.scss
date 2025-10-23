@@ -1,3 +1,5 @@
+@import 'src/theme/theme-colors.scss';
+
 .plots {
     display: flex;
     flex-direction: column;
@@ -5,15 +7,16 @@
     &__controls {
         display: flex;
         gap: 0.5rem;
-        > * {
-            width: 30%
-        }
+        flex-wrap: wrap;
     }
     &__filler {
         flex: 1 1 auto;
     }
     &__header {
         display: inline;
+    }
+    &__option {
+        text-align: right;
     }
     &__more {
         margin: 0.5rem;
@@ -25,14 +28,6 @@
 ::ng-deep {
     .grid-tile.grid-tile--type-XAXIS {
         sci-toolbar-button {
-            display: none;
-        }
-    }
-    .expand-close-button {
-        display: none;
-    }
-    .title {
-        .mat-icon {
             display: none;
         }
     }

@@ -1,8 +1,11 @@
 @import 'src/theme/theme-colors.scss';
 
-// TODO: add narrow and mobile styles (column)
+// for some reason these are needed here to register, the ones in styles.scss have no effect
 :host {
-    background: $color-accent;
+    --scicharts-accent: #{$color-accent};
+    --scicharts-info: #{$color-info};
+    --scicharts-primary: #{$color-primary};
+    --scicharts-primary-contrast: #{$color-primary-contrast};
 }
 
 .viz {

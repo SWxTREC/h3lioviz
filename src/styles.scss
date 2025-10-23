@@ -2,7 +2,6 @@
 
 /* You can add global styles to this file, and also import other style files */
 @import 'theme/theme-colors.scss';
-@import 'theme/theme-lasp.scss';
 
 @include global.all((
     'primary-color': $color-primary,
@@ -11,17 +10,18 @@
     'info-color': $color-info,
     'success-color': $color-success,
     'background-color': #53576D,
-
     'link-color': darken( $color-accent, 20%),
     'heading-color': $color-primary
 ));
 
 // you can add color variables from other libraries/name-spaces here as well
-/*
+// for some reason, these don't have any effect here, but keeping them in, in case
 :root {
-    --library-variablename: #fff;
+    --scicharts-accent: #{$color-accent};
+    --scicharts-info: #{$color-info};
+    --scicharts-primary: #{$color-primary};
+    --scicharts-primary-contrast: #{$color-primary-contrast};
 }
-*/
 
 .lower-footer__partners {
     a {

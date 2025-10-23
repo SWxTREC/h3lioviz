@@ -1,34 +1,37 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup } from '@angular/forms';
-import { cloneDeep } from 'lodash';
-import { debounceTime } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { cloneDeep, defaultsDeep } from 'lodash';
 
 import {
-    IDataset,
+    IDatasetStrict,
     ImageViewerService,
     IMenuOptions,
-    IPlot,
     IPlotParams,
+    IPlotStrict,
+    IRangeVariable,
     MenuOptionsService,
     PlotsService,
     UiOptionsService,
     XRangeService
 } from 'scicharts';
 import {
-    ADDITIONAL_VARIABLES,
+    ConfigLabels,
     DEFAULT_PLOT_OPTIONS,
-    FOCUS_VARIABLES,
     H3LIO_PRESET,
     IMAGE_DATASETS,
     imageDatasetCatalog,
     ISiteConfig,
+    IVariableInfo,
+    MODEL_VARIABLES,
     modelDatasetCatalog,
-    observedDatasetCatalog,
-    SATELLITE_NAMES
+    observedDatasetCatalog
 } from 'src/app/models';
-import { PlayingService } from 'src/app/services';
+import { PlayingService, SiteConfigService } from 'src/app/services';
 import { environment, localUrls } from 'src/environments/environment';
+
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
     selector: 'swt-plots',
@@ -40,234 +43,196 @@ export class PlotsComponent implements OnChanges {
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
 
-    additionalModelVariables = ADDITIONAL_VARIABLES
-        .filter( variable => [ 'temperature', 'pressure', 'bx', 'by', 'bz' ].includes(variable.serverName));
-    additionalModelVariableSelected: boolean;
-    additionalObservedVariableList: string[] = [ 'temperature', 'Bx', 'By', 'Bz' ];
-    additionalObservedVariableSelected: boolean;
-    focusModelVariables = FOCUS_VARIABLES;
-    focusObservedVariableList: string[] = [ 'speed', 'density' ];
+    modelVariables: IVariableInfo[] = MODEL_VARIABLES;
+    observedVariableList: IRangeVariable[] = observedDatasetCatalog['ace_swepam_1m'].rangeVariables;
     imageData = IMAGE_DATASETS;
-    imageList: string[] = Object.keys(this.imageData);
-    plotForm: FormGroup = new FormGroup({
-        image: new FormControl(),
-        model: new FormControl(),
-        observed: new FormControl()
-    });
-    showAllModel = false;
-    showAllObserved = false;
+    legendCardToggle = new FormControl();
     siteConfig: ISiteConfig;
 
     constructor(
+        public confirmationDialog: MatDialog,
         protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
         private _menuOptionsService: MenuOptionsService,
         private _plotsService: PlotsService,
+        private _siteConfigService: SiteConfigService,
         private _uiOptionsService: UiOptionsService,
         private _xRangeService: XRangeService
     ) {
         this._menuOptionsService.setGlobalMenuOptions( cloneDeep(DEFAULT_PLOT_OPTIONS) );
+        // use methods to set uiOptions
         const uiOptions = this._uiOptionsService.getUiOptions();
         uiOptions.minimumPlotHeight = 50;
         uiOptions.gridHeightCorrection = 200;
-        uiOptions.legend = 'minimal';
         uiOptions.stackedMode = true;
         this._uiOptionsService.setUiOptions( uiOptions );
-        // use methods to set uiOptions
         this._uiOptionsService.updateFeatures( H3LIO_PRESET );
         this._uiOptionsService.setPlotGrid( 3, 1 );
-
         this._plotsService.enableCrosshairSync();
         this._xRangeService.enableZoomSyncByVariable( true, 'time' );
         this._imageViewerService.setImageViewerSync( true );
 
-        this.plotForm.valueChanges.pipe(
-            debounceTime(1000),
+        this.legendCardToggle.valueChanges.pipe(
             takeUntilDestroyed()
-        ).subscribe( newValue => {
-            const plotList = [];
-            if ( newValue.image?.length ) {
-                plotList.push(this.getImagePlot( newValue.image ));
+        ).subscribe( showCards => {
+            if ( showCards ) {
+                this._uiOptionsService.setUiOptions({ legend: 'left' });
+                this._siteConfigService.updateSiteConfig({ [ConfigLabels.legendCards]: true });
+            } else {
+                this._uiOptionsService.setUiOptions({ legend: 'minimal' });
+                this._siteConfigService.updateSiteConfig({ [ConfigLabels.legendCards]: false });
             }
-            if ( newValue.model?.length) {
-                newValue.model.forEach( (variable: string, index: number) => {
-                    plotList.push(this.getModelPlot(variable, index));
-                });
-            }
-            if ( newValue.observed?.length ) {
-                plotList.push(this.getObservedPlot( newValue.observed ));
-            }
-            this.additionalModelVariableSelected =
-                    !!this.additionalModelVariables.find(
-                        variable => this.plotForm.controls.model.value.includes(variable.serverName)
-                    );
-            this.additionalObservedVariableSelected =
-                    !!this.plotForm.controls.observed.value.find(
-                        ( variable: string ) => this.additionalObservedVariableList.includes(variable)
-                    );
-            this.showAllModel = this.additionalModelVariableSelected;
-            this.showAllObserved = this.additionalObservedVariableSelected;
-            this._plotsService.setPlots( plotList );
         });
+        // once, on init, set the legend toggle based on the site config
+        const legendConfig = this._siteConfigService.getSiteConfig().legendCards;
+        this.legendCardToggle.setValue( legendConfig );
     }
 
-    ngOnChanges() {
-        const plotsToSet = this.getPlotListByFormCategory( this.plotConfig );
-        this.plotForm.setValue( plotsToSet );
+    ngOnChanges( changes: SimpleChanges ) {
+        // once, on load, set the plots based on the config or the default
+        if ( changes.plotConfig.firstChange ) {
+            const plots: IPlotStrict[] = [];
+            // parse plots from the config
+            this.plotConfig.forEach( plotParams => {
+                const datasetList = plotParams.datasets.map( dataset => {
+                    const isModelDataset = modelDatasetCatalog[ dataset.datasetId ] != null;
+                    const isObservedDataset = observedDatasetCatalog[ dataset.datasetId ] != null;
+                    const isImageDataset = imageDatasetCatalog[ dataset.datasetId ] != null;
+                    const rangeVariableNames = dataset.rangeVars.map( ( rangeVariable: IRangeVariable ) => rangeVariable.name );
+                    // create IDatasetStrict datasets
+                    if ( isModelDataset ) {
+                        return this.createModelDataset( rangeVariableNames );
+                    } else if ( isObservedDataset ) {
+                        return this.createObservedDataset( rangeVariableNames );
+                    } else if ( isImageDataset ) {
+                        return this.createImageDataset( dataset.datasetId );
+                    }
+                }).filter( ds => !!ds );
+                const imageDatasetType = imageDatasetCatalog[ plotParams.datasets[0].datasetId ] != null;
+                const plotType = imageDatasetType ? 'IMAGE' : 'LINE';
+                const plotOptions = plotParams.options ? plotParams.options : cloneDeep(DEFAULT_PLOT_OPTIONS);
+                // create IPlotStrict plots
+                const plotToSet = this.getPlot( plotType, datasetList, plotOptions );
+                plots.push( plotToSet );
+            });
+            this._plotsService.setPlots( plots );
+        }
+    }
+
+    addPlot( type: 'image' | 'model' | 'observed', datasetName: string ) {
+        const datasets = [];
+        if ( type === 'image' ) {
+            const imageDataset = this.createImageDataset( datasetName );
+            if ( imageDataset != null ) {
+                datasets.push(imageDataset);
+            }
+        }
+        if ( type === 'model' ) {
+            const modelDataset = this.createModelDataset( [ datasetName ] );
+            if ( modelDataset != null ) {
+                datasets.push( modelDataset );
+            }
+        }
+        if ( type === 'observed' ) {
+            const observedDataset = this.createObservedDataset( [ datasetName ] );
+            if ( observedDataset != null ) {
+                datasets.push(observedDataset);
+            }
+        }
+        const plotType = type === 'image' ? 'IMAGE' : 'LINE';
+        const newPlot: IPlotStrict = this.getPlot( plotType, datasets, cloneDeep(DEFAULT_PLOT_OPTIONS) );
+        this._plotsService.addPlot( newPlot );
+    }
+
+    clearAllPlots() {
+        const dialogRef = this.confirmationDialog.open(
+            ConfirmationDialogComponent, {
+                width: '350px',
+                data: { title: 'Confirm clear all plots?', confirmButtonText: 'Clear all plots' }
+            });
+        dialogRef.afterClosed().subscribe((result: boolean) => {
+            if (result === true) {
+                this._plotsService.removeAllPlots();
+            }
+        });
     }
 
     createImageDataset( imageDatasetId: string )  {
-        const datasetInfo = this.imageData[imageDatasetId];
-        const newDataset: IDataset = {
-            uid: imageDatasetId,
-            url: environment.latisUrl + datasetInfo.id + '.jsond',
-            name: datasetInfo.displayName,
-            rangeVariables: [
-                'url'
-            ],
-            selectedRangeVariables: [ 'url' ],
-            domainVariables: [ 'time' ]
-        };
-        // some image datasets are converted to files because they are not standard types
-        const needsType = !imageDatasetId.includes('image');
-        if ( needsType ) {
-            newDataset.type = 'STRING_LIST';
+        const catalogDataset = imageDatasetCatalog[imageDatasetId];
+        if ( catalogDataset != null ) {
+            const imageDataset: IDatasetStrict = {
+                uid: imageDatasetId,
+                url: environment.latisUrl + imageDatasetId + '.jsond',
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: catalogDataset.rangeVariables,
+                domainVariables: catalogDataset.domainVariables
+            };
+            // some image datasets are converted to files because they are not standard types
+            const needsType = !imageDatasetId.includes('image');
+            if ( needsType ) {
+                imageDataset.type = 'STRING_LIST';
+            }
+            return imageDataset;
+        } else {
+            return null;
         }
-        return newDataset;
     }
 
-    createDatasetGroup( variable: string )  {
-        const plotGroup = [];
-        // push model data to plotGroup
-        [ 'stereoa', 'earth', 'stereob' ].forEach( (satellite: string) => {
-            const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
-            const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
-            const newDataset: IDataset = {
+    createModelDataset( variables: string[] )  {
+        const satellite = 'earth';
+        const catalogDataset = modelDatasetCatalog[satellite];
+        const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
+        const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
+        const selectedVariables = variables
+            .map( variable => catalogDataset.rangeVariables.find( rv => rv.name === variable ) )
+            .filter( rv => !!rv );
+        if ( selectedVariables.length > 0 ) {
+            const modelDataset: IDatasetStrict = {
                 uid: satellite,
                 url: urlBase + urlSuffix,
-                name: 'Model data ' + SATELLITE_NAMES[satellite],
-                rangeVariables: [
-                    'density',
-                    'velocity',
-                    'pressure',
-                    'temperature',
-                    'bx',
-                    'by',
-                    'bz'
-                ],
-                selectedRangeVariables: [ variable ],
-                domainVariables: [ 'time' ]
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: selectedVariables,
+                domainVariables: catalogDataset.domainVariables
             };
-            plotGroup.push( newDataset );
-        });
-        return plotGroup;
+            return modelDataset;
+        } else {
+            return null;
+        }
     }
 
-    getImagePlot( imageIds: string[] ) {
-        const imageDatasets = imageIds.map( imageId => this.createImageDataset( imageId ));
-        const imagePlot: IPlot = {
-            datasets: imageDatasets,
-            initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
+    createObservedDataset( variables: string[] ) {
+        const instrument = 'ace_swepam_1m';
+        const catalogDataset = observedDatasetCatalog[instrument];
+        const selectedRangeVariables = variables
+            .map( variable => catalogDataset.rangeVariables.find( rv => rv.name === variable ) )
+            .filter( rv => !!rv );
+        if ( selectedRangeVariables.length > 0 ) {
+            const archivedSwepamDataset: IDatasetStrict = {
+                uid: instrument,
+                url: environment.latisUrl + instrument + '.jsond?',
+                name: catalogDataset.name,
+                rangeVariables: catalogDataset.rangeVariables,
+                selectedRangeVariables: selectedRangeVariables,
+                domainVariables: catalogDataset.domainVariables
+            };
+            return archivedSwepamDataset;
+        } else {
+            return null;
+        }
+    }
+
+    getPlot( plotType: 'IMAGE' | 'LINE', datasets: IDatasetStrict[], options: IMenuOptions ): IPlotStrict {
+        const optionsWithDefaults = defaultsDeep( options, DEFAULT_PLOT_OPTIONS );
+        return {
+            datasets: datasets,
+            initialOptions: optionsWithDefaults,
             range: {
                 start: this.timeRange[0] * 1000,
                 end: this.timeRange[1] * 1000
             },
-            type: 'IMAGE'
+            type: plotType
         };
-        return imagePlot;
-    }
-
-    getModelPlot( groupVariable: string, index: number ) {
-        const datasetGroup = this.createDatasetGroup( groupVariable );
-        const modelPlot: IPlot = {
-            datasets: datasetGroup,
-            initialOptions: DEFAULT_PLOT_OPTIONS as IMenuOptions,
-            range: {
-                start: this.timeRange[0] * 1000,
-                end: this.timeRange[1] * 1000
-            }
-        };
-        return modelPlot;
-    }
-
-    createObservedDataset( instrument: string, variables: string[] ) {
-        if ( instrument === 'mag' ) {
-            const archivedMagDataset: IDataset = {
-                uid: 'ace_mag_1m',
-                url: environment.latisUrl + 'ace_mag_1m.jsond?',
-                name: 'ACE Archived Real Time Mag Data',
-                rangeVariables: [ 'Bx', 'By', 'Bz' ],
-                selectedRangeVariables: variables,
-                domainVariables: [ 'time' ]
-            };
-            return archivedMagDataset;
-        }
-        if ( instrument === 'swepam' ) {
-            const archivedSwepamDataset: IDataset = {
-                uid: 'ace_swepam_1m',
-                url: environment.latisUrl + 'ace_swepam_1m.jsond?',
-                name: 'ACE Archived real time Swepam data',
-                rangeVariables: [ 'density', 'speed', 'temperature' ],
-                selectedRangeVariables: variables,
-                domainVariables: [ 'time' ]
-            };
-            return archivedSwepamDataset;
-        }
-    }
-
-    getObservedPlot( variables: string[] ) {
-        const observedVariablesByInstrument = variables.reduce( ( aggregator, variable ) => {
-            const mag = new Set([ 'Bx', 'By', 'Bz' ]);
-            const swepam = new Set([ 'density', 'speed', 'temperature' ]);
-            if ( mag.has(variable)) {
-                aggregator.mag.push( variable );
-            }
-            if ( swepam.has( variable ) ) {
-                aggregator.swepam.push( variable );
-            }
-            return aggregator;
-        }, { mag: [], swepam: []});
-        const observedDatasets = Object.keys( observedVariablesByInstrument )
-            .map( key => {
-                if ( observedVariablesByInstrument[key].length ) {
-                    return this.createObservedDataset(key, observedVariablesByInstrument[key] );
-                } else {
-                    return null;
-                }
-            }).filter( dataset => dataset );
-        const observedPlotOptions = DEFAULT_PLOT_OPTIONS as IMenuOptions;
-        observedPlotOptions.yAxis.useMultipleAxes = true;
-        const observedPlot: IPlot = {
-            datasets: observedDatasets,
-            initialOptions: observedPlotOptions,
-            range: {
-                start: this.timeRange[0] * 1000,
-                end: this.timeRange[1] * 1000
-            }
-        };
-        return observedPlot;
-    }
-
-    /** returns a value that can be used to set the plot form value */
-    getPlotListByFormCategory( plotConfig: IPlotParams[] ) {
-        const plotListByCategory = plotConfig.reduce( ( aggregator, plotDatasets) => {
-            plotDatasets.datasets.forEach( dataset => {
-                if ( imageDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.image.push( dataset.datasetId );
-                }
-                if ( modelDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.model.push( ...dataset.rangeVars );
-                }
-                if ( observedDatasetCatalog[dataset.datasetId] ) {
-                    aggregator.observed.push( ...dataset.rangeVars );
-                }
-            });
-            Object.keys( aggregator ).forEach( key => {
-                aggregator[key] = Array.from(new Set( aggregator[key] ));
-            });
-            return aggregator;
-
-        }, { image: [], model: [], observed: []});
-        return plotListByCategory;
     }
 }

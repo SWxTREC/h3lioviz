@@ -2,7 +2,7 @@ import {
     AnalogAxisRangeType,
     AxisFormat,
     DiscreteAxisRangeType,
-    IDataset,
+    IDatasetStrict,
     IMenuOptions,
     IPlotParams,
     IUiFeatures,
@@ -11,7 +11,7 @@ import {
 } from 'scicharts';
 import { environment, localUrls } from 'src/environments/environment';
 
-import { COLOR_FORM_DEFAULT_VALUES } from './control-panel';
+import { VARIABLE_CONFIG } from './control-panel';
 
 export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
     dataDisplay: {
@@ -42,9 +42,9 @@ export const DEFAULT_PLOT_OPTIONS: IMenuOptions  = {
 
 // set the UI features for H3lioViz
 export const H3LIO_PRESET: IUiFeatures = {
-    dragHandle: false,
     panning: false,
     toolbarButtons: [
+        ToolbarButtonId.remove,
         ToolbarButtonId.displaySettings,
         ToolbarButtonId.toggleVariables,
         ToolbarButtonId.downloadImage
@@ -65,6 +65,30 @@ export const SATELLITE_NAMES = {
 };
 
 export const IMAGE_DATASETS = {
+    iswa_goesp_suvi_094_files_thinned: {
+        id: 'iswa_goesp_suvi_094_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 094'
+    },
+    iswa_goesp_suvi_131_files_thinned: {
+        id: 'iswa_goesp_suvi_131_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 131'
+    },
+    iswa_goesp_suvi_171_files_thinned: {
+        id: 'iswa_goesp_suvi_171_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 171'
+    },
+    iswa_goesp_suvi_195_files_thinned: {
+        id: 'iswa_goesp_suvi_195_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 195'
+    },
+    iswa_goesp_suvi_284_files_thinned: {
+        id: 'iswa_goesp_suvi_284_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 284'
+    },
+    iswa_goesp_suvi_304_files_thinned: {
+        id: 'iswa_goesp_suvi_304_files_thinned',
+        displayName: 'GOES primary spacecraft SUVI 304'
+    },
     sdo_aia_0094_image_files: {
         id: 'sdo_aia_0094_image_files',
         displayName: 'SDO AIA 094 (green)'
@@ -133,6 +157,10 @@ export const IMAGE_DATASETS = {
         id: 'sdo_hmiif_image_files',
         displayName: 'SDO HMI intensitygram flat'
     },
+    iswa_ccor1_l3_image_files: {
+        id: 'iswa_ccor1_l3_image_files',
+        displayName: 'GOES CCOR-1'
+    },
     soho_lasco_c2_files: {
         id: 'soho_lasco_c2_files',
         displayName: 'SOHO LASCO C2'
@@ -151,15 +179,14 @@ export const IMAGE_DATASETS = {
     }
 };
 
-export const imageDatasetCatalog: { [parameter: string]: IDataset } = Object.keys(IMAGE_DATASETS).reduce( (aggregator, dataset) => {
+export const imageDatasetCatalog: { [parameter: string]: IDatasetStrict } = Object.keys(IMAGE_DATASETS).reduce( (aggregator, dataset) => {
     const datasetInfo = IMAGE_DATASETS[dataset];
-    const scichartsDataset: IDataset = {
+    const scichartsDataset: IDatasetStrict = {
         url: environment.latisUrl + datasetInfo.id + '.jsond',
         name: datasetInfo.displayName,
         rangeVariables: [
-            'url'
+            { name: 'url', displayName: 'Image URL' }
         ],
-        selectedRangeVariables: [ 'url' ],
         domainVariables: [ 'time' ]
     };
     // some image datasets are converted to files because they are not standard types
@@ -171,64 +198,70 @@ export const imageDatasetCatalog: { [parameter: string]: IDataset } = Object.key
     return aggregator;
 }, {});
 
-export const modelDatasetCatalog: { [parameter: string]: IDataset } =
+export const modelDatasetCatalog: { [parameter: string]: IDatasetStrict } =
     [ 'stereoa', 'earth', 'stereob' ].reduce( ( aggregator, satellite: string) => {
         const urlBase: string = environment.production ? environment.aws.api : localUrls.evolutionData;
         // const urlSuffix: string = environment.production ? `getTimeSeries/${this.runId}/${satellite}.jsond` : `evo.${satellite}.json`;
-        const newDataset: IDataset = {
+        const newDataset: IDatasetStrict = {
         // TODO will need to add the suffix when called from the catalog later
             url: urlBase, // + urlSuffix,
             name: 'Model data ' + SATELLITE_NAMES[satellite],
             rangeVariables: [
-                'density',
-                'velocity',
-                'temperature',
-                'pressure',
-                'bx',
-                'by',
-                'bz'
+                { name: 'density', displayName: 'Density' },
+                { name: 'velocity', displayName: 'Radial Velocity' },
+                { name: 'temperature', displayName: 'Temperature' },
+                { name: 'pressure', displayName: 'Pressure' },
+                { name: 'bx', displayName: 'Bx' },
+                { name: 'by', displayName: 'By' },
+                { name: 'bz', displayName: 'Bz' }
             ],
-            // selectedRangeVariables: [ variable ],
             domainVariables: [ 'time' ]
         };
         aggregator[ satellite ] = newDataset;
         return aggregator;
     }, {});
 
-export const observedDatasetCatalog: { [parameter: string]: IDataset } = {
+export const observedDatasetCatalog: { [parameter: string]: IDatasetStrict } = {
     ace_mag_1m: {
         url: environment.latisUrl + 'ace_mag_1m.jsond?',
         name: 'ACE Archived Real Time Data',
-        rangeVariables: [ 'Bx', 'By', 'Bz' ],
-        // selectedRangeVariables: [ variableNameMap[variable] ],
+        rangeVariables: [
+            { name: 'Bx', displayName: 'Bx' },
+            { name: 'By', displayName: 'By' },
+            { name: 'Bz', displayName: 'Bz' }
+        ],
         domainVariables: [ 'time' ]
     },
     ace_swepam_1m: {
         url: environment.latisUrl + 'ace_swepam_1m.jsond?',
         name: 'Archived real time ACE data',
-        rangeVariables: [ 'density', 'speed', 'temperature' ],
-        // selectedRangeVariables: [ variableNameMap[variable] ],
+        rangeVariables: [
+            { name: 'density', displayName: 'Density' },
+            { name: 'speed', displayName: 'Radial Velocity' },
+            { name: 'temperature', displayName: 'Temperature' }
+        ],
         domainVariables: [ 'time' ]
     }
 };
 
-export const datasetMapById: { [parameter: string]: IDataset } =
+export const datasetMapById: { [parameter: string]: IDatasetStrict } =
     Object.assign( {}, imageDatasetCatalog, modelDatasetCatalog, observedDatasetCatalog );
 
 export const DEFAULT_PLOT_CONFIG: IPlotParams[] = [
     {
         datasets: [
             {
-                datasetId: 'stereoa',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
-            },
+                datasetId: 'earth',
+                rangeVars: [ { name: VARIABLE_CONFIG.density.serverName, displayName: VARIABLE_CONFIG.density.displayName } ]
+            }
+        ],
+        options: DEFAULT_PLOT_OPTIONS
+    },
+    {
+        datasets: [
             {
                 datasetId: 'earth',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
-            },
-            {
-                datasetId: 'stereob',
-                rangeVars: [ COLOR_FORM_DEFAULT_VALUES.colorVariable.serverName ]
+                rangeVars: [ { name: VARIABLE_CONFIG.velocity.serverName, displayName: VARIABLE_CONFIG.velocity.displayName } ]
             }
         ],
         options: DEFAULT_PLOT_OPTIONS

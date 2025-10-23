@@ -9,6 +9,7 @@ import { MaterialModule } from 'src/app/modules';
 
 import { ColorsComponent } from '../colors/colors.component';
 import { ContoursComponent } from '../contours/contours.component';
+import { FeaturesComponent } from '../features/features.component';
 import { SlicesComponent } from '../slices/slices.component';
 
 import { ControlPanelComponent } from './control-panel.component';
@@ -21,6 +22,7 @@ describe('ControlPanelComponent', () => {
         await TestBed.configureTestingModule({
             declarations: [
                 ControlPanelComponent,
+                FeaturesComponent,
                 SlicesComponent,
                 ContoursComponent,
                 ColorsComponent
