@@ -91,7 +91,7 @@ export class PlotsComponent implements OnChanges {
     ngOnChanges( changes: SimpleChanges ) {
         // once, on load, set the plots based on the config or the default
         if ( changes.plotConfig.firstChange ) {
-            const plots = [];
+            const plots: IPlotStrict[] = [];
             // parse plots from the config
             this.plotConfig.forEach( plotParams => {
                 const datasetList = plotParams.datasets.map( dataset => {
@@ -116,11 +116,6 @@ export class PlotsComponent implements OnChanges {
                 plots.push( plotToSet );
             });
             this._plotsService.setPlots( plots );
-        }
-        // update the local site config with any changes to the input runId
-        // this is needed when a new run is loaded and the plots change
-        if ( changes.runId ) {
-            this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: changes.runId.currentValue });
         }
     }
 
