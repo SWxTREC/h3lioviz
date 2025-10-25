@@ -6,7 +6,7 @@ export interface IVariableInfo {
     units: string;
     defaultColorRange: [ number, number ];
     defaultColormap: IColormapInfo;
-    defaultSubsetRange: [ number, number ];
+    defaultContourValue: number;
     entireRange: [ number, number ];
     step: number;
 }

@@ -42,25 +42,25 @@ export const COLORMAPS: { [param: string]: IColormapInfo } = {
 
 // TODO: set these in the server on load
 export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
-    velocity: {
-        serverName: 'velocity',
-        displayName: 'Radial Velocity',
-        units: 'km/s',
-        defaultColorRange: [ 300, 900 ],
-        defaultColormap: COLORMAPS.rainbow,
-        defaultSubsetRange: [ 300, 900 ],
-        entireRange: [ 200, 1600 ],
-        step: 50
-    },
     density: {
         serverName: 'density',
         displayName: 'Density',
         units: 'r<sup>2</sup>N/cm<sup>3</sup>',
         defaultColorRange: [ 0, 30 ],
         defaultColormap: COLORMAPS.viridis,
-        defaultSubsetRange: [ 15, 30 ],
+        defaultContourValue: 22,
         entireRange: [ 0, 60 ],
         step: 1
+    },
+    velocity: {
+        serverName: 'velocity',
+        displayName: 'Radial Velocity',
+        units: 'km/s',
+        defaultColorRange: [ 300, 900 ],
+        defaultColormap: COLORMAPS.rainbow,
+        defaultContourValue: 600,
+        entireRange: [ 200, 1600 ],
+        step: 50
     },
     pressure: {
         serverName: 'pressure',
@@ -68,9 +68,9 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'r<sup>2</sup>N/cm<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
         defaultColorRange: [ 100000, 2500000 ],
         defaultColormap: COLORMAPS.plasma,
-        defaultSubsetRange: [ 500000, 10000000 ],
+        defaultContourValue: 5000000,
         entireRange: [ 100000, 10000000 ],
-        step: 3000
+        step: 30000
     },
     temperature: {
         serverName: 'temperature',
@@ -78,7 +78,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'K',
         defaultColorRange: [ 10000, 200000 ],
         defaultColormap: COLORMAPS.inferno,
-        defaultSubsetRange: [ 500000, 1000000 ],
+        defaultContourValue: 750000,
         entireRange: [ 10000, 1000000 ],
         step: 3000
     },
@@ -88,37 +88,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: 'nT',
         defaultColorRange: [ -30, 30 ],
         defaultColormap: COLORMAPS.coolToWarm,
-        defaultSubsetRange: [ -30, 0 ],
-        entireRange: [ -100, 100 ],
-        step: 5
-    },
-    bx: {
-        serverName: 'bx',
-        displayName: 'Bx',
-        units: 'nT',
-        defaultColorRange: [ -30, 30 ],
-        defaultColormap: COLORMAPS.coolToWarm,
-        defaultSubsetRange: [ -30, 0 ],
-        entireRange: [ -100, 100 ],
-        step: 5
-    },
-    by: {
-        serverName: 'by',
-        displayName: 'By',
-        units: 'nT',
-        defaultColorRange: [ -30, 30 ],
-        defaultColormap: COLORMAPS.coolToWarm,
-        defaultSubsetRange: [ -30, 0 ],
-        entireRange: [ -100, 100 ],
-        step: 5
-    },
-    bz: {
-        serverName: 'bz',
-        displayName: 'Bz',
-        units: 'nT',
-        defaultColorRange: [ -30, 30 ],
-        defaultColormap: COLORMAPS.coolToWarm,
-        defaultSubsetRange: [ -30, 0 ],
+        defaultContourValue: -15,
         entireRange: [ -100, 100 ],
         step: 5
     },
@@ -128,9 +98,9 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         units: '—',
         defaultColorRange: [ 0.001, 0.05 ],
         defaultColormap: COLORMAPS.divergent,
-        defaultSubsetRange: [ 0.001, 0.05 ],
-        entireRange: [ 0, 0.1 ],
-        step: 0.001
+        defaultContourValue: 0.0001,
+        entireRange: [ 0, 0.01 ],
+        step: 0.0001
     }
 };
 
@@ -138,18 +108,14 @@ export const MODEL_VARIABLES = [
     VARIABLE_CONFIG.density,
     VARIABLE_CONFIG.velocity,
     VARIABLE_CONFIG.temperature,
-    VARIABLE_CONFIG.pressure
-    // TODO: reenable this when variable data is available from backend
-    // VARIABLE_CONFIG.b
+    VARIABLE_CONFIG.pressure,
+    VARIABLE_CONFIG.b
 ];
-export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.density, VARIABLE_CONFIG.pressure ];
+export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.density, VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.pressure ];
 export const ADDITIONAL_VARIABLES = [
     VARIABLE_CONFIG.temperature,
-    // VARIABLE_CONFIG.dp,
-    VARIABLE_CONFIG.b
-    // VARIABLE_CONFIG.bx,
-    // VARIABLE_CONFIG.by,
-    // VARIABLE_CONFIG.bz
+    VARIABLE_CONFIG.b,
+    VARIABLE_CONFIG.dp
 ];
 
 export interface IColorSettings {
@@ -159,8 +125,8 @@ export interface IColorSettings {
 }
 
 export const COLOR_FORM_DEFAULT_VALUES: IColorSettings = {
-    colorVariable: VARIABLE_CONFIG.velocity,
-    colormap: VARIABLE_CONFIG.velocity.defaultColormap,
+    colorVariable: VARIABLE_CONFIG.pressure,
+    colormap: VARIABLE_CONFIG.pressure.defaultColormap,
     opacity: [ 60, 90 ] as [ number, number ]
 };
 
@@ -186,7 +152,7 @@ export interface IControlPanel {
 
 export const DEFAULT_CONTROL_PANEL_EXPANSIONS = {
     colors: true,
-    contours: false,
+    contours: true,
     features: false,
     slices: true
 };
@@ -198,27 +164,22 @@ export const DEFAULT_OPACITIES: { [parameter: string]: [ number, number ] } =
     }, {});
 
 export interface IContourSettings {
-    cmeContours?: boolean; // deprecated
     contourVariable: IVariableInfo;
-    numberOfContours: number;
-    contourArea?: 'cme' | 'all'; // deprecated
     threshold: boolean;
 }
 
 export const CONTOUR_FORM_DEFAULT_VALUES: IContourSettings = {
     threshold: false,
-    contourVariable: VARIABLE_CONFIG.density,
-    numberOfContours: 5
+    contourVariable: VARIABLE_CONFIG.pressure
 };
 
 export const DEFAULT_CONTOUR_RANGES: { [parameter: string]: [ number, number ] } =
     Object.keys(VARIABLE_CONFIG).reduce( (aggregator, variable) => {
-        aggregator[variable] = VARIABLE_CONFIG[variable].defaultSubsetRange;
+        aggregator[variable] = [ VARIABLE_CONFIG[variable].defaultContourValue, VARIABLE_CONFIG[variable].defaultContourValue ];
         return aggregator;
     }, {});
 
 export interface ILayers {
-    cme: boolean;
     latSlice: boolean;
     lonSlice: boolean;
     lonSliceType: 'solar-equator' | 'ecliptic';
@@ -243,7 +204,6 @@ export const FEATURES = [
 ];
 
 export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
-    cme: false,
     latSlice: true,
     lonSlice: true,
     lonSliceType: 'ecliptic',
@@ -252,10 +212,3 @@ export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
     satellites: true,
     satFieldlines: false
 };
-
-export const INITIAL_TICK_STEP =
-    // the difference between the high value and the low value, divided by numberOfContours - 1
-    ( CONTOUR_FORM_DEFAULT_VALUES.contourVariable.defaultSubsetRange[1] -
-        CONTOUR_FORM_DEFAULT_VALUES.contourVariable.defaultSubsetRange[0]) /
-    ( CONTOUR_FORM_DEFAULT_VALUES.numberOfContours - 1 );
-
