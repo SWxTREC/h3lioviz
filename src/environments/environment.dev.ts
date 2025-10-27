@@ -14,8 +14,7 @@ if ( !siteRootUrl.includes('localhost') && siteRootUrl.split('/').filter( pathSt
 
 export const environment = {
     aws: {
-        api: 'https://h3lioviz-api.bryandev.swx-trec.com/',
-        // api: 'https://apigw.dev.swx-trec.com/h3lioviz/',
+        api: 'https://h3lioviz-api.dev.swx-trec.com/',
         cognito: {
             appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
             region: 'us-east-1',
@@ -35,8 +34,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.bryandev.swx-trec.com/paraview/'
-    // sessionManagerURL: 'https://paraview-web.dev.swx-trec.com/paraview/'
+    sessionManagerURL: 'https://paraview-web.dev.swx-trec.com/paraview/'
 };
 
 // these need to be in file, but are not used for 'production' builds
