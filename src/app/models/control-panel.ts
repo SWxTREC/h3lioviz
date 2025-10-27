@@ -66,10 +66,10 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         serverName: 'pressure',
         displayName: 'Ram pressure',
         units: 'r<sup>2</sup>N/m<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
-        defaultColorRange: [ 0.1, 2.5 ],
+        defaultColorRange: [ 0, 2.5 ],
         defaultColormap: COLORMAPS.plasma,
         defaultContourValue: 5,
-        entireRange: [ 0.1, 10 ],
+        entireRange: [ 0, 10 ],
         step: 0.01
     },
     temperature: {
