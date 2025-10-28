@@ -10,7 +10,7 @@ export interface IColormapInfo {
 export const COLORMAPS: { [param: string]: IColormapInfo } = {
     wsa_enlil: {
         displayName: 'WSA-Enlil',
-        imgSrc: 'assets/images/wsa_enlil.jpeg',
+        imgSrc: 'assets/images/wsa_enlil.png',
         serverName: 'WSA-Enlil'
     },
     coolToWarm: {
