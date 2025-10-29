@@ -70,7 +70,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         defaultColormap: COLORMAPS.plasma,
         defaultContourValue: 5,
         entireRange: [ 0, 10 ],
-        step: 0.01
+        step: 0.5
     },
     temperature: {
         serverName: 'temperature',
