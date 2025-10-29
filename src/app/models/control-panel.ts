@@ -8,7 +8,7 @@ export interface IColormapInfo {
 
 // serverName must match an option on the server
 export const COLORMAPS: { [param: string]: IColormapInfo } = {
-    wsa_enlil: {
+    wsaEnlil: {
         displayName: 'WSA-Enlil',
         imgSrc: 'assets/images/wsa_enlil.png',
         serverName: 'WSA-Enlil'
@@ -52,7 +52,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         displayName: 'Density',
         units: 'r<sup>2</sup>N/cm<sup>3</sup>',
         defaultColorRange: [ 0, 60 ],
-        defaultColormap: COLORMAPS.wsa_enlil,
+        defaultColormap: COLORMAPS.wsaEnlil,
         defaultContourValue: 22,
         entireRange: [ 0, 60 ],
         step: 1
@@ -62,7 +62,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
         displayName: 'Radial Velocity',
         units: 'km/s',
         defaultColorRange: [ 200, 1600 ],
-        defaultColormap: COLORMAPS.wsa_enlil,
+        defaultColormap: COLORMAPS.wsaEnlil,
         defaultContourValue: 600,
         entireRange: [ 200, 1600 ],
         step: 50
