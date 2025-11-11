@@ -172,7 +172,9 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         // stop playing and set index when time player is destroyed
         this._playingService.playing$.next(false);
         this.updateTime.emit( this.timeIndex );
-        this.statusSubscription.unsubscribe();
+        if ( this.statusSubscription ) {
+            this.statusSubscription.unsubscribe();
+        }
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
