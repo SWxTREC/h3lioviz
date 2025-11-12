@@ -6,8 +6,7 @@ import * as CognitoIdentity from 'aws-sdk/clients/cognitoidentity';
 // eslint-disable-next-line @typescript-eslint/naming-convention
 import * as CognitoIdentityServiceProvider from 'aws-sdk/clients/cognitoidentityserviceprovider';
 import { LaspNavService } from 'lasp-nav';
-import { ICognitoTokens, ICognitoUserInfo, StorageKeys } from 'src/app/models/auth';
-import { environment } from 'src/environments/environment';
+import { ICognitoTokens, StorageKeys } from 'src/app/models/auth';
 
 @Injectable()
 export class ProfileNavService extends LaspNavService {
@@ -28,7 +27,7 @@ export class ProfileNavService extends LaspNavService {
         super();
 
         this._cognito = new CognitoIdentityServiceProvider({
-            region: environment.aws.cognito.region
+            // region: environment.aws.cognito.region
         });
 
         // when a user logs in, they are redirected back to the home page.
@@ -53,42 +52,44 @@ export class ProfileNavService extends LaspNavService {
                 window.localStorage.removeItem( StorageKeys.loginNonce );
                 window.localStorage.removeItem( StorageKeys.loginRedirect );
                 // use the 'code' from the GET params to retrieve tokens from Cognito
-                this._http.post(
-                    `${environment.aws.cognito.loginPage}/oauth2/token`,
-                    `grant_type=authorization_code`
-                        + `&redirect_uri=${environment.siteRootUrl}index.html`
-                        + `&code=${params.code}`
-                        + `&client_id=${environment.aws.cognito.appClientId}`,
-                    {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    }
-                ).toPromise().then( (response: ICognitoTokens) => {
-                    // save the tokens to localStorage so the session can persist across refreshes
-                    window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(response) );
-                    this.setLoggedIn( true );
-                    resolve( undefined );
-                });
+                // this._http.post(
+                //     `${environment.aws.cognito.loginPage}/oauth2/token`,
+                //     `grant_type=authorization_code`
+                //         + `&redirect_uri=${environment.siteRootUrl}index.html`
+                //         + `&code=${params.code}`
+                //         + `&client_id=${environment.aws.cognito.appClientId}`,
+                //     {
+                //         headers: {
+                //             'Content-Type': 'application/x-www-form-urlencoded'
+                //         }
+                //     }
+                // ).toPromise().then( (response: ICognitoTokens) => {
+                //     // save the tokens to localStorage so the session can persist across refreshes
+                //     window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(response) );
+                //     this.setLoggedIn( true );
+                //     resolve( undefined );
+                // });
             } else {
                 resolve( undefined );
             }
         });
     }
 
-    async getCognitoUserInfo(): Promise<ICognitoUserInfo> {
-        await this.finishedInitialLogin;
-        const request = new HttpRequest( 'GET', `${environment.aws.cognito.loginPage}/oauth2/userInfo` );
+    // async getCognitoUserInfo(): Promise<ICognitoUserInfo> {
+    // await this.finishedInitialLogin;
+    // const request = new HttpRequest( 'GET', `${environment.aws.cognito.loginPage}/oauth2/userInfo` );
 
-        return await this.makeAwsRequest( request );
-    }
+    // return await this.makeAwsRequest( request );
+    // }
 
     async loadUserProfile(): Promise<{ firstName?: string; lastName?: string; username?: string }> {
-        const cognitoInfo = await this.getCognitoUserInfo();
+        // const cognitoInfo = await this.getCognitoUserInfo();
         return {
-            firstName: cognitoInfo.username,
+            firstName: '',
+            // firstName: cognitoInfo.username,
             lastName: '',
-            username: cognitoInfo.email
+            username: ''
+            // username: cognitoInfo.email
         };
     }
 
@@ -101,12 +102,12 @@ export class ProfileNavService extends LaspNavService {
         const loginNonce = Math.random().toString( 36 ).substring( 2 );
         window.localStorage.setItem( StorageKeys.loginNonce, loginNonce );
         window.localStorage.setItem( StorageKeys.loginRedirect, destinationUrl );
-        window.location.href = `${environment.aws.cognito.loginPage}/login`
-            + `?client_id=${environment.aws.cognito.appClientId}`
-            + `&response_type=code`
-            + `&scope=openid profile email phone aws.cognito.signin.user.admin`
-            + `&redirect_uri=${environment.siteRootUrl}index.html`
-            + `&state=${loginNonce}`;
+        // window.location.href = `${environment.aws.cognito.loginPage}/login`
+        //     + `?client_id=${environment.aws.cognito.appClientId}`
+        //     + `&response_type=code`
+        //     + `&scope=openid profile email phone aws.cognito.signin.user.admin`
+        //     + `&redirect_uri=${environment.siteRootUrl}index.html`
+        //     + `&state=${loginNonce}`;
     }
 
     async logout(): Promise<void> {
@@ -151,20 +152,20 @@ export class ProfileNavService extends LaspNavService {
     private async _refreshCognitoAccessToken(): Promise<void> {
         try {
             // attempt to get new access tokens using the stored refresh token
-            const tokens = this.getStoredTokens();
-            const newTokens: ICognitoTokens = await this._http.post(
-                `${environment.aws.cognito.loginPage}/oauth2/token`,
-                `grant_type=refresh_token`
-                    + `&client_id=${environment.aws.cognito.appClientId}`
-                    + `&refresh_token=${tokens.refresh_token}`,
-                {
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                }
-            ).toPromise() as ICognitoTokens;
+            // const tokens = this.getStoredTokens();
+            // const newTokens: ICognitoTokens = await this._http.post(
+            //     `${environment.aws.cognito.loginPage}/oauth2/token`,
+            //     `grant_type=refresh_token`
+            //         + `&client_id=${environment.aws.cognito.appClientId}`
+            //         + `&refresh_token=${tokens.refresh_token}`,
+            //     {
+            //         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            //     }
+            // ).toPromise() as ICognitoTokens;
 
-            // this response doesn't include the refresh token, so add that to the set of new tokens before saving to localStorage
-            newTokens.refresh_token = tokens.refresh_token;
-            window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(newTokens) );
+            // // this response doesn't include the refresh token, so add that to the set of new tokens before saving to localStorage
+            // newTokens.refresh_token = tokens.refresh_token;
+            // window.localStorage.setItem( StorageKeys.cognitoTokens, JSON.stringify(newTokens) );
         } catch ( e ) {
             return this.onFailToRefresh();
         }
