@@ -20,8 +20,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
     @ViewChild(MatSort) sort: MatSort;
 
     @Input() catalog: IModelMetadata[];
-    @Input() runId: string;
-    @Output() updateRunId: EventEmitter<string> = new EventEmitter(undefined);
+    @Input() selectedRun: IModelMetadata;
+    @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
     expandedRun: IModelMetadata;
     displayedColumns: string[];
     headers: { [ parameter: string ]: string };
@@ -30,21 +30,22 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
     tableData: any;
 
     ngOnInit() {
-        if ( this.runId ) {
-            const selectedRun = this.catalog.find( run => run['run_id'] === this.runId);
+        if ( this.selectedRun ) {
+            const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
             this.selection.select( selectedRun );
         }
-        // add inferred resolution to the metadata
-        const formattedCatalog = this.catalog.map( (catalogEntry: IModelMetadata) => {
-            catalogEntry.resolution = this.getResolution( catalogEntry.code );
-            return catalogEntry;
-        });
-        this.tableData =  new MatTableDataSource<IModelMetadata>(formattedCatalog);
-        this.allMetadata = Object.keys(formattedCatalog[0]);
+
+        this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
+        this.allMetadata = Object.keys(this.catalog[0]);
         this.headers = {
             program: 'Model',
             institute: 'Institute',
             rundate_cal: 'Date of event',
+            cme_cone_half_angle: 'Cone half angle',
+            cme_latitude: 'Latitude',
+            cme_longitude: 'Longitude',
+            cme_radial_velocity: '  Radial velocity',
+            cme_time: 'Time at Sun (21.5Rs)',
             creation: 'Date of run creation',
             resolution: 'Resolution',
             cordata: 'Coronal data',
@@ -59,29 +60,27 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
             more: 'More info'
         };
         this.displayedColumns = [
-            'run_id',
             'rundate_cal',
+            'run_id',
+            'cme_cone_half_angle',
+            'cme_latitude',
+            'cme_longitude',
+            'cme_radial_velocity',
+            'cme_time',
             'more'
         ];
-
     }
 
     ngAfterViewInit() {
         this.tableData.sort = this.sort;
     }
 
-    getResolution( codeString: string ) {
-        const resolution = codeString.includes('low') ?
-            'low' :
-            codeString.includes('med') ?
-            'med' :
-            undefined;
-        return resolution;
-    }
-
     newSelection( run: IModelMetadata ) {
         this.selection.toggle(run);
-        const runId = this.selection.selected[0]?.run_id;
-        this.updateRunId.emit( runId );
+        if ( this.selection.isSelected( run ) ) {
+            this.updateRunSelection.emit( run );
+        } else {
+            this.updateRunSelection.emit( null );
+        }
     }
 }

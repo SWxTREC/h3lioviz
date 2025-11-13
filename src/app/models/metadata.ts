@@ -4,6 +4,11 @@ export interface IModelMetadata {
     boundary_old: string;
     case: string;
     cmedata: string;
+    cme_cone_half_angle: string;
+    cme_latitude: string;
+    cme_longitude: string;
+    cme_radial_velocity: string;
+    cme_time: string;
     code: string;
     cordata: string;
     corona: string;

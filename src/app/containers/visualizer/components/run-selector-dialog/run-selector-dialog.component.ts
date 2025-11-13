@@ -9,20 +9,20 @@ import { CatalogService } from 'src/app/services';
     styleUrls: [ './run-selector-dialog.component.scss' ]
 })
 export class RunSelectorDialogComponent implements OnInit {
-    previousSelection: string;
+    previousSelection: IModelMetadata;
 
     constructor(
         public dialogRef: MatDialogRef<RunSelectorDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: { runId: string; catalog: IModelMetadata[] },
+        @Inject(MAT_DIALOG_DATA) public data: { selectedRun: IModelMetadata; catalog: IModelMetadata[] },
         private _catalogService: CatalogService
     ) {}
 
     ngOnInit(): void {
-        this.previousSelection = this.data.runId;
+        this.previousSelection = this.data.selectedRun;
     }
 
-    updateRunId( value: string ) {
-        this.data.runId = value;
+    updateRunSelection( value: IModelMetadata ) {
+        this.data.selectedRun = value;
     }
 }
 

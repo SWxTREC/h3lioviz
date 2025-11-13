@@ -62,6 +62,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     resizing = true;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     runTitle: string;
+    selectedRunMetadata: IModelMetadata;
     showTitle: boolean;
     siteConfig: ISiteConfig;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
@@ -331,6 +332,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
 
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
+        this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
 
         // check for a stored time index for this runId
         const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
@@ -349,12 +351,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { runId: this.runId$.value, catalog: this.catalog },
+            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog },
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            if ( result && result !== this.runId$.value ) {
-                this.updateRunId( result );
+            this.selectedRunMetadata = result;
+            const selectedRunId = this.selectedRunMetadata?.run_id;
+            if ( selectedRunId && selectedRunId !== this.runId$.value ) {
+                this.updateRunId( selectedRunId );
             }
         });
     }
