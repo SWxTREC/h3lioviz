@@ -16,6 +16,7 @@ import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
 import { isEmpty, isEqual } from 'lodash';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import moment from 'moment';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -259,7 +260,21 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
+            const hasCmeMetadata = this.selectedRunMetadata && this.selectedRunMetadata.cme_time;
+            let defaultTimeIndex = 16;
+            if ( !hasCmeMetadata ) {
+                // no cme metadata, set timeIndex to middle
+                defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || defaultTimeIndex;
+            } else {
+                const cmeStarts = this.selectedRunMetadata.cme_time.split('\n')
+                    .map( timeString => moment.utc( timeString ).valueOf() / 1000 );
+                // find first cmeStart after first timeTick
+                const cmeStartInTimeTicks = cmeStarts.find( cmeStart => cmeStart > this.timeTicks[0]);
+                // find the timeTick just above the cmeStartInTimeTicks
+                const timeTickAboveCmeStart = this.timeTicks.filter( timeTick => timeTick > cmeStartInTimeTicks )[0];
+                // set defaultTimeIndex to two timeTicks after cmeStart
+                defaultTimeIndex = this.timeTicks.indexOf( timeTickAboveCmeStart ) + 2 || defaultTimeIndex;
+            }
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
         });
