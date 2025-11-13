@@ -370,7 +370,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            this.selectedRunMetadata = result;
+            // if the dialog closes with no changes, preserve the selectedRunMetadata
+            this.selectedRunMetadata = result ?? this.selectedRunMetadata;
             const selectedRunId = this.selectedRunMetadata?.run_id;
             if ( selectedRunId && selectedRunId !== this.runId$.value ) {
                 this.updateRunId( selectedRunId );

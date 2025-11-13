@@ -36,7 +36,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
         }
 
         this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
-        this.allMetadata = Object.keys(this.catalog[0]);
+        this.allMetadata = Object.keys(this.catalog[0]).sort();
         this.headers = {
             program: 'Model',
             institute: 'Institute',

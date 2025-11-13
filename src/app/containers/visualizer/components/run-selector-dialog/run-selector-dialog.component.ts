@@ -21,8 +21,8 @@ export class RunSelectorDialogComponent implements OnInit {
         this.previousSelection = this.data.selectedRun;
     }
 
-    updateRunSelection( value: IModelMetadata ) {
-        this.data.selectedRun = value;
+    updateRunSelection( runInfo: IModelMetadata ) {
+        this.data.selectedRun = runInfo;
     }
 }
 

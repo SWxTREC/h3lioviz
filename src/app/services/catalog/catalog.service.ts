@@ -22,7 +22,7 @@ export class CatalogService {
             const formattedCatalog = this._formatCatalog(catalog);
             this.catalog$.next(formattedCatalog);
             this.runTitles = Array.from(this.catalog$.value).reduce( (aggregator, run) => {
-                const time = moment.utc( run['rundate_cal'] ).format('YYYY-MM-DD HH');
+                const time = moment.utc( run['rundate_cal'] ).format('YYYY-MM-DDTHH');
                 aggregator[ run['run_id'] ] = `${time} (${run.institute})`;
                 return aggregator;
             }, {});
