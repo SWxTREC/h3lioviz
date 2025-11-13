@@ -4,8 +4,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { provideRouter } from '@angular/router';
 
-import { ProfileNavService } from '..';
-
 import { AwsService } from './aws.service';
 
 describe('AwsService', () => {
@@ -21,7 +19,6 @@ describe('AwsService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                ProfileNavService,
                 provideRouter([])
             ]
         });

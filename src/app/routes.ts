@@ -12,7 +12,6 @@ export const routes: Routes = [
         title: 'Documentation | H3lioViz',
         loadChildren: () => import( './containers/docs/docs.module').then( m => m.DocsModule )
     }, {
-        // canActivate: [ AuthGuard ],
         data: { footer: FooterMode.MINIMAL },
         title: 'Visualizer | H3lioViz',
         loadChildren: () => import( './containers/visualizer/visualizer.module').then( m => m.VisualizerModule ),

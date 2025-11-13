@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
-import { AwsService, ProfileNavService } from 'src/app/services';
+import { AwsService } from 'src/app/services';
 
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.container';
@@ -29,7 +29,6 @@ describe('HomeComponent', () => {
             declarations: [ HomeComponent ],
             providers: [
                 AwsService,
-                ProfileNavService,
                 provideRouter([])
             ]
         });

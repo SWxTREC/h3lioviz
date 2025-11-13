@@ -3,12 +3,7 @@
         <p>
             Explore heliosphere model runs in 3 dimensions
         </p>
-        @if (isLoggedIn) {
-            <a routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
-        }
-        @if (!isLoggedIn) {
-            <button mat-button (click)="profileService.onSignInClick('/visualizer')">Sign in/Register</button>
-        }
+        <a routerLink="/visualizer"><button mat-raised-button color="primary">Go to visualizer</button></a>
     </div>
     <div class="home__media">
         <img src="https://swx-trec.com/swx-trec-assets/h3lioviz/enlil-3d.gif" alt="movie showing 3-d visualization of solar wind model">
