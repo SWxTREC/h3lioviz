@@ -19,7 +19,7 @@ export interface IKeyboard {
 
 export const KEYBOARD_SHORTCUTS: IKeyboard[] = [
     {
-        action: 'Rotate around the Sun',
+        action: 'Rotate the plane',
         icon: 'cached',
         instruction: 'shift+left-click'
     },
