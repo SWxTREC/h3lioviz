@@ -22,14 +22,7 @@ if ( siteRootUrl.slice(-1, 1) !== '/' ) {
 export const environment = {
     aws: {
         // we don't want to hit AWS when developing locally, so an empty api string here
-        api: '#',
-        cognito: {
-            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
-            region: 'us-east-1',
-            userPoolId: 'm1uXvZDys',
-            loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
-            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
-        }
+        api: '#'
     },
     dev: true,
     googleAnalyticsId: '', // intentionally empty; don't try to track usage during development
