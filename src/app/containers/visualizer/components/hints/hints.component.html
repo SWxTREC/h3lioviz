@@ -1,5 +1,10 @@
 <div class="hints">
     @for (shortcut of keyboardShortcuts; track shortcut) {
-        <small class="hint">{{shortcut.action}} <code>{{shortcut.instruction}}</code></small>
+        <small class="hint">
+            <div class="hint-action">
+                {{shortcut.action}}<mat-icon>{{shortcut.icon}}</mat-icon>
+            </div>
+            <code>{{shortcut.instruction}}</code>
+        </small>
     }
 </div>
