@@ -9,7 +9,6 @@ import { environment, environmentConfig } from 'src/environments/environment';
 })
 export class AwsService {
     awsUrl: string = environment.aws.api;
-    loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
     monitoringInterval: Subscription;
@@ -26,7 +25,6 @@ export class AwsService {
     monitorPvServer() {
         this.monitoringInterval = interval(1000)
         .pipe(
-            takeWhile( () => this.loggedIn === true ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // pass through fails—looking specifically for a 500
