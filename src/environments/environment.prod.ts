@@ -12,14 +12,7 @@ if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== 
 
 export const environment = {
     aws: {
-        api: 'https://h3lioviz-api.prod.swx-trec.com/',
-        cognito: {
-            appClientId: '3lihoerp9d5nmrb8i6g0e13g05',
-            region: 'us-east-1',
-            userPoolId: 'm1uXvZDys',
-            loginPage: 'https://swx-trec.auth.us-east-1.amazoncognito.com',
-            identityPoolId: '27092902-649f-4118-b0ef-733c51b3fe7e'
-        }
+        api: 'https://h3lioviz-api.prod.swx-trec.com/'
     },
     dev: false,
     googleAnalyticsId: 'GTM-NMJRJJHD',

@@ -15,10 +15,9 @@ import { ChartModule } from 'scicharts';
 import { environment } from 'src/environments/environment';
 
 import { AppComponent } from './app.component';
-import { AuthGuard } from './guards/auth-guard.service';
 import { MaterialModule } from './modules';
 import { routes } from './routes';
-import { AwsService, ProfileNavService } from './services';
+import { AwsService } from './services';
 
 @NgModule({
     declarations: [
@@ -41,14 +40,7 @@ import { AwsService, ProfileNavService } from './services';
         RouterModule.forRoot( routes, { scrollPositionRestoration: 'enabled' } )
     ],
     providers: [
-        AuthGuard,
         AwsService,
-        ProfileNavService,
-        // LaspNavService,
-        // {
-        //     provide: LaspNavService,
-        //     useExisting: ProfileNavService
-        // },
         {
             provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: { appearance: 'outline' }

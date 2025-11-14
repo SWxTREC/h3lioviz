@@ -1,30 +1,21 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
-import { catchError, distinctUntilChanged, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
+import { catchError, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
-
-import { ProfileNavService } from '../profile-nav/profile-nav.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AwsService {
     awsUrl: string = environment.aws.api;
-    loggedIn: boolean;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
     monitoringInterval: Subscription;
 
     constructor(
-        private _http: HttpClient,
-        private _profileService: ProfileNavService
-    ) {
-        this._profileService.isLoggedIn.pipe( distinctUntilChanged() ).subscribe( loginStatus => {
-            this.loggedIn = true;
-            // this.loggedIn = loginStatus;
-        });
-    }
+        private _http: HttpClient
+    ) {}
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
         // add a random query parameter to the request, the easiest way to keep the request from being cached in the browser
@@ -34,7 +25,6 @@ export class AwsService {
     monitorPvServer() {
         this.monitoringInterval = interval(1000)
         .pipe(
-            takeWhile( () => this.loggedIn === true ),
             takeWhile( () => this.pvServerStarted$.value === false ),
             startWith(0),
             // pass through fails—looking specifically for a 500

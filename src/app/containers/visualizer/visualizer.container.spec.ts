@@ -10,7 +10,7 @@ import { MomentModule } from 'ngx-moment';
 import { ChartModule, GridComponent } from 'scicharts';
 import { ComponentsModule } from 'src/app/modules';
 import { MaterialModule } from 'src/app/modules/material.module';
-import { AwsService, ProfileNavService } from 'src/app/services';
+import { AwsService } from 'src/app/services';
 
 import {
     ColorsComponent,
@@ -54,7 +54,6 @@ describe('VisualizerComponent', () => {
             ],
             providers: [
                 AwsService,
-                ProfileNavService,
                 provideRouter([])
             ]
         })
