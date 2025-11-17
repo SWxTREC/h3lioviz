@@ -21,7 +21,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IPlotParams } from 'scicharts';
-import { ConfigLabels, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, ICmeMetadata, IModelMetadata, ISiteConfig } from 'src/app/models';
 import {
     AwsService,
     CatalogService,
@@ -53,6 +53,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     controlPanelSize = 300;
     errorMessage: string = null;
     gutterSize = 11;
+    hasCmeMetadata: boolean;
     loading = true;
     openPlots: boolean;
     openControls: boolean;
@@ -80,6 +81,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     windowResize$: Subject<void> = new Subject();
     // dimensions are [ width, height ]
     windowDimensions: number[];
+    protected _cmeMetadata: ICmeMetadata;
 
     @HostListener('window:resize')
     onResize() {
@@ -260,9 +262,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            const hasCmeMetadata = this.selectedRunMetadata && this.selectedRunMetadata.cme_time;
             let defaultTimeIndex = 16;
-            if ( !hasCmeMetadata ) {
+            if ( !this.hasCmeMetadata ) {
                 // no cme metadata, set timeIndex to middle
                 defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || defaultTimeIndex;
             } else {
@@ -348,6 +349,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
         this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
+        this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+        if ( this.hasCmeMetadata ) {
+            this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+        }
 
         // check for a stored time index for this runId
         const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
@@ -370,8 +375,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
+            console.log( 'The dialog was closed', result, this.selectedRunMetadata );
             // if the dialog closes with no changes, preserve the selectedRunMetadata
             this.selectedRunMetadata = result ?? this.selectedRunMetadata;
+            this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+            if ( this.hasCmeMetadata ) {
+                this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+            }
             const selectedRunId = this.selectedRunMetadata?.run_id;
             if ( selectedRunId && selectedRunId !== this.runId$.value ) {
                 this.updateRunId( selectedRunId );

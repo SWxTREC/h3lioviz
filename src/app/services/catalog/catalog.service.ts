@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { IModelMetadata } from 'src/app/models';
+import { ICmeMetadata, IModelMetadata } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
 
 @Injectable({
@@ -61,6 +61,24 @@ export class CatalogService {
             return catalogEntry;
         });
         return catalog;
+    }
+
+    formatCmeMetadataForHtml( run: IModelMetadata ): ICmeMetadata {
+        if ( !run.cme_time ) {
+            return null;
+        }
+        const cmeTime = run.cme_time.replace(/-/g, '\u2011').split('\n').join(', ');
+        const cmeConeHalfAngle = run.cme_cone_half_angle.split('\n').join(', ');
+        const cmeRadialVelocity = run.cme_radial_velocity.split('\n').join(', ');
+        const cmeLatitude = run.cme_latitude.split('\n').join(', ');
+        const cmeLongitude = run.cme_longitude.split('\n').join(', ');
+        return {
+            time: cmeTime,
+            coneHalfAngle: cmeConeHalfAngle,
+            radialVelocity: cmeRadialVelocity,
+            latitude: cmeLatitude,
+            longitude: cmeLongitude
+        };
     }
 
     getCatalog(): Observable<any> {

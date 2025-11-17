@@ -14,7 +14,14 @@
         margin-left: 1rem;
         color: white;
         display: flex;
-        flex-direction: column;}
+        flex-direction: column;
+        flex-wrap: wrap;
+        // wide enough to fit two CME time strings plus label
+        width: 330px;
+        div {
+            margin-bottom: 0.25rem;
+        }
+    }
     &__container {
         position: relative;
         z-index: 1;

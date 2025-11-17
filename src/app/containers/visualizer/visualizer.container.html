@@ -60,21 +60,21 @@
                         <div class="viz__overlay">
                             <div class="viz__menus">
                                 <div class="viz__cme-metadata">
-                                    @if (selectedRunMetadata?.cme_time) {
+                                    @if ( hasCmeMetadata ) {
                                         <div>
-                                            CME time: {{ selectedRunMetadata.cme_time }}
+                                            <strong>CME time:</strong> {{ _cmeMetadata.time }}
                                         </div>
                                         <div>
-                                            Cone half angle: {{ selectedRunMetadata.cme_cone_half_angle }}
+                                            <strong>Cone half angle:</strong> {{ _cmeMetadata.coneHalfAngle }}
                                         </div>
                                         <div>
-                                            Latitude: {{ selectedRunMetadata.cme_latitude }}
+                                            <strong>Latitude:</strong> {{ _cmeMetadata.latitude }}
                                         </div>
                                         <div>
-                                            Longitude: {{ selectedRunMetadata.cme_longitude }}
+                                            <strong>Longitude:</strong> {{ _cmeMetadata.longitude }}
                                         </div>
                                         <div>
-                                            Radial Velocity: {{ selectedRunMetadata.cme_radial_velocity }}
+                                            <strong>Radial Velocity:</strong> {{ _cmeMetadata.radialVelocity }}
                                         </div>
                                     }
                                 </div>

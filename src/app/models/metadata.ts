@@ -51,3 +51,11 @@ export interface IModelMetadata {
     xalpha: number;
     resolution?: string;
 }
+
+export interface ICmeMetadata {
+    time: string;
+    latitude: string;
+    longitude: string;
+    radialVelocity: string;
+    coneHalfAngle: string;
+}
