@@ -18,13 +18,9 @@ export class CatalogService {
         // get catalog on app load
         this.getCatalog().subscribe( catalog => {
             // sort catalog by `cme_time`, if it exists, otherwise by `rundate_cal`, then sort by `run_id`to ensure consistent ordering
-            catalog.sort( ( a, b ) => {
-                if ( a['rundate_cal'] === b['rundate_cal'] ) {
-                    return b['run_id'] - (a['run_id']);
-                } else {
-                    return moment(b['rundate_cal']).valueOf() - moment(a['rundate_cal']).valueOf();
-                }
-            });
+            catalog.sort( ( a, b ) =>
+                moment(b['rundate_cal']).valueOf() - moment(a['rundate_cal']).valueOf() || b['run_id'] - (a['run_id'])
+            );
             const formattedCatalog = this._formatCatalog(catalog);
             this.catalog$.next(formattedCatalog);
             this.runTitles = Array.from(this.catalog$.value).reduce( (aggregator, run) => {
