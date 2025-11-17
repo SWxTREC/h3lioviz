@@ -40,7 +40,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
         this.headers = {
             program: 'Model',
             institute: 'Institute',
-            rundate_cal: 'Date of event',
+            rundate_cal: 'Time of run',
             cme_cone_half_angle: 'Cone half angle',
             cme_latitude: 'Latitude',
             cme_longitude: 'Longitude',
@@ -62,11 +62,11 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
         this.displayedColumns = [
             'rundate_cal',
             'run_id',
+            'cme_time',
             'cme_cone_half_angle',
             'cme_latitude',
             'cme_longitude',
             'cme_radial_velocity',
-            'cme_time',
             'more'
         ];
     }
