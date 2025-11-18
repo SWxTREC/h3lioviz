@@ -32,6 +32,7 @@ export class ContoursComponent implements OnChanges {
         floor: this.defaultContourVariable.entireRange[0],
         ceil: this.defaultContourVariable.entireRange[1],
         combineLabels: (min, max) => min + ' to ' + max,
+        hideLimitLabels: false,
         step: this.defaultContourVariable.step,
         animate: false
     };
@@ -132,6 +133,7 @@ export class ContoursComponent implements OnChanges {
         const newOptions = {
             floor: contourVariable.entireRange[0],
             ceil: contourVariable.entireRange[1],
+            hideLimitLabels: false,
             step: contourVariable.step,
             animate: false
         };

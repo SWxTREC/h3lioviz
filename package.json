@@ -5,7 +5,7 @@
     "changelog": "auto-changelog",
     "ng": "ng",
     "start": "ng serve",
-    "start:prod": "ng serve --prod",
+    "start:prod": "ng serve --configuration production",
     "start:dev": "ng serve --configuration production,dev",
     "build": "ng build",
     "build:pages": "ng build --prod --output-path docs --base-href=/h3lioviz/",

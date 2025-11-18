@@ -9,7 +9,7 @@ export interface IColormapInfo {
 // serverName must match an option on the server
 export const COLORMAPS: { [param: string]: IColormapInfo } = {
     wsaEnlil: {
-        displayName: 'WSA-Enlil',
+        displayName: 'SWPC-default',
         imgSrc: 'assets/images/wsa_enlil.png',
         serverName: 'WSA-Enlil'
     },
@@ -70,12 +70,12 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     pressure: {
         serverName: 'pressure',
         displayName: 'Ram pressure',
-        units: 'r<sup>2</sup>N/m<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
-        defaultColorRange: [ 0, 2.5 ],
-        defaultColormap: COLORMAPS.plasma,
+        units: 'r<sup>2</sup>N/m<sup>3</sup>&nbsp;*&nbsp;km<sup>2</sup>/s<sup>2</sup>',
+        defaultColorRange: [ 0, 10 ],
+        defaultColormap: COLORMAPS.wsaEnlil,
         defaultContourValue: 5,
         entireRange: [ 0, 10 ],
-        step: 0.5
+        step: 0.1
     },
     temperature: {
         serverName: 'temperature',
@@ -113,9 +113,9 @@ export const MODEL_VARIABLES = [
     VARIABLE_CONFIG.density,
     VARIABLE_CONFIG.velocity,
     VARIABLE_CONFIG.temperature,
-    VARIABLE_CONFIG.pressure,
-    VARIABLE_CONFIG.b
+    VARIABLE_CONFIG.pressure
 ];
+
 export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.density, VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.pressure ];
 export const ADDITIONAL_VARIABLES = [
     VARIABLE_CONFIG.temperature,
@@ -132,7 +132,7 @@ export interface IColorSettings {
 export const COLOR_FORM_DEFAULT_VALUES: IColorSettings = {
     colorVariable: VARIABLE_CONFIG.pressure,
     colormap: VARIABLE_CONFIG.pressure.defaultColormap,
-    opacity: [ 60, 90 ] as [ number, number ]
+    opacity: [ 60, 100 ] as [ number, number ]
 };
 
 export const DEFAULT_COLORMAPS: { [parameter: string]: IColormapInfo }  =
@@ -214,6 +214,6 @@ export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
     lonSliceType: 'ecliptic',
     lonStreamlines: false,
     radialSlice: false,
-    satellites: true,
+    satellites: false,
     satFieldlines: false
 };
