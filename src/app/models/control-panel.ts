@@ -113,9 +113,9 @@ export const MODEL_VARIABLES = [
     VARIABLE_CONFIG.density,
     VARIABLE_CONFIG.velocity,
     VARIABLE_CONFIG.temperature,
-    VARIABLE_CONFIG.pressure,
-    VARIABLE_CONFIG.b
+    VARIABLE_CONFIG.pressure
 ];
+
 export const FOCUS_VARIABLES = [ VARIABLE_CONFIG.density, VARIABLE_CONFIG.velocity, VARIABLE_CONFIG.pressure ];
 export const ADDITIONAL_VARIABLES = [
     VARIABLE_CONFIG.temperature,
