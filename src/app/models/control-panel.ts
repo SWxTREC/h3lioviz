@@ -70,7 +70,7 @@ export const VARIABLE_CONFIG: { [param: string]: IVariableInfo } = {
     pressure: {
         serverName: 'pressure',
         displayName: 'Ram pressure',
-        units: 'r<sup>2</sup>N/m<sup>3</sup> * km<sup>2</sup>/s<sup>2</sup>',
+        units: 'r<sup>2</sup>N/m<sup>3</sup>&nbsp;*&nbsp;km<sup>2</sup>/s<sup>2</sup>',
         defaultColorRange: [ 0, 10 ],
         defaultColormap: COLORMAPS.wsaEnlil,
         defaultContourValue: 5,
