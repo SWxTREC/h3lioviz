@@ -1,9 +1,9 @@
 <div mat-dialog-content>
     @if (data.catalog) {
         <swt-run-selector
-            [runId]="data.runId"
+            [selectedRun]="data.selectedRun"
             [catalog]="data.catalog"
-            (updateRunId)="updateRunId($event)"
+            (updateRunSelection)="updateRunSelection($event)"
         >
         </swt-run-selector>
     }
@@ -12,5 +12,5 @@
     @if (previousSelection) {
         <button mat-button [mat-dialog-close]="previousSelection">Cancel</button>
     }
-    <button mat-raised-button color="primary" [disabled]="!data.runId" [mat-dialog-close]="data.runId">Select</button>
+    <button mat-raised-button color="primary" [disabled]="!data.selectedRun" [mat-dialog-close]="data.selectedRun">Select</button>
 </div>

@@ -16,11 +16,12 @@ import { LaspBaseAppSnippetsService } from 'lasp-base-app-snippets';
 import { LaspNavService } from 'lasp-nav';
 import { isEmpty, isEqual } from 'lodash';
 import { decompressFromEncodedURIComponent } from 'lz-string';
+import moment from 'moment';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IPlotParams } from 'scicharts';
-import { ConfigLabels, DEFAULT_SITE_CONFIG, IModelMetadata, ISiteConfig } from 'src/app/models';
+import { ConfigLabels, DEFAULT_SITE_CONFIG, ICmeMetadata, IModelMetadata, ISiteConfig } from 'src/app/models';
 import {
     AwsService,
     CatalogService,
@@ -52,6 +53,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     controlPanelSize = 300;
     errorMessage: string = null;
     gutterSize = 11;
+    hasCmeMetadata: boolean;
     loading = true;
     openPlots: boolean;
     openControls: boolean;
@@ -62,6 +64,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     resizing = true;
     runId$: BehaviorSubject<string> = new BehaviorSubject(undefined);
     runTitle: string;
+    selectedRunMetadata: IModelMetadata;
     showTitle: boolean;
     siteConfig: ISiteConfig;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
@@ -78,6 +81,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     windowResize$: Subject<void> = new Subject();
     // dimensions are [ width, height ]
     windowDimensions: number[];
+    protected _cmeMetadata: ICmeMetadata;
 
     @HostListener('window:resize')
     onResize() {
@@ -258,7 +262,20 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     getTimeTicks( timeIndex?: number ) {
         this.pvView.get().session.call('pv.time.values', []).then( (timeValues: number[]) => {
             this.timeTicks = timeValues.map( value => Math.round( value ) );
-            const defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || 16;
+            let defaultTimeIndex = 16;
+            if ( !this.hasCmeMetadata ) {
+                // no cme metadata, set timeIndex to middle
+                defaultTimeIndex = Math.trunc(this.timeTicks.length / 2) || defaultTimeIndex;
+            } else {
+                const cmeStarts = this.selectedRunMetadata.cme_time.split('\n')
+                    .map( timeString => moment.utc( timeString ).valueOf() / 1000 );
+                // find first cmeStart after first timeTick
+                const cmeStartInTimeTicks = cmeStarts.find( cmeStart => cmeStart > this.timeTicks[0]);
+                // find the timeTick just above the cmeStartInTimeTicks
+                const timeTickAboveCmeStart = this.timeTicks.filter( timeTick => timeTick > cmeStartInTimeTicks )[0];
+                // set defaultTimeIndex to two timeTicks after cmeStart
+                defaultTimeIndex = this.timeTicks.indexOf( timeTickAboveCmeStart ) + 2 || defaultTimeIndex;
+            }
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
         });
@@ -331,6 +348,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
 
         this.runTitle = this._catalogService.runTitles[this.runId$.value];
+        this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
+        this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+        if ( this.hasCmeMetadata ) {
+            this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+        }
 
         // check for a stored time index for this runId
         const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
@@ -349,12 +371,19 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { runId: this.runId$.value, catalog: this.catalog },
+            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog },
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            if ( result && result !== this.runId$.value ) {
-                this.updateRunId( result );
+            // if the dialog closes with no changes, preserve the selectedRunMetadata
+            this.selectedRunMetadata = result ?? this.selectedRunMetadata;
+            this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+            if ( this.hasCmeMetadata ) {
+                this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+            }
+            const selectedRunId = this.selectedRunMetadata?.run_id;
+            if ( selectedRunId && selectedRunId !== this.runId$.value ) {
+                this.updateRunId( selectedRunId );
             }
         });
     }

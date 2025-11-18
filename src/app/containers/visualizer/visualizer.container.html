@@ -59,6 +59,25 @@
                     @if (runId$ | async) {
                         <div class="viz__overlay">
                             <div class="viz__menus">
+                                <div class="viz__cme-metadata">
+                                    @if ( hasCmeMetadata ) {
+                                        <div>
+                                            <strong>CME time:</strong> {{ _cmeMetadata.time }}
+                                        </div>
+                                        <div>
+                                            <strong>Cone half angle:</strong> {{ _cmeMetadata.coneHalfAngle }}
+                                        </div>
+                                        <div>
+                                            <strong>Latitude:</strong> {{ _cmeMetadata.latitude }}
+                                        </div>
+                                        <div>
+                                            <strong>Longitude:</strong> {{ _cmeMetadata.longitude }}
+                                        </div>
+                                        <div>
+                                            <strong>Radial Velocity:</strong> {{ _cmeMetadata.radialVelocity }}
+                                        </div>
+                                    }
+                                </div>
                                 <swt-mouse-zoom [pvView]="pvView"></swt-mouse-zoom>
                                 <swt-orientation-menu [pvView]="pvView"></swt-orientation-menu>
                             </div>

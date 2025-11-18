@@ -9,6 +9,19 @@
 }
 
 .viz {
+    &__cme-metadata {
+        margin-top: 2rem;
+        margin-left: 1rem;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        // wide enough to fit two CME time strings plus label
+        width: 330px;
+        div {
+            margin-bottom: 0.25rem;
+        }
+    }
     &__container {
         position: relative;
         z-index: 1;
@@ -49,7 +62,7 @@
         }
     }
     &__menus {
-        width: 50%;
+        width: 100%;
         display: flex;
         position: absolute;
         right: 0;
