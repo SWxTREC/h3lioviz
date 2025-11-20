@@ -1,4 +1,3 @@
-##  2025-05-28 v1.5.0
 
 ### Added
 - Single contour variable
