@@ -1,5 +1,11 @@
-##  2025-05-28 v1.5.0
+### Changed
+- Sort by 'creation' date
+- Time at 21.5Rs column relabeled
 
+### Removed
+- Runs before 2025-09-30T
+
+##  v2.0.0
 ### Added
 - Single contour variable
 - SWPC default colormap
