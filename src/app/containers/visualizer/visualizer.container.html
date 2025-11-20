@@ -60,7 +60,7 @@
                         <div class="viz__overlay">
                             <div class="viz__menus">
                                 <div class="viz__cme-metadata">
-                                    @if ( hasCmeMetadata ) {
+                                    @if ( hasCmeMetadata && !loading) {
                                         <div>
                                             <strong>CME time:</strong> {{ _cmeMetadata.time }}
                                         </div>

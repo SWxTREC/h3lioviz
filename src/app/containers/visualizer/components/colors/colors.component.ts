@@ -182,7 +182,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         this.colorbarRightOffset = this.getPercentageOfFullColorRange( rightOffset );
         this.colorRange = [ event.value, event.highValue ];
         this.userColorRanges[ this.colorVariableServerName ] = cloneDeep(this.colorRange);
-        this.pvView.get().session.call('pv.h3lioviz.set_range', [ this.colorVariableServerName, this.colorRange ] );
+        this.session.call('pv.h3lioviz.set_range', [ this.colorVariableServerName, this.colorRange ] );
         this.renderDebouncer.next();
     }
 }

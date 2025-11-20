@@ -228,6 +228,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.pvView.setContainer( divRenderer );
                 // websocket is connected, if runId, load run data
                 if ( this.runId$.value != null ) {
+                    this.loading = true;
                     this.loadModel( this.runId$.value );
                 }
             }
@@ -375,13 +376,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
-            // if the dialog closes with no changes, preserve the selectedRunMetadata
             this.selectedRunMetadata = result ?? this.selectedRunMetadata;
-            this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
-            if ( this.hasCmeMetadata ) {
-                this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
-            }
             const selectedRunId = this.selectedRunMetadata?.run_id;
+            // if the dialog closes with no changes, preserve the selectedRunMetadata
             if ( selectedRunId && selectedRunId !== this.runId$.value ) {
                 this.updateRunId( selectedRunId );
             }
@@ -445,9 +442,14 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     setTimestep( timeIndex: number ) {
-        this.loading = true;
         this.timeIndex = timeIndex;
-        this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => this.loading = false );
+        this.pvView.get().session.call('pv.time.index.set', [ timeIndex ]).then( () => {
+            setTimeout( () => {
+                this.loading = false;
+            }, 1000);
+            // this is to trigger the backend to set the correct units for pressure
+            this.pvView.get().session.call('pv.h3lioviz.set_range', [ 'pressure', this.siteConfig[ConfigLabels.colorRanges].pressure ] );
+        });
         const userTimeIndexMap: { [runId: string]: number } = this.siteConfig[ConfigLabels.timeIndexMap] ?? {};
         userTimeIndexMap[ this.runId$.value ] = this.timeIndex;
         this._siteConfigService.updateSiteConfig( { [ConfigLabels.timeIndexMap ]: userTimeIndexMap });
