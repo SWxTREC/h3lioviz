@@ -1,3 +1,8 @@
+### Fixed
+- Run id column spacing
+
+##  v2.0.1
+
 ### Changed
 - Sort by 'creation' date
 - Time at 21.5Rs column relabeled

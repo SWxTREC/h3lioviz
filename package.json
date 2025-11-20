@@ -18,7 +18,7 @@
     "lint:watch": "nodemon --exec \"ng lint\" --ext ts --ignore node_modules/",
     "e2e": "ng e2e",
     "preversion": "ng lint && ng test --no-watch --no-progress",
-    "postversion": "git push && git push --tags && git push external main && git push --tags external main && git checkout dev && git merge origin/main && git push",
+    "postversion": "git push origin && git push --tags origin && git push external main && git push --tags external main && git checkout dev && git merge origin/main && git push",
     "version": "auto-changelog -p && git add src/assets/markdown/CHANGELOG.md"
   },
   "private": true,
