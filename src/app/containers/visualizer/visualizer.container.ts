@@ -277,6 +277,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // set defaultTimeIndex to two timeTicks after cmeStart
                 defaultTimeIndex = this.timeTicks.indexOf( timeTickAboveCmeStart ) + 2 || defaultTimeIndex;
             }
+            // this is to trigger the backend to set the correct units for pressure
+            this.pvView.get().session.call('pv.h3lioviz.set_range', [ 'pressure', this.siteConfig[ConfigLabels.colorRanges].pressure ] );
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
         });
@@ -447,8 +449,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             setTimeout( () => {
                 this.loading = false;
             }, 1000);
-            // this is to trigger the backend to set the correct units for pressure
-            this.pvView.get().session.call('pv.h3lioviz.set_range', [ 'pressure', this.siteConfig[ConfigLabels.colorRanges].pressure ] );
         });
         const userTimeIndexMap: { [runId: string]: number } = this.siteConfig[ConfigLabels.timeIndexMap] ?? {};
         userTimeIndexMap[ this.runId$.value ] = this.timeIndex;

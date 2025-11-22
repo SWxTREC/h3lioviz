@@ -145,8 +145,10 @@ This will:
 * run the linter and unit tests and abort if they fail
 * increment the version, commit the change, and create a git tag
 * generate the changelog
-* push the changes and the new tag to the remote repo
+* push the changes and the new tag to the remote repos (origin and external)
 * merge the version changes back into the dev branch
+
+Note that the version number will be correct in the code for the dev branch, but the deployed version in dev will only be updated on the next run of the dev-build Jenkins job.
 
 ### Deploy production to AWS
 
