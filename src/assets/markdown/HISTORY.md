@@ -1,4 +1,9 @@
 ### Fixed
+- Changelog headings
+
+##  v2.0.2
+
+### Fixed
 - Run id column spacing
 
 ##  v2.0.1
