@@ -19,6 +19,11 @@ import { DEFAULT_PLOT_CONFIG } from './plots';
 
 // this object holds all the application state
 export interface ISiteConfig {
+    camera?: {
+        focal: number[];
+        position: number[];
+        up: number[];
+    };
     colormaps: { [parameter: string]: IColormapInfo };
     colorRanges: { [parameter: string]: [ number, number ] };
     colorSettings: IColorSettings;
@@ -40,6 +45,7 @@ export interface ISiteConfig {
 }
 
 export enum ConfigLabels {
+    camera = 'camera',
     colormaps = 'colormaps',
     colorRanges = 'colorRanges',
     colorSettings = 'colorSettings',

@@ -72,12 +72,14 @@ export class SiteConfigService {
             }
             return aggregator;
         }, {});
+
         return jsonConfig;
     }
 
     /** set the site config. Update the session storage and the URL with the new config */
     setSiteConfig( newConfig: ISiteConfig, updateUrl = true ): void {
-        const minConfig = this._paramsService.removeDefaults(newConfig, DEFAULT_SITE_CONFIG) as ISiteConfig;
+        const minConfig = newConfig;
+        // const minConfig = this._paramsService.removeDefaults(newConfig, DEFAULT_SITE_CONFIG) as ISiteConfig;
         const jsonConfig: Object = this.parseConfigToJson( minConfig );
         // save our new config to session storage
         for ( const key in jsonConfig ) {
