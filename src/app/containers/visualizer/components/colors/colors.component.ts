@@ -70,12 +70,8 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         this.subscriptions.push(this._siteCofigService.config$.subscribe( () => this.siteConfig = this._siteCofigService.getSiteConfig() ));
         // initialize FormGroup with default color menu names and values
         Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.colorForm.addControl(controlName, new FormControl( COLOR_FORM_DEFAULT_VALUES[controlName]));
+            this.colorForm.addControl(controlName, new FormControl());
         });
-        // create user objects from site config
-        this.userColormaps = this.siteConfig[ ConfigLabels.colormaps ];
-        this.userColorRanges = this.siteConfig[ ConfigLabels.colorRanges ];
-        this.userOpacities = this.siteConfig[ ConfigLabels.opacities ];
 
         this.subscriptions.push(
             this.renderDebouncer.pipe(
@@ -91,6 +87,10 @@ export class ColorsComponent implements OnChanges, OnDestroy {
         // get session once, when pvView is defined
         if ( this.pvView && !this.session ) {
             this.session = this.pvView.get().session;
+            // create user objects from site config
+            this.userColormaps = this.siteConfig[ ConfigLabels.colormaps ];
+            this.userColorRanges = this.siteConfig[ ConfigLabels.colorRanges ];
+            this.userOpacities = this.siteConfig[ ConfigLabels.opacities ];
             // once we have a session, set form subscriptions
             this.setFormSubscriptions();
             // once form is interacting with session via subscriptions, initialize the form from siteConfig

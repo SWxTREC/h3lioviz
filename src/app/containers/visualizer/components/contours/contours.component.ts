@@ -56,9 +56,7 @@ export class ContoursComponent implements OnChanges {
         );
         // initialize FormGroup with default contour menu names and values
         Object.keys(CONTOUR_FORM_DEFAULT_VALUES).forEach( controlName => {
-            this.contours.addControl(controlName, new FormControl(
-                this.siteConfig[ ConfigLabels.contourSettings ][ controlName ]
-            ));
+            this.contours.addControl(controlName, new FormControl());
         });
         // debounce render
         this.subscriptions.push(

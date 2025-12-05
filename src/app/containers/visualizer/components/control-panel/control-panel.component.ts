@@ -16,7 +16,7 @@ export class ControlPanelComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.expansionState = this._siteConfigService.getSiteConfig()[ ConfigLabels.cPanelExpansions ];
+        this.expansionState = this._siteConfigService.getSiteConfig()?.[ ConfigLabels.cPanelExpansions ];
     }
 
     updateConfig(): void {
