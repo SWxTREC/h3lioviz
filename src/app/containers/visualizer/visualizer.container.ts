@@ -231,13 +231,13 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.loading = true;
                     this.loadModel( this.runId$.value );
                 }
-                // apply stored camera position if it exists
                 const viewId = this.pvView.view;
                 const config = this._siteConfigService.getSiteConfig();
+                // apply stored camera position if it exists
                 if ( this.pvView && !isEmpty(config[ ConfigLabels.camera ]) ) {
                     this.pvView.get().session.call(
                         'viewport.camera.update', [
-                            this.pvView.view,
+                            viewId,
                             config[ ConfigLabels.camera ].focal,
                             config[ ConfigLabels.camera ].up,
                             config[ ConfigLabels.camera ].position
