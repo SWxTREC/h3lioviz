@@ -1,12 +1,14 @@
+
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assign, cloneDeep, defaultsDeep } from 'lodash';
+import { assign, cloneDeep } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { BehaviorSubject } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { ParamsService, PlotsService } from 'scicharts';
 import { DEFAULT_PLOT_OPTIONS } from 'src/app/models';
-import { ConfigLabels, DEFAULT_SITE_CONFIG, ISiteConfig } from 'src/app/models/site-config';
+import { ConfigLabels, ISiteConfig } from 'src/app/models/site-config';
 
 @Injectable({
     providedIn: 'root'
@@ -21,8 +23,11 @@ export class SiteConfigService {
         private _paramsService: ParamsService,
         private _plotsService: PlotsService
     ) {
-        // update site config with plot changes
-        this._plotsService.getPlots$().subscribe((plots) => {
+        // subscribe to plot changes to update the site config, however, only update when plots exist to avoid
+        // overwriting the config with an empty array on load
+        // explicitly set the plot config when clearing plots via the clearAllPlots method in the plots
+        // component, and don't worry about case where final plot is removed manually
+        this._plotsService.getPlots$().pipe( filter( plots => plots.length > 0 )).subscribe((plots) => {
             const changedParams = this._paramsService.getChangedPlotParams( DEFAULT_PLOT_OPTIONS );
             if ( plots.some( p => p.type === 'XAXIS' ) ) {
                 // if in stackedMode, remove the last plot (the x-axis plot) from the config
@@ -34,10 +39,7 @@ export class SiteConfigService {
 
     /** return the site config */
     getSiteConfig(): ISiteConfig {
-        const config = cloneDeep(this.config$.getValue());
-        // add default values not stored in the url
-        defaultsDeep(config, DEFAULT_SITE_CONFIG);
-        return config;
+        return cloneDeep(this.config$.getValue());
     }
 
     /** returns a compressed string of the current site config */
@@ -78,9 +80,7 @@ export class SiteConfigService {
 
     /** set the site config. Update the session storage and the URL with the new config */
     setSiteConfig( newConfig: ISiteConfig, updateUrl = true ): void {
-        const minConfig = newConfig;
-        // const minConfig = this._paramsService.removeDefaults(newConfig, DEFAULT_SITE_CONFIG) as ISiteConfig;
-        const jsonConfig: Object = this.parseConfigToJson( minConfig );
+        const jsonConfig: Object = this.parseConfigToJson( newConfig );
         // save our new config to session storage
         for ( const key in jsonConfig ) {
             if ( jsonConfig.hasOwnProperty( key ) ) {
@@ -88,9 +88,9 @@ export class SiteConfigService {
             }
         }
         // alert components of changes to the site config
-        this.config$.next( minConfig );
+        this.config$.next( newConfig );
         if (updateUrl) {
-            this.navigateToNewUrl(minConfig);
+            this.navigateToNewUrl(newConfig);
         }
     }
 

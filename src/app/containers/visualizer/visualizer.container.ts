@@ -231,9 +231,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.loading = true;
                     this.loadModel( this.runId$.value );
                 }
+                // apply stored camera position if it exists
                 const viewId = this.pvView.view;
                 const config = this._siteConfigService.getSiteConfig();
-                if ( this.pvView && config[ ConfigLabels.camera ] ) {
+                if ( this.pvView && !isEmpty(config[ ConfigLabels.camera ]) ) {
                     this.pvView.get().session.call(
                         'viewport.camera.update', [
                             this.pvView.view,
@@ -245,16 +246,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // to save the camera position, set up a subscription to image changes
                 this.subscriptions.push(this.pvView.get().session.subscribe('viewport.image.push.subscription', ( update ) => {
                     // this skips the updates that are stale
-                    console.log(update[0].memsize);
-                    console.log('zoom info?', this.pvView.getViewStream());
-                    // this.pvView.getViewStream(this.pvView.viewId).then( ( state ) => {
-                    //     console.log({ state });
-                    // });
                     if ( !update[0].stale ) {
-                        console.log('storing camera position from image update');
                         this.pvView.get().session.call( 'viewport.camera.get', [ viewId ] ).then(
                             ( cameraPosition: { bounds: number[]; center: number[]; focal: number[]; position: number[]; up: number } ) => {
-                                console.log({ cameraPosition });
                                 // store camera position in site config
                                 const cameraConfig = {
                                     focal: cameraPosition.focal,
@@ -265,10 +259,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                             }
                         );
                     }
-                }));
-                console.log('setting up viewport geometry subscription');
-                this.subscriptions.push(this.pvView.get().session.subscribe('viewport.geometry.view.get.state', ( newState ) => {
-                    console.log({ newState  });
                 }));
             }
         }));
@@ -521,7 +511,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     togglePlotsPanel() {
         this.openPlots = !this.openPlots;
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
-
         this.setPlotsPanel();
     }
 

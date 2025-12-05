@@ -153,6 +153,8 @@ export class PlotsComponent implements OnChanges {
         dialogRef.afterClosed().subscribe((result: boolean) => {
             if (result === true) {
                 this._plotsService.removeAllPlots();
+                // explicitly update site config to clear plots
+                this._siteConfigService.updateSiteConfig({ plots: [] });
             }
         });
     }
