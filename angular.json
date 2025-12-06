@@ -89,6 +89,14 @@
                   "with": "src/environments/environment.dev.ts"
                 }
               ]
+            },
+            "swpc": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.swpc.ts"
+                }
+              ]
             }
           }
         },
@@ -103,6 +111,9 @@
             },
             "dev": {
               "browserTarget": "h3lioviz:build:dev"
+            },
+            "swpc": {
+              "browserTarget": "h3lioviz:build:swpc"
             }
           }
         },

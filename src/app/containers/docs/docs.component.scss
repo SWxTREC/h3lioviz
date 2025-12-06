@@ -4,4 +4,11 @@ dt {
 
 .documentation {
     margin: 1rem;
+    &__changelog {
+        text-align: right;
+    }
+    &__shortcut {
+        display: flex;
+        gap: 0.5rem;
+    }
 }
