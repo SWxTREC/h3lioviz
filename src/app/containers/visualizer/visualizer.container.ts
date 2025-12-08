@@ -231,6 +231,35 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.loading = true;
                     this.loadModel( this.runId$.value );
                 }
+                const viewId = this.pvView.view;
+                const config = this._siteConfigService.getSiteConfig();
+                // apply stored camera position if it exists
+                if ( this.pvView && !isEmpty(config[ ConfigLabels.camera ]) ) {
+                    this.pvView.get().session.call(
+                        'viewport.camera.update', [
+                            viewId,
+                            config[ ConfigLabels.camera ].focal,
+                            config[ ConfigLabels.camera ].up,
+                            config[ ConfigLabels.camera ].position
+                        ] );
+                }
+                // to save the camera position, set up a subscription to image changes
+                this.subscriptions.push(this.pvView.get().session.subscribe('viewport.image.push.subscription', ( update ) => {
+                    // this skips the updates that are stale
+                    if ( !update[0].stale ) {
+                        this.pvView.get().session.call( 'viewport.camera.get', [ viewId ] ).then(
+                            ( cameraPosition: { bounds: number[]; center: number[]; focal: number[]; position: number[]; up: number } ) => {
+                                // store camera position in site config
+                                const cameraConfig = {
+                                    focal: cameraPosition.focal,
+                                    position: cameraPosition.position,
+                                    up: cameraPosition.up
+                                };
+                                this._siteConfigService.updateSiteConfig( { [ConfigLabels.camera]: cameraConfig } );
+                            }
+                        );
+                    }
+                }));
             }
         }));
     }
@@ -482,7 +511,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     togglePlotsPanel() {
         this.openPlots = !this.openPlots;
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
-
         this.setPlotsPanel();
     }
 

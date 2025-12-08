@@ -83,12 +83,12 @@ export class PlotsComponent implements OnChanges {
                 this._siteConfigService.updateSiteConfig({ [ConfigLabels.legendCards]: false });
             }
         });
-        // once, on init, set the legend toggle based on the site config
-        const legendConfig = this._siteConfigService.getSiteConfig().legendCards;
-        this.legendCardToggle.setValue( legendConfig );
     }
 
     ngOnChanges( changes: SimpleChanges ) {
+        // once, on init, set the legend toggle based on the site config
+        const legendConfig = this._siteConfigService.getSiteConfig().legendCards;
+        this.legendCardToggle.setValue( legendConfig );
         // once, on load, set the plots based on the config or the default
         if ( changes.plotConfig.firstChange ) {
             const plots: IPlotStrict[] = [];
@@ -153,6 +153,8 @@ export class PlotsComponent implements OnChanges {
         dialogRef.afterClosed().subscribe((result: boolean) => {
             if (result === true) {
                 this._plotsService.removeAllPlots();
+                // explicitly update site config to clear plots
+                this._siteConfigService.updateSiteConfig({ plots: [] });
             }
         });
     }
