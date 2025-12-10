@@ -160,13 +160,16 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         } else {
             this.initVizDimensions();
         }
+        // reset runId to null to wait for catalog to load
+        // runId will be set from siteConfig subscription if it exists there, in afterView
+        this.runId$.next( null );
 
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
                 // if waiting for aws server, open the dialog so the user has something to do
                 setTimeout(() => {
-                    if ( (this.catalog && !this.runId$.value) ||
+                    if ( (this.catalog && !this.runId$.value ) ||
                         (this.catalog && !this.pvServerStarted) ) {
                         this.openDialog();
                     } else {
@@ -336,9 +339,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // height of window whether landscape or portrait
         this.componentMaxHeight = this.windowDimensions[1] - headerFooterHeight;
         // this can change if window is resized, so get from source
-        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions
-            // the library that makes the movies insists on even numbered pixel dimensions
-            .map( dim => dim % 2 === 0 ? dim : dim - 1 ) as [ number, number ];
+        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions;
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
@@ -353,8 +354,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.vizDimensions[1] = Math.min( storedVizDimensions[1], vizMaxHeight);
             } else {
                 // initialize to defaultVizWidth and vizMaxHeight (and ensure even pixel dimensions)
-                this.vizDimensions = [ defaultVizWidth, vizMaxHeight ]
-                    .map( dim => dim % 2 === 0 ? dim : dim - 1) as [ number, number ];
+                this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
             }
             // for landscape, panelSize is width
             this.vizPanelSize = this.vizDimensions[0] ?? defaultVizWidth;
@@ -368,8 +368,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.vizDimensions[0] = Math.min( storedVizDimensions[0], this.windowDimensions[0]);
             } else {
                 // initialize to window width and defaultVizHeight (and ensure even pixel dimensions)
-                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ]
-                    .map( dim => dim % 2 === 0 ? dim : dim - 1) as [ number, number ];
+                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ];
             }
             // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
             this.vizPanelSize = this.vizDimensions[1] ?
@@ -510,6 +509,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     }
                 }
             });
+            // the video downloade library requires dimensions as even numbers, ensure even numbers
+            this.vizDimensions = this.vizDimensions
+                .map( dimension => dimension % 2 === 0 ? dimension : dimension - 1 ) as [ number, number ];
             this._siteConfigService.updateSiteConfig({ [ConfigLabels.vDimensions]: this.vizDimensions });
         }
     }

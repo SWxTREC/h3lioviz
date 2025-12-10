@@ -1,6 +1,7 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import * as d3 from 'd3';
 import { LaspVideoEncoderService } from 'lasp-video-encoder';
+import { LaspZipDownloaderService } from 'lasp-zip-downloader';
 import { reject } from 'lodash';
 import { QUALITY_HIGH } from 'mediabunny';
 import moment from 'moment';
@@ -49,7 +50,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         private _imageViewerService: ImageViewerService,
         private _laspVideoEncoderService: LaspVideoEncoderService,
         private _plotsService: PlotsService,
-        private _statusService: StatusService
+        private _statusService: StatusService,
+        private _zipDownloader: LaspZipDownloaderService
     ) {
         this.subscriptions.push( this._playingService.playing$.pipe(
             debounceTime(300),
@@ -97,9 +99,11 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                 this.session.subscribe('viewport.image.push.subscription', () => {
                     if ( this.makeImageArray ) {
                         // wait a beat for the image to update in the pvContentElement
-                        setTimeout(() => this.imageArray.push(this.pvContentElement.querySelector('img').src), 0);
-                        // keep track of the timesteps for the images for the file name
-                        this.imageTimesteps.push( this.timeTicks[this.timeIndex] );
+                        setTimeout(() => {
+                            this.imageArray.push(this.pvContentElement.querySelector('img').src);
+                            // keep track of the timesteps for the images for the file name
+                            this.imageTimesteps.push( this.timeTicks[this.timeIndex] );
+                        }, 0);
                     }
                     // keep timeIndex in sync when new image is received
                     this.session.call('pv.time.index.get', []).then( (timeIndex) => {
@@ -221,10 +225,11 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     downloadImages(): void {
         const images: string[] = this.removeDuplicatesFromImageArray( this.imageArray );
+        this.triggerDownload( images );
         // TODO: zip images into a single download
-        images.forEach( ( imageUrl ) => {
-            this.triggerDownload( 'h3lioviz', imageUrl, 'jpg' );
-        });
+        // images.forEach( ( imageUrl ) => {
+        //     this.triggerDownload( 'h3lioviz', imageUrl, 'jpg' );
+        // });
         this.resetImageArray();
     }
 
@@ -233,8 +238,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         const formattedImages = images.map( ( imageUrl, i ) => {
             return { url: imageUrl, timestamp: i * 0.25 }; // 4 frames per second
         });
-        const titleTimeStart = moment.utc( this.imageTimesteps[0] * 1000 ).format('YYYY-MM-DDTHH');
-        const titleTimeEnd = moment.utc( this.imageTimesteps[this.imageTimesteps.length - 1] * 1000 ).format('YYYY-MM-DDTHH');
+        const titleTimeStart = moment.utc( this.imageTimesteps[0] * 1000 ).format('YYYY-MM-DDTHH:mm');
+        const titleTimeEnd = moment.utc( this.imageTimesteps[this.imageTimesteps.length - 1] * 1000 ).format('YYYY-MM-DDTHH:mm');
         this._laspVideoEncoderService.saveImagesAsVideo( () => Promise.resolve(formattedImages), {
             allowChoosingQuality: false,
             videoQuality: QUALITY_HIGH,
@@ -288,8 +293,8 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     removeDuplicatesFromImageArray( imageArray: string[] ): string[] {
-        return reject(this.imageArray, (imageUrl, i) => {
-            return i > 0 && this.imageArray[i - 1] === imageUrl;
+        return reject(imageArray, (imageUrl, i) => {
+            return i > 0 && imageArray[i - 1] === imageUrl;
         });
     }
 
@@ -320,15 +325,48 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.makeImageArray = !this.makeImageArray;
     }
 
-    triggerDownload( plotName: string, imageUrl: string, type: string) {
-        const anchor = document.createElement('a');
-        anchor.href = imageUrl;
-        anchor.download = plotName + '.' + type;
-        anchor.target = '_self';
-        anchor.click();
-        window.URL.revokeObjectURL(imageUrl);
-        anchor.remove();
+    triggerDownload( images: string[] ) {
+    // this.triggerDownload( imageUrl: string, index: number): void {
+        // const anchor = document.createElement('a');
+        // anchor.href = imageUrl;
+        // anchor.download = `h3lioviz-${index}.jpg`;
+        // anchor.target = '_self';
+        // anchor.click();
+        // window.URL.revokeObjectURL(imageUrl);
+        // anchor.remove();
+        const formattedImageFiles = images.map( ( imageUrl, i ) => {
+            return {
+                name: `h3lioviz-${i}.jpg`,
+                url: 'assets/images/blue_orange.png'
+            };
+        });
+        console.log('downloading zip with ', formattedImageFiles);
+        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
     }
+
+    // downloadZip(requests: string[], filename='swx-portal-datasets.zip'): void {
+    //     const zipService = environment.ZIP_SERVICE;
+    //     // create a form
+    //     const form = document.createElement( 'form' );
+    //     form.method = 'post';
+    //     form.action = zipService;
+    //     form.target = '_blank';
+    //     form.style.display = 'none';
+    //     // create an input element for each URL
+    //     requests.forEach( url => {
+    //         const input = form.appendChild( document.createElement('input') );
+    //         input.name = 'url';
+    //         input.value = url;
+    //     });
+    //     // request the server to give a name to the zipped file
+    //     const nameInput = form.appendChild( document.createElement('input') );
+    //     nameInput.name = 'filename';
+    //     nameInput.value = filename;
+    //     // submit the form, then remove it
+    //     document.body.appendChild( form );
+    //     form.submit();
+    //     form.remove();
+    // }
 
     /** find the closest tick value to a given timestamp */
     private _getNearestTick( timestamp: number ): number {
