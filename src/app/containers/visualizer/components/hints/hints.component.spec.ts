@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { MaterialModule } from 'src/app/modules';
+
 import { HintsComponent } from './hints.component';
 
 describe('HintsComponent', () => {
@@ -8,7 +10,9 @@ describe('HintsComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ HintsComponent ]
+            declarations: [ HintsComponent ],
+            imports: [ MaterialModule ]
+
         })
     .compileComponents();
     });
