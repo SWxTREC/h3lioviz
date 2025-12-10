@@ -36,17 +36,26 @@
                 }
             </div>
             <div class="time-player__download-controls">
-                <mat-checkbox laspStopClick [checked]="makeImageArray" (click)="toggleMakeImageArray()">
-                    Save&nbsp;image&nbsp;sequence
-                </mat-checkbox>
-                <mat-icon
-                    [matMenuTriggerFor]="surfaceMenu"
-                    class="time-player__download"
-                    [class.time-player__download--hidden]="imageArray.length === 0"
-                    [class.time-player__download--disabled]="_playingService.playing$ | async"
-                >
-                    download
-                </mat-icon>
+                <div matTooltip="select images for download" class="time-player__download-controls time-player__download-controls--hover" (click)="toggleMakeImageArray()">
+                    @if (makeImageArray) {
+                        <mat-icon class="time-player__record" [class.time-player__record--active]="imageArray.length > 0">circle</mat-icon>
+                        Saving&nbsp;image&nbsp;sequence
+                    } @else {
+                        <mat-icon>adjust</mat-icon>
+                        Save&nbsp;image&nbsp;sequence
+                    }
+                </div>
+                @if (imageArray.length > 0) {
+                    <mat-icon
+                        matTooltip="download selected images"
+                        [matMenuTriggerFor]="surfaceMenu"
+                        class="time-player__download"
+                        [class.time-player__download--hidden]="imageArray.length === 0"
+                        [class.time-player__download--disabled]="_playingService.playing$ | async"
+                    >
+                        download
+                    </mat-icon>
+                }
                 <mat-menu #surfaceMenu="matMenu">
                     <button mat-menu-item (click)="downloadImages()">Download images</button>
                     <button mat-menu-item (click)="downloadMovie()">Download movie</button>

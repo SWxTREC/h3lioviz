@@ -1,4 +1,5 @@
 @import 'src/theme/theme-colors.scss';
+
 @keyframes fade {
   0%,100% { opacity: 0.1 }
   50% { opacity: 1 }
@@ -67,8 +68,21 @@
     &__download-controls {
         display: flex;
         align-items: center;
-        width: 300px;
+        width: 250px;
         gap: 0.5rem;
+        cursor: pointer;
+        &--hover:hover {
+            .mat-icon {
+                color: $color-warn;
+            }
+        }
+    }
+    &__record {
+        color: $color-warn;
+        animation: none;
+        &--active {
+            animation: fade 2s linear infinite;
+        }
     }
     &__slider {
         width: 100%;
@@ -104,7 +118,7 @@
     }
     &__spacer {
         flex-grow: 1;
-        width: 300px;
+        width: 250px;
     }
 }
 // Only have one set of player controls in the app, hide the ones in scicharts

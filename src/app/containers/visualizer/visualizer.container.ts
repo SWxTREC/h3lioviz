@@ -160,9 +160,6 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         } else {
             this.initVizDimensions();
         }
-        // reset runId to null to wait for catalog to load
-        // runId will be set from siteConfig subscription if it exists there, in afterView
-        this.runId$.next( null );
 
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {

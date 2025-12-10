@@ -197,6 +197,12 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    clearImageArray() {
+        this.imageArray = [];
+        this.imageTimesteps = [];
+        this.makeImageArray = false;
+    }
+
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
     findNearestValue( target: number, sortedList: number[] ): number {
         if ( target < sortedList[0] ) {
@@ -225,12 +231,18 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     downloadImages(): void {
         const images: string[] = this.removeDuplicatesFromImageArray( this.imageArray );
-        this.triggerDownload( images );
-        // TODO: zip images into a single download
-        // images.forEach( ( imageUrl ) => {
-        //     this.triggerDownload( 'h3lioviz', imageUrl, 'jpg' );
-        // });
-        this.resetImageArray();
+        this.downloadZip( images );
+        this.clearImageArray();
+    }
+
+    downloadZip( images: string[] ) {
+        const formattedImageFiles = images.map( ( imageUrl, i ) => {
+            return {
+                name: `h3lioviz-${i}.jpg`,
+                url: imageUrl
+            };
+        });
+        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
     }
 
     downloadMovie(): void {
@@ -245,7 +257,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             videoQuality: QUALITY_HIGH,
             outputFilename: `h3lioviz-${titleTimeStart}-${titleTimeEnd}.mp4`
         } );
-        this.resetImageArray();
+        this.clearImageArray();
     }
 
     hoverTimeline( event: MouseEvent ) {
@@ -298,12 +310,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         });
     }
 
-    resetImageArray() {
-        this.imageArray = [];
-        this.imageTimesteps = [];
-        this.makeImageArray = false;
-    }
-
     setTimeIndex( newIndex: number ) {
         // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
@@ -324,49 +330,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.imageTimesteps = [];
         this.makeImageArray = !this.makeImageArray;
     }
-
-    triggerDownload( images: string[] ) {
-    // this.triggerDownload( imageUrl: string, index: number): void {
-        // const anchor = document.createElement('a');
-        // anchor.href = imageUrl;
-        // anchor.download = `h3lioviz-${index}.jpg`;
-        // anchor.target = '_self';
-        // anchor.click();
-        // window.URL.revokeObjectURL(imageUrl);
-        // anchor.remove();
-        const formattedImageFiles = images.map( ( imageUrl, i ) => {
-            return {
-                name: `h3lioviz-${i}.jpg`,
-                url: 'assets/images/blue_orange.png'
-            };
-        });
-        console.log('downloading zip with ', formattedImageFiles);
-        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
-    }
-
-    // downloadZip(requests: string[], filename='swx-portal-datasets.zip'): void {
-    //     const zipService = environment.ZIP_SERVICE;
-    //     // create a form
-    //     const form = document.createElement( 'form' );
-    //     form.method = 'post';
-    //     form.action = zipService;
-    //     form.target = '_blank';
-    //     form.style.display = 'none';
-    //     // create an input element for each URL
-    //     requests.forEach( url => {
-    //         const input = form.appendChild( document.createElement('input') );
-    //         input.name = 'url';
-    //         input.value = url;
-    //     });
-    //     // request the server to give a name to the zipped file
-    //     const nameInput = form.appendChild( document.createElement('input') );
-    //     nameInput.name = 'filename';
-    //     nameInput.value = filename;
-    //     // submit the form, then remove it
-    //     document.body.appendChild( form );
-    //     form.submit();
-    //     form.remove();
-    // }
 
     /** find the closest tick value to a given timestamp */
     private _getNearestTick( timestamp: number ): number {
