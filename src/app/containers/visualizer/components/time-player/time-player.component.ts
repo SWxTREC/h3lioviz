@@ -100,6 +100,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                     if ( this.makeImageArray ) {
                         // wait a beat for the image to update in the pvContentElement
                         setTimeout(() => {
+                            // get the blob url from the img src in the pvContentElement
                             this.imageArray.push(this.pvContentElement.querySelector('img').src);
                             // keep track of the timesteps for the images for the file name
                             this.imageTimesteps.push( this.timeTicks[this.timeIndex] );
@@ -304,6 +305,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }
     }
 
+    /** remove sequential duplicate images from the array, i.e., reject if duplicate of previous image */
     removeDuplicatesFromImageArray( imageArray: string[] ): string[] {
         return reject(imageArray, (imageUrl, i) => {
             return i > 0 && imageArray[i - 1] === imageUrl;

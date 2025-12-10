@@ -350,7 +350,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // ensure new height is not greater than vizMaxHeight for this window
                 this.vizDimensions[1] = Math.min( storedVizDimensions[1], vizMaxHeight);
             } else {
-                // initialize to defaultVizWidth and vizMaxHeight (and ensure even pixel dimensions)
+                // initialize to defaultVizWidth and vizMaxHeight
                 this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
             }
             // for landscape, panelSize is width
@@ -364,7 +364,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // ensure new width is not greater than maxWidth for this window
                 this.vizDimensions[0] = Math.min( storedVizDimensions[0], this.windowDimensions[0]);
             } else {
-                // initialize to window width and defaultVizHeight (and ensure even pixel dimensions)
+                // initialize to window width and defaultVizHeight
                 this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ];
             }
             // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
@@ -382,6 +382,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // get current plotConfig
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
         // wait a beat in case the catalog is just arriving
+        // TODO: this seems to help the issue where a runId is selected before the catalog is ready, but it doesn't fix it completely
         setTimeout(() => {
             this.runTitle = this._catalogService.runTitles[this.runId$.value];
             this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
@@ -506,7 +507,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     }
                 }
             });
-            // the video downloade library requires dimensions as even numbers, ensure even numbers
+            // the video download library requires dimensions as even numbers, ensure even numbers
             this.vizDimensions = this.vizDimensions
                 .map( dimension => dimension % 2 === 0 ? dimension : dimension - 1 ) as [ number, number ];
             this._siteConfigService.updateSiteConfig({ [ConfigLabels.vDimensions]: this.vizDimensions });
