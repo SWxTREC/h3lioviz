@@ -98,7 +98,13 @@
                     </div>
                 </div>
                 @if (timeTicks?.length && (runId$ | async)) {
-                    <swt-time-player [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+                    <swt-time-player
+                        [pvView]="pvView"
+                        [timeIndex]="timeIndex"
+                        [timeTicks]="timeTicks"
+                        (updateTime)="setTimestep($event)"
+                        [pvContentElement]="pvContent">
+                    </swt-time-player>
                 }
             </as-split-area>
             @if (openPlots || splitDirection === 'vertical' ) {

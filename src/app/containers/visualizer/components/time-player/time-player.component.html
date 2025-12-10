@@ -2,7 +2,7 @@
     <div>{{  timeTicks[timeIndex] | amFromUnix | amUtc | amDateFormat: 'YYYY-MM-DD HH:00 UTC' }}</div>
     <mat-slider
         class="time-player__slider"
-        [class.time-player__slider--pulsing]="this._playingService.playing$ | async"
+        [class.time-player__slider--pulsing]="_playingService.playing$ | async"
         color="primary"
         [min]="0"
         [max]="timeTicks.length - 1"
@@ -26,11 +26,31 @@
             {{ timeTicks[timeTicks.length - 1] | amFromUnix | amUtc  |  amDateFormat: 'YYYY-MM-DD HH:00'}}
         </div>
     </div>
-    <div class="time-player__controls" [class.time-player__controls--disabled]="timeIndex === timeTicks.length - 1" (click)="togglePlay()">
-        @if (this._playingService.playing$ | async) {
-            <mat-icon>pause</mat-icon>
-        } @else {
-            <mat-icon>play_arrow</mat-icon>
-        }
+    <div class="time-player__controls">
+            <div class="time-player__spacer"></div>
+            <div class="time-player__action" [class.time-player__action--disabled]="timeIndex === timeTicks.length - 1" (click)="togglePlay()">
+                @if (_playingService.playing$ | async) {
+                    <mat-icon>pause</mat-icon>
+                } @else {
+                    <mat-icon>play_arrow</mat-icon>
+                }
+            </div>
+            <div class="time-player__download-controls">
+                <mat-checkbox laspStopClick [checked]="makeImageArray" (click)="toggleMakeImageArray()">
+                    Save&nbsp;image&nbsp;sequence
+                </mat-checkbox>
+                <mat-icon
+                    [matMenuTriggerFor]="surfaceMenu"
+                    class="time-player__download"
+                    [class.time-player__download--hidden]="imageArray.length === 0"
+                    [class.time-player__download--disabled]="_playingService.playing$ | async"
+                >
+                    download
+                </mat-icon>
+                <mat-menu #surfaceMenu="matMenu">
+                    <button mat-menu-item (click)="downloadImages()">Download images</button>
+                    <button mat-menu-item (click)="downloadMovie()">Download movie</button>
+                </mat-menu>
+            </div>
     </div>
 </div>

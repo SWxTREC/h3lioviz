@@ -14,8 +14,9 @@
     text-align: center;
     padding: 0.3rem 1rem;
     line-height: 1;
-    &__controls {
+    &__action {
         line-height: 0;
+        width: 100%;
         mat-icon {
             font-size: 40px;
             height: 40px;
@@ -25,6 +26,14 @@
             opacity: 0.3;
             pointer-events: none;
         }
+    }
+    &__controls {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        line-height: 1;
     }
     &__crosshair {
         position: absolute;
@@ -44,6 +53,22 @@
         transform: translateX(-50%);
         padding: 0.1rem 0.2rem;
         border-radius: 5%;
+    }
+    &__download {
+        visibility: visible;
+        &--hidden {
+            visibility: hidden;
+        }
+        &--disabled {
+            color: transparentize(black, 0.7);
+            pointer-events: none;
+        }
+    }
+    &__download-controls {
+        display: flex;
+        align-items: center;
+        width: 300px;
+        gap: 0.5rem;
     }
     &__slider {
         width: 100%;
@@ -76,6 +101,10 @@
         position: relative;
         top: -2.3rem;
         width: 100%;
+    }
+    &__spacer {
+        flex-grow: 1;
+        width: 300px;
     }
 }
 // Only have one set of player controls in the app, hide the ones in scicharts

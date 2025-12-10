@@ -376,13 +376,15 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: runId });
         // get current plotConfig
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
-
-        this.runTitle = this._catalogService.runTitles[this.runId$.value];
-        this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
-        this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
-        if ( this.hasCmeMetadata ) {
-            this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
-        }
+        // wait a beat in case the catalog is just arriving
+        setTimeout(() => {
+            this.runTitle = this._catalogService.runTitles[this.runId$.value];
+            this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
+            this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+            if ( this.hasCmeMetadata ) {
+                this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+            }
+        }, 0);
 
         // check for a stored time index for this runId
         const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
