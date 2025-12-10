@@ -336,7 +336,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         // height of window whether landscape or portrait
         this.componentMaxHeight = this.windowDimensions[1] - headerFooterHeight;
         // this can change if window is resized, so get from source
-        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions;
+        const storedVizDimensions: [ number, number ] = this._siteConfigService.getSiteConfig().vDimensions
+            // the library that makes the movies insists on even numbered pixel dimensions
+            .map( dim => dim % 2 === 0 ? dim : dim - 1 ) as [ number, number ];
         // set splitDirection and dimensions
         if ( landscapeWindow ) {
             this.splitDirection = 'horizontal';
@@ -350,8 +352,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // ensure new height is not greater than vizMaxHeight for this window
                 this.vizDimensions[1] = Math.min( storedVizDimensions[1], vizMaxHeight);
             } else {
-                // initialize to defaultVizWidth and vizMaxHeight
-                this.vizDimensions = [ defaultVizWidth, vizMaxHeight ];
+                // initialize to defaultVizWidth and vizMaxHeight (and ensure even pixel dimensions)
+                this.vizDimensions = [ defaultVizWidth, vizMaxHeight ]
+                    .map( dim => dim % 2 === 0 ? dim : dim - 1) as [ number, number ];
             }
             // for landscape, panelSize is width
             this.vizPanelSize = this.vizDimensions[0] ?? defaultVizWidth;
@@ -364,8 +367,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 // ensure new width is not greater than maxWidth for this window
                 this.vizDimensions[0] = Math.min( storedVizDimensions[0], this.windowDimensions[0]);
             } else {
-                // initialize to window width and defaultVizHeight
-                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ];
+                // initialize to window width and defaultVizHeight (and ensure even pixel dimensions)
+                this.vizDimensions = [ this.windowDimensions[0], defaultVizHeight ]
+                    .map( dim => dim % 2 === 0 ? dim : dim - 1) as [ number, number ];
             }
             // for portrait, vizPanelSize is height plus attached accessories: player and toolbar
             this.vizPanelSize = this.vizDimensions[1] ?
