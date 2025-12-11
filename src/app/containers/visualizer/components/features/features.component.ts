@@ -99,6 +99,7 @@ export class FeaturesComponent implements OnChanges, OnDestroy, OnInit {
             } else if (typeof controlStates[ controlName ] === 'boolean') {
                 const name = snakeCase( controlName );
                 const state = controlStates[ controlName ] === true ? 'on' : 'off';
+                console.log('updating feature', controlName, 'to', controlStates[ controlName ]);
                 this.session.call( 'pv.h3lioviz.visibility', [ name, state ] );
             }
         });
