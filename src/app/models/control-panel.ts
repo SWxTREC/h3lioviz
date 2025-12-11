@@ -185,6 +185,7 @@ export const DEFAULT_CONTOUR_RANGES: { [parameter: string]: [ number, number ] }
     }, {});
 
 export interface ILayers {
+    colorBar: boolean;
     latSlice: boolean;
     lonSlice: boolean;
     lonSliceType: 'solar-equator' | 'ecliptic';
@@ -205,10 +206,12 @@ export const SLICES = [
 export const FEATURES = [
     'lonStreamlines',
     'satellites',
-    'satFieldlines'
+    'satFieldlines',
+    'colorBar'
 ];
 
 export const LAYER_FORM_DEFAULT_VALUES: ILayers = {
+    colorBar: false,
     latSlice: true,
     lonSlice: true,
     lonSliceType: 'ecliptic',
