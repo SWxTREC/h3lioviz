@@ -25,7 +25,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://paraview-web.noaa-demo.swx-trec.com/h3lioviz/paraview/'
+    sessionManagerURL: 'https://dev-01-alb-h3lioviz-swpc.woc.noaa.gov/h3lioviz/paraview/'
 };
 
 // these need to be in file, but are not used for 'production' builds
