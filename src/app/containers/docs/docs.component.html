@@ -1,29 +1,30 @@
 <mat-card class="documentation">
-    <mat-card-header>
-        <mat-card-title>Next Generation 3D Solar Wind Interactive Data Visualizations</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <p>This website is part of an initial deployment and proof of concept to: </p>
-        <ul>
-            <li>develop an initial application to enable full 3D visualization of solar wind model output</li>
-            <li>deploy and run the solar wind models in the SWx TREC Cloud-based computing environment alongside the visualization tool</li>
-            <li>bring about effective collaborative use in forecasting offices</li>
-        </ul>
-
-        <p>Further features and enhancements to come. Learn more and get in touch via the <a target="_blank" [href]="moreInfoHref">SWx TREC site</a>.</p>
-
-        <h2>Keyboad tips for panning</h2>
-        <dl>
-            @for (shortcut of keyboardShortcuts; track shortcut) {
-                <dt>{{shortcut.action}}</dt>
-                <dd>{{shortcut.instruction}}</dd>
-            }
-        </dl>
-        <markdown [src]="'assets/markdown/DOCUMENTATION.md'"></markdown>
+    <mat-card-content class="documentation__changelog">
+        <button mat-raised-button color="primary" routerLink="changelog">View Changelog</button>
     </mat-card-content>
 </mat-card>
 <mat-card class="documentation">
+    <mat-card-header>
+        <mat-card-title>
+            <h1>H3lioViz (pronounced like "helio-viz")</h1></mat-card-title>
+    </mat-card-header>
     <mat-card-content>
-        <button mat-raised-button color="primary" routerLink="changelog">View Changelog</button>
+        <markdown [src]="'https://raw.githubusercontent.com/SWxTREC/documentation/refs/heads/main/h3lioviz/model.md'"></markdown>
+    </mat-card-content>
+</mat-card>
+<mat-card class="documentation">
+    <mat-card-header>
+        <mat-card-title>Keyboard tips</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <dl>
+            @for (shortcut of keyboardShortcuts; track shortcut) {
+                <div class="documentation__shortcut">
+                    <mat-icon aria-hidden="false" aria-label="Keyboard icon">{{shortcut.icon}}</mat-icon>
+                    <dt>{{shortcut.action}}</dt>
+                </div>
+                <dd>{{shortcut.instruction}}</dd>
+            }
+        </dl>
     </mat-card-content>
 </mat-card>
