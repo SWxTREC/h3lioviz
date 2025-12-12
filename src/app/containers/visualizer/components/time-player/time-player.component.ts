@@ -99,9 +99,18 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
                 this.session.subscribe('viewport.image.push.subscription', () => {
                     if ( this.makeImageArray ) {
                         // wait a beat for the image to update in the pvContentElement
-                        setTimeout(() => {
+                        setTimeout(async() => {
                             // get the blob url from the img src in the pvContentElement
-                            this.imageArray.push(this.pvContentElement.querySelector('img').src);
+                            const imgSrc = this.pvContentElement.querySelector('img').src;
+                            // Fetch and store the image binary
+                            try {
+                                const result = await fetch(imgSrc);
+                                const blob = await result.blob();
+                                const blobUrl = URL.createObjectURL(blob);
+                                this.imageArray.push(blobUrl);
+                            } catch (error) {
+                                console.error('Error fetching image binary:', error);
+                            }
                             // keep track of the timesteps for the images for the file name
                             this.imageTimesteps.push( this.timeTicks[this.timeIndex] );
                         }, 0);
