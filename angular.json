@@ -48,6 +48,11 @@
                 "glob": "**/*",
                 "input": "node_modules/scicharts/assets",
                 "output": "assets/chart"
+              },
+              {
+                "glob": "@(mitm.html|sw.js)",
+                "input": "./node_modules/streamsaver/",
+                "output": "./assets/lasp-zip-downloader/"
               }
             ],
             "styles": [

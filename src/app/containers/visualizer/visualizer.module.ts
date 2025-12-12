@@ -5,6 +5,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
 import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
 import { LaspEnhancedSelectModule } from 'lasp-enhanced-select';
+import { LaspVideoEncoderModule, LaspVideoEncoderService } from 'lasp-video-encoder';
+import { LaspZipDownloaderService } from 'lasp-zip-downloader';
 import { MomentModule } from 'ngx-moment';
 import { ChartModule } from 'scicharts';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
@@ -35,6 +37,7 @@ import { VisualizerComponent } from './visualizer.container';
         FormsModule,
         LaspEnhancedNgxSliderModule,
         LaspEnhancedSelectModule,
+        LaspVideoEncoderModule,
         MaterialModule,
         MomentModule,
         AngularSplitModule,
@@ -57,6 +60,10 @@ import { VisualizerComponent } from './visualizer.container';
         RunSelectorDialogComponent,
         TimePlayerComponent,
         VisualizerComponent
+    ],
+    providers: [
+        LaspVideoEncoderService,
+        LaspZipDownloaderService
     ]
 })
 export class VisualizerModule { }

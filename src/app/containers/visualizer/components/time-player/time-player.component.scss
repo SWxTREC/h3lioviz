@@ -1,4 +1,9 @@
 @import 'src/theme/theme-colors.scss';
+
+$download-text-width: 220px;
+$icon-width: 50px;
+
+
 @keyframes fade {
   0%,100% { opacity: 0.1 }
   50% { opacity: 1 }
@@ -14,8 +19,9 @@
     text-align: center;
     padding: 0.3rem 1rem;
     line-height: 1;
-    &__controls {
+    &__action {
         line-height: 0;
+        width: 100%;
         mat-icon {
             font-size: 40px;
             height: 40px;
@@ -25,6 +31,14 @@
             opacity: 0.3;
             pointer-events: none;
         }
+    }
+    &__controls {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        line-height: 1;
     }
     &__crosshair {
         position: absolute;
@@ -44,6 +58,40 @@
         transform: translateX(-50%);
         padding: 0.1rem 0.2rem;
         border-radius: 5%;
+    }
+    &__download-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        visibility: visible;
+        &--hidden {
+            visibility: hidden;
+        }
+        &--hover{
+            &:hover{
+                .mat-icon {
+                    color: $color-warn;
+                }
+            }
+        }
+        &--icon {
+            width: $icon-width;
+            margin-right: 1rem;
+        }
+        &--small {
+            gap: 0;
+        }
+        &--text {
+            width: $download-text-width;
+        }
+    }
+    &__record {
+        color: $color-warn;
+        animation: none;
+        &--active {
+            animation: fade 2s linear infinite;
+        }
     }
     &__slider {
         width: 100%;
@@ -76,6 +124,10 @@
         position: relative;
         top: -2.3rem;
         width: 100%;
+    }
+    &__spacer {
+        flex-grow: 1;
+        margin-left: calc(#{$download-text-width} + #{$icon-width} + 1rem);
     }
 }
 // Only have one set of player controls in the app, hide the ones in scicharts

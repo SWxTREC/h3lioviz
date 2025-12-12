@@ -1,5 +1,10 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import * as d3 from 'd3';
+import { LaspVideoEncoderService } from 'lasp-video-encoder';
+import { LaspZipDownloaderService } from 'lasp-zip-downloader';
+import { reject } from 'lodash';
+import { QUALITY_HIGH } from 'mediabunny';
+import moment from 'moment';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, throttleTime } from 'rxjs/operators';
 import { ImageViewerService, IPlot, PlotsService, StatusService } from 'scicharts';
@@ -11,6 +16,7 @@ import { PlayingService } from 'src/app/services';
     styleUrls: [ './time-player.component.scss' ]
 })
 export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy {
+    @Input() pvContentElement: HTMLDivElement;
     @Input() pvView: any;
     @Input() timeIndex: number;
     @Input() timeTicks: number[];
@@ -19,6 +25,9 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     crosshairPositionPercent: number;
     hoveredTime: number;
     hasImageDatasets: boolean;
+    imageArray: string[] = [];
+    imageTimesteps: number[] = [];
+    makeImageArray = false;
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
     // since crosshairs are synced, only one plotId is needed
     plotId: string;
@@ -39,8 +48,10 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     constructor(
         protected _playingService: PlayingService,
         private _imageViewerService: ImageViewerService,
+        private _laspVideoEncoderService: LaspVideoEncoderService,
         private _plotsService: PlotsService,
-        private _statusService: StatusService
+        private _statusService: StatusService,
+        private _zipDownloader: LaspZipDownloaderService
     ) {
         this.subscriptions.push( this._playingService.playing$.pipe(
             debounceTime(300),
@@ -86,6 +97,24 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             this.subscriptions.push(
                 // subscribe to image push events, triggered when a new image is received from paraview
                 this.session.subscribe('viewport.image.push.subscription', () => {
+                    if ( this.makeImageArray ) {
+                        // wait a beat for the image to update in the pvContentElement
+                        setTimeout(async() => {
+                            // get the blob url from the img src in the pvContentElement
+                            const imgSrc = this.pvContentElement.querySelector('img').src;
+                            // Fetch and store the image binary
+                            try {
+                                const result = await fetch(imgSrc);
+                                const blob = await result.blob();
+                                const blobUrl = URL.createObjectURL(blob);
+                                this.imageArray.push(blobUrl);
+                            } catch (error) {
+                                console.error('Error fetching image binary:', error);
+                            }
+                            // keep track of the timesteps for the images for the file name
+                            this.imageTimesteps.push( this.timeTicks[this.timeIndex] );
+                        }, 0);
+                    }
                     // keep timeIndex in sync when new image is received
                     this.session.call('pv.time.index.get', []).then( (timeIndex) => {
                         // stop playing if end of time is reached
@@ -178,6 +207,12 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.subscriptions.forEach( subscription => subscription.unsubscribe() );
     }
 
+    clearImageArray() {
+        this.imageArray = [];
+        this.imageTimesteps = [];
+        this.makeImageArray = false;
+    }
+
     /** using a binary search, find the closest value to the target of a pre-sorted list (code borrowed from scicharts) */
     findNearestValue( target: number, sortedList: number[] ): number {
         if ( target < sortedList[0] ) {
@@ -202,6 +237,37 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             }
         }
         return ( sortedList[ low ] - target ) < ( target - sortedList[ high ] ) ? sortedList[ low ] : sortedList[ high ];
+    }
+
+    downloadImages(): void {
+        const images: string[] = this.removeDuplicatesFromImageArray( this.imageArray );
+        this.downloadZip( images );
+        this.clearImageArray();
+    }
+
+    downloadMovie(): void {
+        const images: string[] = this.removeDuplicatesFromImageArray( this.imageArray );
+        const formattedImages = images.map( ( imageUrl, i ) => {
+            return { url: imageUrl, timestamp: i * 0.25 }; // 4 frames per second
+        });
+        const titleTimeStart = moment.utc( this.imageTimesteps[0] * 1000 ).format('YYYY-MM-DDTHH:mm');
+        const titleTimeEnd = moment.utc( this.imageTimesteps[this.imageTimesteps.length - 1] * 1000 ).format('YYYY-MM-DDTHH:mm');
+        this._laspVideoEncoderService.saveImagesAsVideo( () => Promise.resolve(formattedImages), {
+            allowChoosingQuality: false,
+            videoQuality: QUALITY_HIGH,
+            outputFilename: `h3lioviz-${titleTimeStart}-${titleTimeEnd}.mp4`
+        } );
+        this.clearImageArray();
+    }
+
+    downloadZip( images: string[] ) {
+        const formattedImageFiles = images.map( ( imageUrl, i ) => {
+            return {
+                name: `h3lioviz-${i}.jpg`,
+                url: imageUrl
+            };
+        });
+        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
     }
 
     hoverTimeline( event: MouseEvent ) {
@@ -248,6 +314,13 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }
     }
 
+    /** remove sequential duplicate images from the array, i.e., reject if duplicate of previous image */
+    removeDuplicatesFromImageArray( imageArray: string[] ): string[] {
+        return reject(imageArray, (imageUrl, i) => {
+            return i > 0 && imageArray[i - 1] === imageUrl;
+        });
+    }
+
     setTimeIndex( newIndex: number ) {
         // setting the index will drive the image-push subscription
         this.session.call('pv.time.index.set', [ newIndex ]);
@@ -255,6 +328,19 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this._xTimestampSubject.next(timestamp);
         if ( this.hasImageDatasets ) {
             this._imageViewerService.updateTimeSync({ timestamp: timestamp * 1000 });
+        }
+    }
+
+    stopImageCapture() {
+        this.makeImageArray = false;
+        this._playingService.playing$.next(false);
+    }
+
+    startImageCapture() {
+        this.makeImageArray = !this.makeImageArray;
+        if ( this.makeImageArray === true ) {
+            this.imageArray = [];
+            this.imageTimesteps = [];
         }
     }
 

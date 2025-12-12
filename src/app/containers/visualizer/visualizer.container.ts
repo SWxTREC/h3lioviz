@@ -166,7 +166,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.catalog = catalog;
                 // if waiting for aws server, open the dialog so the user has something to do
                 setTimeout(() => {
-                    if ( (this.catalog && !this.runId$.value) ||
+                    if ( (this.catalog && !this.runId$.value ) ||
                         (this.catalog && !this.pvServerStarted) ) {
                         this.openDialog();
                     } else {
@@ -308,6 +308,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             }
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
+            // after everything is loaded, trigger equatorial slice snapping if applicable
+            if ( this.siteConfig[ ConfigLabels.layers]?.lonSliceType ) {
+                const lonSliceType = this.siteConfig[ ConfigLabels.layers ].lonSliceType;
+                this.pvView?.get().session.call('pv.h3lioviz.snap_solar_plane', [ lonSliceType ]);
+            }
         });
     }
 
@@ -376,13 +381,16 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: runId });
         // get current plotConfig
         this.plotConfig = this._siteConfigService.getSiteConfig()[ ConfigLabels.plots ];
-
-        this.runTitle = this._catalogService.runTitles[this.runId$.value];
-        this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
-        this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
-        if ( this.hasCmeMetadata ) {
-            this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
-        }
+        // wait a beat in case the catalog is just arriving
+        // TODO: this seems to help the issue where a runId is selected before the catalog is ready, but it doesn't fix it completely
+        setTimeout(() => {
+            this.runTitle = this._catalogService.runTitles[this.runId$.value];
+            this.selectedRunMetadata = this.catalog.find( run => run['run_id'] === runId);
+            this.hasCmeMetadata = this.selectedRunMetadata && !!this.selectedRunMetadata.cme_time;
+            if ( this.hasCmeMetadata ) {
+                this._cmeMetadata = this._catalogService.formatCmeMetadataForHtml( this.selectedRunMetadata );
+            }
+        }, 0);
 
         // check for a stored time index for this runId
         const timeIndexMap = this._siteConfigService.getSiteConfig()[ ConfigLabels.timeIndexMap ];
@@ -499,6 +507,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                     }
                 }
             });
+            // the video download library requires dimensions as even numbers, ensure even numbers
+            this.vizDimensions = this.vizDimensions
+                .map( dimension => dimension % 2 === 0 ? dimension : dimension - 1 ) as [ number, number ];
             this._siteConfigService.updateSiteConfig({ [ConfigLabels.vDimensions]: this.vizDimensions });
         }
     }

@@ -62,7 +62,7 @@
                                 <div class="viz__cme-metadata">
                                     @if ( hasCmeMetadata && !loading) {
                                         <div>
-                                            <strong>CME time:</strong> {{ _cmeMetadata.time }}
+                                            <strong>Time at 21.5Rs:</strong> {{ _cmeMetadata.time }}
                                         </div>
                                         <div>
                                             <strong>Cone half angle:</strong> {{ _cmeMetadata.coneHalfAngle }}
@@ -98,7 +98,13 @@
                     </div>
                 </div>
                 @if (timeTicks?.length && (runId$ | async)) {
-                    <swt-time-player [pvView]="pvView" [timeIndex]="timeIndex" [timeTicks]="timeTicks" (updateTime)="setTimestep($event)"></swt-time-player>
+                    <swt-time-player
+                        [pvView]="pvView"
+                        [timeIndex]="timeIndex"
+                        [timeTicks]="timeTicks"
+                        (updateTime)="setTimestep($event)"
+                        [pvContentElement]="pvContent">
+                    </swt-time-player>
                 }
             </as-split-area>
             @if (openPlots || splitDirection === 'vertical' ) {
