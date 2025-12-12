@@ -1,5 +1,9 @@
 @import 'src/theme/theme-colors.scss';
 
+$download-text-width: 220px;
+$icon-width: 50px;
+
+
 @keyframes fade {
   0%,100% { opacity: 0.1 }
   50% { opacity: 1 }
@@ -55,26 +59,31 @@
         padding: 0.1rem 0.2rem;
         border-radius: 5%;
     }
-    &__download {
+    &__download-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
         visibility: visible;
         &--hidden {
             visibility: hidden;
         }
-        &--disabled {
-            color: transparentize(black, 0.7);
-            pointer-events: none;
-        }
-    }
-    &__download-controls {
-        display: flex;
-        align-items: center;
-        width: 250px;
-        gap: 0.5rem;
-        cursor: pointer;
-        &--hover:hover {
-            .mat-icon {
-                color: $color-warn;
+        &--hover{
+            &:hover{
+                .mat-icon {
+                    color: $color-warn;
+                }
             }
+        }
+        &--icon {
+            width: $icon-width;
+            margin-right: 1rem;
+        }
+        &--small {
+            gap: 0;
+        }
+        &--text {
+            width: $download-text-width;
         }
     }
     &__record {
@@ -118,7 +127,7 @@
     }
     &__spacer {
         flex-grow: 1;
-        width: 250px;
+        margin-left: calc(#{$download-text-width} + #{$icon-width} + 1rem);
     }
 }
 // Only have one set of player controls in the app, hide the ones in scicharts

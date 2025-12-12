@@ -236,16 +236,6 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.clearImageArray();
     }
 
-    downloadZip( images: string[] ) {
-        const formattedImageFiles = images.map( ( imageUrl, i ) => {
-            return {
-                name: `h3lioviz-${i}.jpg`,
-                url: imageUrl
-            };
-        });
-        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
-    }
-
     downloadMovie(): void {
         const images: string[] = this.removeDuplicatesFromImageArray( this.imageArray );
         const formattedImages = images.map( ( imageUrl, i ) => {
@@ -259,6 +249,16 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
             outputFilename: `h3lioviz-${titleTimeStart}-${titleTimeEnd}.mp4`
         } );
         this.clearImageArray();
+    }
+
+    downloadZip( images: string[] ) {
+        const formattedImageFiles = images.map( ( imageUrl, i ) => {
+            return {
+                name: `h3lioviz-${i}.jpg`,
+                url: imageUrl
+            };
+        });
+        this._zipDownloader.downloadFiles( `h3lioviz-images-${formattedImageFiles.length}-frames.zip`, formattedImageFiles );
     }
 
     hoverTimeline( event: MouseEvent ) {
@@ -322,15 +322,14 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }
     }
 
+    stopCapturingImages() {
+        this.makeImageArray = false;
+        this._playingService.playing$.next(false);
+    }
+
     togglePlay() {
         const playingStatus = this._playingService.playing$.value;
         this._playingService.playing$.next(!playingStatus);
-    }
-
-    toggleMakeImageArray() {
-        this.imageArray = [];
-        this.imageTimesteps = [];
-        this.makeImageArray = !this.makeImageArray;
     }
 
     /** find the closest tick value to a given timestamp */
