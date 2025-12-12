@@ -322,9 +322,17 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         }
     }
 
-    stopCapturingImages() {
+    stopImageCapture() {
         this.makeImageArray = false;
         this._playingService.playing$.next(false);
+    }
+
+    startImageCapture() {
+        this.makeImageArray = !this.makeImageArray;
+        if ( this.makeImageArray === true ) {
+            this.imageArray = [];
+            this.imageTimesteps = [];
+        }
     }
 
     togglePlay() {

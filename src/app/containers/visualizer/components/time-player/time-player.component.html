@@ -41,7 +41,7 @@
                     class="time-player__download-control
                     time-player__download-control--hover
                     time-player__download-control--text"
-                    (click)="makeImageArray = !makeImageArray"
+                    (click)="startImageCapture()"
                 >
                     @if (makeImageArray) {
                         <mat-icon class="time-player__record" [class.time-player__record--active]="makeImageArray">circle</mat-icon>
@@ -56,7 +56,7 @@
                         <div
                             class="time-player__download-control time-player__download-control--small"
                             matTooltip="Stop recording images"
-                            (click)="stopCapturingImages()">
+                            (click)="stopImageCapture()">
                             <mat-icon
                             >stop</mat-icon>
                             stop
