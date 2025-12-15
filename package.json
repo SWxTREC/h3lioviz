@@ -1,6 +1,6 @@
 {
   "name": "h3lioviz",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "scripts": {
     "changelog": "auto-changelog",
     "ng": "ng",
