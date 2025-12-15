@@ -127,7 +127,7 @@
       "dev"
     ],
     "output": "src/assets/markdown/CHANGELOG.md",
-    "startingVersion": "2.0.2",
+    "startingVersion": "2.1.0",
     "template": "changelog-template.hbs",
     "unreleased": false
   }

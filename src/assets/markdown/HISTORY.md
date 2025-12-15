@@ -1,3 +1,14 @@
+### Added
+- Ability to export image and mp4 files
+- Save camera settings in the URL
+- Toggle colorbar visbility
+
+### Changed
+- Documentation
+- Colorbar legend defaults to off
+
+##  v2.1.0
+
 ### Fixed
 - Changelog headings
 
