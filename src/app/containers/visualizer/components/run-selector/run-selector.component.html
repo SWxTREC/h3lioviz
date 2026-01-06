@@ -1,5 +1,5 @@
 <div class="selector-table__container">
-    <table class="selector-table__table"  mat-table recycleRows [dataSource]="tableData" matSort multiTemplateDataRows>
+    <table mat-table recycleRows [dataSource]="tableData" matSort multiTemplateDataRows>
         @for (column of displayedColumns; track column) {
             <ng-container [matColumnDef]="column">
                 @if (column !== 'more') {

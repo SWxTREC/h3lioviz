@@ -35,7 +35,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     tableData: MatTableDataSource<IModelMetadata>;
 
     ngOnChanges(changes: SimpleChanges) {
-        if ( changes['catalog'] && this.catalog?.length ) {
+        if ( changes.catalog && this.catalog?.length ) {
             this.initDataSource();
         }
     }
