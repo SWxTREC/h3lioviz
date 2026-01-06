@@ -1,6 +1,7 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { IModelMetadata } from 'src/app/models';
@@ -16,8 +17,9 @@ import { IModelMetadata } from 'src/app/models';
             transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
         ])
     ] })
-export class RunSelectorComponent implements AfterViewInit, OnInit {
+export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
 
     @Input() catalog: IModelMetadata[];
     @Input() selectedRun: IModelMetadata;
@@ -27,16 +29,16 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
     headers: { [ parameter: string ]: string };
     allMetadata: string[];
     selection = new SelectionModel<IModelMetadata>(false, []);
-    tableData: any;
+    tableData: MatTableDataSource<IModelMetadata>;
+
+    ngOnChanges(changes: SimpleChanges) {
+        if ( changes['catalog'] && this.catalog?.length ) {
+            this.initDataSource();
+        }
+    }
 
     ngOnInit() {
-        if ( this.selectedRun ) {
-            const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
-            this.selection.select( selectedRun );
-        }
-
-        this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
-        this.allMetadata = Object.keys(this.catalog[0]).sort();
+        this.initDataSource();
         this.headers = {
             program: 'Model',
             institute: 'Institute',
@@ -73,6 +75,26 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
 
     ngAfterViewInit() {
         this.tableData.sort = this.sort;
+        this.tableData.paginator = this.paginator;
+    }
+
+    initDataSource() {
+        if ( this.selectedRun ) {
+            const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
+            if ( selectedRun ) {
+                this.selection.select( selectedRun );
+            }
+        }
+
+        this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
+        if ( this.sort ) {
+            this.tableData.sort = this.sort;
+        }
+        if ( this.paginator ) {
+            this.tableData.paginator = this.paginator;
+        }
+
+        this.allMetadata = Object.keys(this.catalog[0]).sort();
     }
 
     newSelection( run: IModelMetadata ) {
