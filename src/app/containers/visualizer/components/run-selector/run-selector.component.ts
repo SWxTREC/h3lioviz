@@ -1,7 +1,7 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { IModelMetadata } from 'src/app/models';
@@ -26,8 +26,11 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
     expandedRun: IModelMetadata;
     displayedColumns: string[];
+    pageSize: number;
+    pageSizeOptions = [ 5, 10, 25 ];
     headers: { [ parameter: string ]: string };
     allMetadata: string[];
+    selectedRunIndex: number;
     selection = new SelectionModel<IModelMetadata>(false, []);
     tableData: MatTableDataSource<IModelMetadata>;
 
@@ -75,25 +78,22 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
 
     ngAfterViewInit() {
         this.tableData.sort = this.sort;
+        this.paginator.pageIndex = this.selectedRunIndex >= 0 ? Math.floor( this.selectedRunIndex / this.paginator.pageSize ) : 0;
         this.tableData.paginator = this.paginator;
     }
 
     initDataSource() {
+        const storedPageSize = sessionStorage.getItem('runSelectorPageSize');
+        this.pageSize = storedPageSize ? +storedPageSize : this.pageSizeOptions[1];
         if ( this.selectedRun ) {
             const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
+            this.selectedRunIndex = this.catalog.indexOf( selectedRun );
             if ( selectedRun ) {
                 this.selection.select( selectedRun );
             }
         }
 
         this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
-        if ( this.sort ) {
-            this.tableData.sort = this.sort;
-        }
-        if ( this.paginator ) {
-            this.tableData.paginator = this.paginator;
-        }
-
         this.allMetadata = Object.keys(this.catalog[0]).sort();
     }
 
@@ -106,7 +106,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         }
     }
 
-    paginationChange() {
+    paginationChange( event: PageEvent ) {
+        sessionStorage.setItem('runSelectorPageSize', event.pageSize.toString());
         this.expandedRun = null;
     }
 }

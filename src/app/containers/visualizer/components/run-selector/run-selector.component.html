@@ -46,9 +46,10 @@
     </table>
 </div>
 <mat-paginator
-    [pageSizeOptions]="[5, 10, 25, 50]"
+    [pageSizeOptions]="pageSizeOptions"
     [length]="tableData.data.length"
-    (page)="paginationChange()"
+    [pageSize]="pageSize"
+    (page)="paginationChange($event)"
     showFirstLastButtons
     aria-label="Select page of available model runs">
 </mat-paginator>
