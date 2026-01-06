@@ -105,4 +105,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
             this.updateRunSelection.emit( null );
         }
     }
+
+    paginationChange() {
+        this.expandedRun = null;
+    }
 }

@@ -1,6 +1,7 @@
 @import 'src/theme/theme-colors.scss';
 
 :host {
+    position: relative;
     padding: 0.25rem 1rem;
     display: flex;
     flex-direction: column;
@@ -21,8 +22,12 @@
     }
 }
 
-
+$height-of-paginator: 56px;
 .selector-table {
+    &__container {
+        max-height: calc(64vh - #{$height-of-paginator});
+        overflow-y: auto;
+    }
     &__detail {
           height: 0;
           td {
