@@ -25,7 +25,7 @@
 $height-of-paginator: 56px;
 .selector-table {
     &__container {
-        max-height: calc(64vh - #{$height-of-paginator});
+        max-height: calc(63dvh - #{$height-of-paginator});
         overflow-y: auto;
     }
     &__detail {
@@ -48,5 +48,21 @@ $height-of-paginator: 56px;
         overflow: scroll;
         background: #eee;
         cursor: default;
+    }
+}
+.paginator{
+    &--narrow {
+        ::ng-deep {
+            .mat-mdc-paginator-page-size-label {
+                display: none;
+            }
+        }
+    }
+    &--narrowest {
+        ::ng-deep {
+            .mat-mdc-paginator-range-label {
+                display: none;
+            }
+        }
     }
 }

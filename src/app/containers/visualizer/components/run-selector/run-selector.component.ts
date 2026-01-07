@@ -22,6 +22,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     @Input() catalog: IModelMetadata[];
+    @Input() screenDimensions: [number, number];
     @Input() selectedRun: IModelMetadata;
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
     expandedRun: IModelMetadata;

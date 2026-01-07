@@ -13,7 +13,8 @@ export class RunSelectorDialogComponent implements OnInit {
 
     constructor(
         public dialogRef: MatDialogRef<RunSelectorDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: { selectedRun: IModelMetadata; catalog: IModelMetadata[] },
+        @Inject(MAT_DIALOG_DATA)
+        public data: { selectedRun: IModelMetadata; catalog: IModelMetadata[]; screenDimensions: [number, number] },
         private _catalogService: CatalogService
     ) {}
 

@@ -409,7 +409,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog },
+            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog, screenDimensions: this.windowDimensions },
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
