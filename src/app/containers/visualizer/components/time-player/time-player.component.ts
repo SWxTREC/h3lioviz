@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import * as d3 from 'd3';
 import { LaspVideoEncoderService } from 'lasp-video-encoder';
 import { LaspZipDownloaderService } from 'lasp-zip-downloader';
@@ -31,6 +31,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     playingDebouncer: Subject<boolean> = new Subject<boolean>();
     // since crosshairs are synced, only one plotId is needed
     plotId: string;
+    screenWidth: number;
     session: {
         subscribe: (arg0: string, arg1: (image: any) => void) => Subscription;
         call: (arg0: string, arg1: number[]) => Promise<any>;
@@ -44,6 +45,11 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     // instead of directly updating the crosshair position, use this Subject to throttle updates
     private _xTimestampSubject: Subject<number> = new Subject<number>();
+
+    @HostListener('window:resize')
+    onResize() {
+        this.screenWidth = window.innerWidth;
+    }
 
     constructor(
         protected _playingService: PlayingService,
@@ -142,6 +148,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
     }
 
     ngAfterViewInit(): void {
+        this.screenWidth = window.innerWidth;
         this.crosshairPositionPercent = this.timeIndex * 100 / ( this.timeTicks.length - 1 );
         this.timeScale = d3.scaleLinear()
             .domain([ 0, 1 ])

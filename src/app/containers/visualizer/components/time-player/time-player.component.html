@@ -27,55 +27,57 @@
         </div>
     </div>
     <div class="time-player__controls">
+        @if ( screenWidth > 700 ) {
             <div class="time-player__spacer"></div>
-            <div class="time-player__action" [class.time-player__action--disabled]="timeIndex === timeTicks.length - 1" (click)="togglePlay()">
-                @if (_playingService.playing$ | async) {
-                    <mat-icon>pause</mat-icon>
+        }
+        <div class="time-player__action" [class.time-player__action--disabled]="timeIndex === timeTicks.length - 1" [class.time-player__action--large-screen]="screenWidth > 700" (click)="togglePlay()">
+            @if (_playingService.playing$ | async) {
+                <mat-icon>pause</mat-icon>
+            } @else {
+                <mat-icon>play_arrow</mat-icon>
+            }
+        </div>
+        <div class="time-player__download-control">
+            <div
+                matTooltip="Record and save images"
+                class="time-player__download-control
+                time-player__download-control--hover
+                time-player__download-control--text"
+                (click)="startImageCapture()"
+            >
+                @if (makeImageArray) {
+                    <mat-icon class="time-player__record" [class.time-player__record--active]="makeImageArray">circle</mat-icon>
+                    Recording&nbsp;image&nbsp;sequence
                 } @else {
-                    <mat-icon>play_arrow</mat-icon>
+                    <mat-icon>adjust</mat-icon>
+                    Capture&nbsp;image&nbsp;sequence
                 }
             </div>
-            <div class="time-player__download-control">
-                <div
-                    matTooltip="Record and save images"
-                    class="time-player__download-control
-                    time-player__download-control--hover
-                    time-player__download-control--text"
-                    (click)="startImageCapture()"
-                >
-                    @if (makeImageArray) {
-                        <mat-icon class="time-player__record" [class.time-player__record--active]="makeImageArray">circle</mat-icon>
-                        Recording&nbsp;image&nbsp;sequence
-                    } @else {
-                        <mat-icon>adjust</mat-icon>
-                        Capture&nbsp;image&nbsp;sequence
-                    }
-                </div>
-                <div class="time-player__download-control time-player__download-control--icon">
-                    @if ( makeImageArray ) {
-                        <div
-                            class="time-player__download-control time-player__download-control--small"
-                            matTooltip="Stop recording images"
-                            (click)="stopImageCapture()">
-                            <mat-icon
-                            >stop</mat-icon>
-                            stop
-                        </div>
-                    }
-                    @if ( !makeImageArray && imageArray.length > 0) {
+            <div class="time-player__download-control time-player__download-control--icon">
+                @if ( makeImageArray ) {
+                    <div
+                        class="time-player__download-control time-player__download-control--small"
+                        matTooltip="Stop recording images"
+                        (click)="stopImageCapture()">
                         <mat-icon
-                            class="time-player__download-control"
-                            matTooltip="Download saved images"
-                            [matMenuTriggerFor]="surfaceMenu"
-                            >
-                            download
-                        </mat-icon>
-                    }
-                </div>
-                <mat-menu #surfaceMenu="matMenu">
-                    <button mat-menu-item (click)="downloadImages()">Download images</button>
-                    <button mat-menu-item (click)="downloadMovie()">Download movie</button>
-                </mat-menu>
+                        >stop</mat-icon>
+                        stop
+                    </div>
+                }
+                @if ( !makeImageArray && imageArray.length > 0) {
+                    <mat-icon
+                        class="time-player__download-control"
+                        matTooltip="Download saved images"
+                        [matMenuTriggerFor]="surfaceMenu"
+                        >
+                        download
+                    </mat-icon>
+                }
             </div>
+            <mat-menu #surfaceMenu="matMenu">
+                <button mat-menu-item (click)="downloadImages()">Download images</button>
+                <button mat-menu-item (click)="downloadMovie()">Download movie</button>
+            </mat-menu>
+        </div>
     </div>
 </div>

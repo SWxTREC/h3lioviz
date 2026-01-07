@@ -20,8 +20,6 @@ $icon-width: 50px;
     padding: 0.3rem 1rem;
     line-height: 1;
     &__action {
-        line-height: 0;
-        width: 100%;
         mat-icon {
             font-size: 40px;
             height: 40px;
@@ -31,11 +29,17 @@ $icon-width: 50px;
             opacity: 0.3;
             pointer-events: none;
         }
+        // center the play/pause button for wider screens
+        &--large-screen {
+            position: absolute;
+            line-height: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
     }
     &__controls {
         display: flex;
         flex-direction: row;
-        width: 100%;
         justify-content: space-between;
         align-items: center;
         line-height: 1;
@@ -127,7 +131,6 @@ $icon-width: 50px;
     }
     &__spacer {
         flex-grow: 1;
-        margin-left: calc(#{$download-text-width} + #{$icon-width} + 1rem);
     }
 }
 // Only have one set of player controls in the app, hide the ones in scicharts
