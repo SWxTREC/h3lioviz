@@ -25,7 +25,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @Input() screenDimensions: [number, number];
     @Input() selectedRun: IModelMetadata;
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
-    expandedRun: IModelMetadata;
+    expandedRun: IModelMetadata = null;
     displayedColumns: string[];
     pageSize: number;
     pageSizeOptions = [ 5, 10, 25 ];

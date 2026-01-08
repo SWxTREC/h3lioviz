@@ -22,7 +22,7 @@
         <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
         <ng-container matColumnDef="moreDetail">
             <td mat-cell *matCellDef="let run" [attr.colspan]="displayedColumns.length">
-                @if( expandedRun === run ) {
+                @if( expandedRun != null && expandedRun === run ) {
                 <div class="selector-table__expand" [@detailExpand]="expandedRun === run ? 'expanded' : 'collapsed'" >
                     <div class="selector-table__more">
                             @for (item of allMetadata; track item) {
