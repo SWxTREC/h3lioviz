@@ -111,4 +111,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         sessionStorage.setItem('runSelectorPageSize', event.pageSize.toString());
         this.expandedRun = null;
     }
+
+    toggleExpandedRun( run: IModelMetadata ) {
+        this.expandedRun = this.expandedRun?.run_id === run.run_id ? null : run;
+    }
 }
