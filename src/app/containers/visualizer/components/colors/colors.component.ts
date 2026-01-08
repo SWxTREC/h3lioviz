@@ -104,7 +104,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
 
     // This mat-select compareWith function is used to verify the proper label for the selection in the dropdown
     compareObjectNames(o1: any, o2: any): boolean {
-        return o1.displayName === o2.displayName;
+        return o1?.displayName === o2?.displayName;
     }
 
     getPercentageOfFullColorRange( offset: number ): string {
