@@ -1,4 +1,10 @@
-.dialog__title {
-	margin: 0;
-	padding: 0 1rem;
+.dialog {
+    &__title {
+        margin: 0;
+        padding: 1rem;
+    }
+    &__content {
+        margin: 0;
+        padding: 0;
+    }
 }
