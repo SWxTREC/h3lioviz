@@ -8,7 +8,7 @@
                 }
                 @if (column === 'more') {
                     <th mat-header-cell *matHeaderCellDef> More info </th>
-                    <td laspStopClick *matCellDef="let run" (click)="this.toggleExpandedRun(run)">
+                    <td laspStopClick mat-cell *matCellDef="let run" (click)="this.toggleExpandedRun(run)">
                         @if (expandedRun?.run_id !== run.run_id) {
                             <mat-icon class="selector-table__info">info</mat-icon>
                         }
