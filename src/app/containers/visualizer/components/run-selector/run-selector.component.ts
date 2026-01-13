@@ -1,6 +1,7 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { IModelMetadata } from 'src/app/models';
@@ -16,27 +17,32 @@ import { IModelMetadata } from 'src/app/models';
             transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
         ])
     ] })
-export class RunSelectorComponent implements AfterViewInit, OnInit {
+export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
 
     @Input() catalog: IModelMetadata[];
+    @Input() screenDimensions: [number, number];
     @Input() selectedRun: IModelMetadata;
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
-    expandedRun: IModelMetadata;
+    expandedRun: IModelMetadata = null;
     displayedColumns: string[];
+    pageSize: number;
+    pageSizeOptions = [ 5, 10, 25 ];
     headers: { [ parameter: string ]: string };
     allMetadata: string[];
+    selectedRunIndex: number;
     selection = new SelectionModel<IModelMetadata>(false, []);
-    tableData: any;
+    tableData: MatTableDataSource<IModelMetadata>;
+
+    ngOnChanges(changes: SimpleChanges) {
+        if ( changes.catalog && this.catalog?.length ) {
+            this.initDataSource();
+        }
+    }
 
     ngOnInit() {
-        if ( this.selectedRun ) {
-            const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
-            this.selection.select( selectedRun );
-        }
-
-        this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
-        this.allMetadata = Object.keys(this.catalog[0]).sort();
+        this.initDataSource();
         this.headers = {
             program: 'Model',
             institute: 'Institute',
@@ -73,6 +79,23 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
 
     ngAfterViewInit() {
         this.tableData.sort = this.sort;
+        this.paginator.pageIndex = this.selectedRunIndex >= 0 ? Math.floor( this.selectedRunIndex / this.paginator.pageSize ) : 0;
+        this.tableData.paginator = this.paginator;
+    }
+
+    initDataSource() {
+        const storedPageSize = sessionStorage.getItem('runSelectorPageSize');
+        this.pageSize = storedPageSize ? +storedPageSize : this.pageSizeOptions[1];
+        if ( this.selectedRun ) {
+            const selectedRun = this.catalog.find( run => run['run_id'] === this.selectedRun.run_id);
+            this.selectedRunIndex = this.catalog.indexOf( selectedRun );
+            if ( selectedRun ) {
+                this.selection.select( selectedRun );
+            }
+        }
+
+        this.tableData =  new MatTableDataSource<IModelMetadata>(this.catalog);
+        this.allMetadata = Object.keys(this.catalog[0]).sort();
     }
 
     newSelection( run: IModelMetadata ) {
@@ -82,5 +105,14 @@ export class RunSelectorComponent implements AfterViewInit, OnInit {
         } else {
             this.updateRunSelection.emit( null );
         }
+    }
+
+    paginationChange( event: PageEvent ) {
+        sessionStorage.setItem('runSelectorPageSize', event.pageSize.toString());
+        this.expandedRun = null;
+    }
+
+    toggleExpandedRun( run: IModelMetadata ) {
+        this.expandedRun = this.expandedRun?.run_id === run.run_id ? null : run;
     }
 }

@@ -1,6 +1,7 @@
 @import 'src/theme/theme-colors.scss';
 
 :host {
+    position: relative;
     padding: 0.25rem 1rem;
     display: flex;
     flex-direction: column;
@@ -21,8 +22,12 @@
     }
 }
 
-
+$height-of-paginator: 56px;
 .selector-table {
+    &__container {
+        max-height: calc(63dvh - #{$height-of-paginator});
+        overflow-y: auto;
+    }
     &__detail {
           height: 0;
           td {
@@ -43,5 +48,21 @@
         overflow: scroll;
         background: #eee;
         cursor: default;
+    }
+}
+.paginator{
+    &--narrow {
+        ::ng-deep {
+            .mat-mdc-paginator-page-size-label {
+                display: none;
+            }
+        }
+    }
+    &--narrowest {
+        ::ng-deep {
+            .mat-mdc-paginator-range-label {
+                display: none;
+            }
+        }
     }
 }

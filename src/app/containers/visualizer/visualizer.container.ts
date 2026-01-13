@@ -357,8 +357,8 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             this.vizPanelSize = this.vizDimensions[0] ?? defaultVizWidth;
         } else {
             this.splitDirection = 'vertical';
-            // width is limiting factor
-            const defaultVizHeight = (this.componentMaxHeight * 0.5) - vizAccessoriesHeight;
+            // make default square
+            const defaultVizHeight = window.innerWidth;
             if ( storedVizDimensions?.every( value => value != null ) ) {
                 this.vizDimensions = storedVizDimensions;
                 // ensure new width is not greater than maxWidth for this window
@@ -409,7 +409,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog },
+            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog, screenDimensions: this.windowDimensions },
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {
