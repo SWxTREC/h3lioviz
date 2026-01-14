@@ -1,3 +1,11 @@
+### Changed
+- Paginate table in dialog to select a run
+
+### Fixed
+- Mobile loading and styling
+
+##  2025-12-14 v2.2.0
+
 ### Added
 - Ability to export image and mp4 files
 - Save camera settings in the URL
@@ -7,17 +15,17 @@
 - Documentation
 - Colorbar legend defaults to off
 
-##  v2.1.0
+##  2025-12-03 v2.1.0
 
 ### Fixed
 - Changelog headings
 
-##  v2.0.2
+##  2025-11-20 v2.0.2
 
 ### Fixed
 - Run id column spacing
 
-##  v2.0.1
+##  2025-11-20 v2.0.1
 
 ### Changed
 - Sort by 'creation' date
@@ -26,7 +34,7 @@
 ### Removed
 - Runs before 2025-09-30T
 
-##  v2.0.0
+##  2025-11-20 v2.0.0
 ### Added
 - Single contour variable
 - SWPC default colormap
