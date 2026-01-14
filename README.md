@@ -132,7 +132,7 @@ Copy the previous release heading from assets/markdown/CHANGELOG.md to the top o
 
 Above that, add the new features, changes, and fixes that have happened in the frontend and to the model since the last release.
 
-In the `package.json`, replace the `"startingVersion": "x.xx.x"`, with the previous release version as copied from the heading.
+In the `package.json`, replace the `"startingVersion": "x.xx.x"`, with the upcoming release version.
 
 Commit and push these updates.
 
