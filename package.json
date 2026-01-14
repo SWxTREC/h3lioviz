@@ -124,10 +124,10 @@
     "commitLimit": false,
     "handlebarsSetup": "./changelog-helpers.js",
     "includeBranch": [
-      "dev"
+      "main"
     ],
     "output": "src/assets/markdown/CHANGELOG.md",
-    "startingVersion": "2.2.0",
+    "startingVersion": "2.3.0",
     "template": "changelog-template.hbs",
     "unreleased": false
   }
