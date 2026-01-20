@@ -68,7 +68,9 @@ export class AppComponent {
             version: ''
         },
         {
-            version: environment.version
+            version: environment.version,
+            link: 'docs/changelog',
+            linkedPart: 'version'
         }
     ];
 
