@@ -1,6 +1,9 @@
 {
   "name": "h3lioviz",
   "version": "2.3.2",
+  "engines": {
+    "node": ">=20.19.3 <21"
+  },
   "scripts": {
     "changelog": "auto-changelog",
     "ng": "ng",

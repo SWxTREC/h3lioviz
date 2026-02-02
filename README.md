@@ -51,7 +51,7 @@ It connects via a websocket to a paraview server.
 
 ## Running H3lioViz Locally
 
-Use Node 18 when developing this project.
+When developing this library, use the version of Node specified in package.json, under `engines`.
 
 See 'Development server' below.
 
