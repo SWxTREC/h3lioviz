@@ -32,6 +32,18 @@
     }
 }
 
+.header__logo--org {
+    height: 40px;
+}
+
+.upper-footer__org-logo {
+    max-height: 72px !important;
+}
+
+.lower-footer__partner-logo {
+    max-height: 72px !important;
+}
+
 .mat-mdc-card-title {
     color: theme-colors.$color-primary;
 }

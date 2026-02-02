@@ -52,7 +52,7 @@ export class AppComponent {
     partnerLogos: IImageLink[] = [
         {
             href: 'https://lasp.colorado.edu',
-            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png'
+            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.2025.png'
         }
     ];
 
