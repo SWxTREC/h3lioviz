@@ -1,7 +1,7 @@
 FROM nginxinc/nginx-unprivileged:mainline-alpine
 USER root
 COPY entrypoint.sh /
-COPY dist/h3lioviz/browser /usr/share/nginx/html/
+COPY dist/h3lioviz /usr/share/nginx/html/
 RUN chown -R nginx:nginx /usr/share/nginx/
 COPY nginx.conf.template /etc/nginx/
 RUN rm /etc/nginx/conf.d/default.conf && \
