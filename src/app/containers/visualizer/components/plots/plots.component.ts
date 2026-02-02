@@ -36,7 +36,7 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 @Component({
     selector: 'swt-plots',
     templateUrl: './plots.component.html',
-    styleUrls: ['./plots.component.scss'],
+    styleUrls: [ './plots.component.scss' ],
     standalone: false
 })
 export class PlotsComponent implements OnChanges {

@@ -23,7 +23,7 @@ import { AwsService } from './services';
     declarations: [
         AppComponent
     ],
-    bootstrap: [AppComponent],
+    bootstrap: [ AppComponent ],
     imports: [
         BrowserModule,
         BrowserAnimationsModule,

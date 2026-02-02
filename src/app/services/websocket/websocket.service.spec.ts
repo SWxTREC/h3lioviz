@@ -1,9 +1,9 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 
 import { WebsocketService } from './websocket.service';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('WebsocketService', () => {
     let service: WebsocketService;

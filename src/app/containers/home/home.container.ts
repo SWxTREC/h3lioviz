@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'swt-home',
     templateUrl: './home.container.html',
-    styleUrls: ['./home.container.scss'],
+    styleUrls: [ './home.container.scss' ],
     standalone: false
 })
 export class HomeComponent implements OnDestroy {

@@ -6,7 +6,7 @@ import { CatalogService } from 'src/app/services';
 @Component({
     selector: 'swt-run-selector-dialog',
     templateUrl: './run-selector-dialog.component.html',
-    styleUrls: ['./run-selector-dialog.component.scss'],
+    styleUrls: [ './run-selector-dialog.component.scss' ],
     standalone: false
 })
 export class RunSelectorDialogComponent implements OnInit {

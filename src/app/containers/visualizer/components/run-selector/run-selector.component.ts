@@ -9,7 +9,7 @@ import { IModelMetadata } from 'src/app/models';
 @Component({
     selector: 'swt-run-selector',
     templateUrl: './run-selector.component.html',
-    styleUrls: ['./run-selector.component.scss'],
+    styleUrls: [ './run-selector.component.scss' ],
     animations: [
         trigger('detailExpand', [
             state('collapsed, void', style({ height: '0px', minHeight: '0' })),

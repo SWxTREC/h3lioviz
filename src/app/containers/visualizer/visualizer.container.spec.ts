@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -22,7 +23,6 @@ import {
     TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('VisualizerComponent', () => {
     let component: VisualizerComponent;

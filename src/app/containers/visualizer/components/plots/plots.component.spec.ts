@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -7,7 +8,6 @@ import { ChartModule, GridComponent } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { PlotsComponent } from './plots.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('PlotsComponent', () => {
     let component: PlotsComponent;

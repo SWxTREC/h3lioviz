@@ -5,7 +5,7 @@ import { debounceTime } from 'rxjs/operators';
 @Component({
     selector: 'swt-orientation-menu',
     templateUrl: './orientation-menu.component.html',
-    styleUrls: ['../form.scss', './orientation-menu.component.scss'],
+    styleUrls: [ '../form.scss', './orientation-menu.component.scss' ],
     standalone: false
 })
 export class OrientationMenuComponent implements OnDestroy {

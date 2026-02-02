@@ -9,7 +9,7 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-features',
     templateUrl: './features.component.html',
-    styleUrls: ['../form.scss', './features.component.scss'],
+    styleUrls: [ '../form.scss', './features.component.scss' ],
     standalone: false
 })
 export class FeaturesComponent implements OnChanges, OnDestroy, OnInit {

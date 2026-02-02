@@ -11,12 +11,12 @@ describe('DocsComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [DocsComponent],
+            declarations: [ DocsComponent ],
             imports: [
                 MarkdownModule.forRoot({ loader: HttpClient }),
                 MaterialModule
             ],
-            providers: [provideHttpClient(withInterceptorsFromDi())]
+            providers: [ provideHttpClient(withInterceptorsFromDi()) ]
         })
             .compileComponents();
     }));

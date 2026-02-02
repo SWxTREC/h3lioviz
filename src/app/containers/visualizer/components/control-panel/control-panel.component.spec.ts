@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -13,7 +14,6 @@ import { FeaturesComponent } from '../features/features.component';
 import { SlicesComponent } from '../slices/slices.component';
 
 import { ControlPanelComponent } from './control-panel.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('ControlPanelComponent', () => {
     let component: ControlPanelComponent;

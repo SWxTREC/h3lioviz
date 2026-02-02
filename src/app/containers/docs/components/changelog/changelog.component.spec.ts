@@ -14,7 +14,7 @@ describe('ChangelogComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [ChangelogComponent],
+            declarations: [ ChangelogComponent ],
             imports: [
                 MarkdownModule.forRoot({ loader: HttpClient }),
                 MaterialModule

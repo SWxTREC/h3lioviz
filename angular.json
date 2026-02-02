@@ -108,17 +108,17 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "browserTarget": "h3lioviz:build"
+            "buildTarget": "h3lioviz:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "h3lioviz:build:production"
+              "buildTarget": "h3lioviz:build:production"
             },
             "dev": {
-              "browserTarget": "h3lioviz:build:dev"
+              "buildTarget": "h3lioviz:build:dev"
             },
             "swpc": {
-              "browserTarget": "h3lioviz:build:swpc"
+              "buildTarget": "h3lioviz:build:swpc"
             }
           }
         },

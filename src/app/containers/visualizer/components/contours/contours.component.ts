@@ -18,7 +18,7 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-contours',
     templateUrl: './contours.component.html',
-    styleUrls: ['../form.scss', './contours.component.scss'],
+    styleUrls: [ '../form.scss', './contours.component.scss' ],
     standalone: false
 })
 export class ContoursComponent implements OnChanges {
