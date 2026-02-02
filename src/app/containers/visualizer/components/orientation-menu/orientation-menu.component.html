@@ -8,24 +8,24 @@
         </span>
         <div class="orientation__form-row">
             <div class="orientation__option">
-                <button class="mat-elevation-z2" mat-fab sciStopClick>
+                <button class="mat-elevation-z2" mat-fab laspStopClick>
                     <img src="assets/images/ecliptic.png" (click)="snapTo('ecliptic')">
                 </button>
                 Ecliptic
             </div>
             <div class="orientation__option">
-                <button class="mat-elevation-z2" mat-fab sciStopClick>
+                <button class="mat-elevation-z2" mat-fab laspStopClick>
                     <img src="assets/images/meridional.png" (click)="snapTo('meridional')">
                 </button>
                 Meridional
             </div>
             <div class="orientation__option">
-                <button class="mat-elevation-z2" mat-fab sciStopClick>
+                <button class="mat-elevation-z2" mat-fab laspStopClick>
                     <img src="assets/images/oblique.png" (click)="snapTo('initial')">
                 </button>
                 Oblique
             </div>
         </div>
-        <button sciStopClick class="orientation__button" mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
+        <button laspStopClick class="orientation__button" mat-raised-button color="primary" (click)="resetZoom()">reset zoom</button>
     </div>
 </mat-menu>
