@@ -1,9 +1,10 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { MaterialModule } from 'src/app/modules';
 
 import { ServerStatusComponent } from './server-status.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('ServerStatusComponent', () => {
     let component: ServerStatusComponent;
@@ -11,13 +12,12 @@ describe('ServerStatusComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ ServerStatusComponent ],
-            imports: [
-                HttpClientTestingModule,
-                MaterialModule
-            ],
+            declarations: [ServerStatusComponent],
+            imports: [MaterialModule],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
             .compileComponents();

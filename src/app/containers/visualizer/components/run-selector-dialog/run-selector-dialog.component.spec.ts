@@ -1,8 +1,9 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialModule } from 'src/app/modules';
 
 import { RunSelectorDialogComponent } from './run-selector-dialog.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('RunSelectorDialogComponent', () => {
     let component: RunSelectorDialogComponent;
@@ -10,13 +11,14 @@ describe('RunSelectorDialogComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ RunSelectorDialogComponent ],
-            imports: [
-                MaterialModule,
-                HttpClientTestingModule
+            declarations: [RunSelectorDialogComponent],
+            imports: [MaterialModule],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
-    .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {

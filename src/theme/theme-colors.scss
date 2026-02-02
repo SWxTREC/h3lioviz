@@ -11,23 +11,23 @@
 // this file defines color variables that can be used throughout the app
 // the initial variable declarations with the palettes need to be repeated from the theme file
 
-$primary:                   mat.define-palette($swt-blue, 400);
-$accent:                    mat.define-palette($swt-sky, 300, 500, 700);
-$warn:                      mat.define-palette($lasp-red, 300, 500, 700);
+$primary:                   mat.m2-define-palette($swt-blue, 400);
+$accent:                    mat.m2-define-palette($swt-sky, 300, 500, 700);
+$warn:                      mat.m2-define-palette($lasp-red, 300, 500, 700);
 
-$color-primary:             mat.get-color-from-palette($primary);
-$color-primary-contrast:    mat.get-color-from-palette($primary, default-contrast);
-$color-accent:              mat.get-color-from-palette($accent);
-$color-warn:                mat.get-color-from-palette($warn);
+$color-primary:             mat.m2-get-color-from-palette($primary);
+$color-primary-contrast:    mat.m2-get-color-from-palette($primary, default-contrast);
+$color-accent:              mat.m2-get-color-from-palette($accent);
+$color-warn:                mat.m2-get-color-from-palette($warn);
 
 $color-info: #617cbc;
 $color-success: #80d5be;
 
 @include mat.all-component-typographies();
 @include mat.core();
-$typography: mat.define-typography-config();
+$typography: mat.m2-define-typography-config();
 
-$theme: mat.define-light-theme((
+$theme: mat.m2-define-light-theme((
     color: (
         primary: $primary,
         accent: $accent,

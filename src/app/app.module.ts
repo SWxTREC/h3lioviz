@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
@@ -23,6 +23,7 @@ import { AwsService } from './services';
     declarations: [
         AppComponent
     ],
+    bootstrap: [AppComponent],
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
@@ -34,18 +35,17 @@ import { AwsService } from './services';
         LaspFooterModule,
         LaspFullPageOverlayModule,
         LaspNavModule,
-        HttpClientModule,
         MarkdownModule.forRoot({ loader: HttpClient }),
         MaterialModule,
-        RouterModule.forRoot( routes, { scrollPositionRestoration: 'enabled' } )
+        RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })
     ],
     providers: [
         AwsService,
         {
             provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
             useValue: { appearance: 'outline' }
-        }
-    ],
-    bootstrap: [ AppComponent ]
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ]
 })
 export class AppModule { }

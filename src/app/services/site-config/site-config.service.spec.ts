@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MatDialogModule } from '@angular/material/dialog';
 
@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { ChartModule } from 'scicharts';
 
 import { SiteConfigService } from './site-config.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('SiteConfigService', () => {
     let service: SiteConfigService;
@@ -14,11 +15,12 @@ describe('SiteConfigService', () => {
         TestBed.configureTestingModule({
             imports: [
                 ChartModule,
-                HttpClientTestingModule,
                 MatDialogModule
             ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         });
         service = TestBed.inject(SiteConfigService);

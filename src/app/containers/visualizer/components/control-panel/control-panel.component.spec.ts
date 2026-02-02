@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -13,6 +13,7 @@ import { FeaturesComponent } from '../features/features.component';
 import { SlicesComponent } from '../slices/slices.component';
 
 import { ControlPanelComponent } from './control-panel.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('ControlPanelComponent', () => {
     let component: ControlPanelComponent;
@@ -30,17 +31,17 @@ describe('ControlPanelComponent', () => {
             imports: [
                 BrowserAnimationsModule,
                 ChartModule,
-                HttpClientTestingModule,
                 MaterialModule,
                 NgxSliderModule,
                 ReactiveFormsModule
             ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
-
         })
-    .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {

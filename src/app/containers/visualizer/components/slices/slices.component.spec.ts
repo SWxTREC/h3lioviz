@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -8,6 +8,7 @@ import { ChartModule } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
 
 import { SlicesComponent } from './slices.component';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('SlicesComponent', () => {
     let component: SlicesComponent;
@@ -15,20 +16,21 @@ describe('SlicesComponent', () => {
 
     beforeEach(async() => {
         await TestBed.configureTestingModule({
-            declarations: [ SlicesComponent ],
+            declarations: [SlicesComponent],
             imports: [
                 BrowserAnimationsModule,
                 ChartModule,
-                HttpClientTestingModule,
                 NgxSliderModule,
                 MaterialModule,
                 ReactiveFormsModule
             ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
-    .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {

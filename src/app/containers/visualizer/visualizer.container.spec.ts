@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -22,6 +22,7 @@ import {
     TimePlayerComponent
 } from './components';
 import { VisualizerComponent } from './visualizer.container';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('VisualizerComponent', () => {
     let component: VisualizerComponent;
@@ -45,7 +46,6 @@ describe('VisualizerComponent', () => {
                 BrowserAnimationsModule,
                 ChartModule,
                 ComponentsModule,
-                HttpClientTestingModule,
                 ReactiveFormsModule,
                 LaspFooterModule,
                 MaterialModule,
@@ -54,10 +54,12 @@ describe('VisualizerComponent', () => {
             ],
             providers: [
                 AwsService,
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
-    .compileComponents();
+            .compileComponents();
     }));
 
     beforeEach(() => {
