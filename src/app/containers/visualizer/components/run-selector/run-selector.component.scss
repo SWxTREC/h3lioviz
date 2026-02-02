@@ -1,4 +1,4 @@
-@import 'src/theme/theme-colors.scss';
+@use 'src/theme/theme-colors.scss';
 
 :host {
     position: relative;
@@ -39,7 +39,7 @@ $height-of-paginator: 56px;
         overflow: hidden;
     }
     &__info {
-        color: $color-info;
+        color: theme-colors.$color-info;
     }
     &__more {
         text-align: left;

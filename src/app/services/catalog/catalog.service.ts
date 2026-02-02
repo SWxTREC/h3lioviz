@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import moment from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ICmeMetadata, IModelMetadata } from 'src/app/models';
@@ -9,12 +9,12 @@ import { environment, localUrls } from 'src/environments/environment';
     providedIn: 'root'
 })
 export class CatalogService {
+    private _http = inject(HttpClient);
+
     catalog$: BehaviorSubject<IModelMetadata[]> = new BehaviorSubject(undefined);
     runTitles: {};
 
-    constructor(
-        private _http: HttpClient
-    ) {
+    constructor() {
         // get catalog on app load
         this.getCatalog().subscribe( catalog => {
             // sort catalog by `creation`, then sort by `run_id`to ensure consistent ordering

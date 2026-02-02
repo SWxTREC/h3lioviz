@@ -1,13 +1,4 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    HostListener,
-    OnDestroy,
-    OnInit,
-    ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
@@ -45,6 +36,16 @@ const vizAccessoriesHeight = 112 + 45;
 })
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
+    dialog = inject(MatDialog);
+    private _activatedRoute = inject(ActivatedRoute);
+    private _awsService = inject(AwsService);
+    private _catalogService = inject(CatalogService);
+    private _changeDetector = inject(ChangeDetectorRef);
+    private _laspNavService = inject(LaspNavService);
+    private _scripts = inject(LaspBaseAppSnippetsService);
+    private _siteConfigService = inject(SiteConfigService);
+    private _websocket = inject(WebsocketService);
+
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
     @ViewChild( 'drawer') drawer: MatSidenav;
     @ViewChild(SplitComponent) splitElement: SplitComponent;
@@ -91,17 +92,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.windowResize$.next();
     }
 
-    constructor(
-        public dialog: MatDialog,
-        private _activatedRoute: ActivatedRoute,
-        private _awsService: AwsService,
-        private _catalogService: CatalogService,
-        private _changeDetector: ChangeDetectorRef,
-        private _laspNavService: LaspNavService,
-        private _scripts: LaspBaseAppSnippetsService,
-        private _siteConfigService: SiteConfigService,
-        private _websocket: WebsocketService
-    ) {
+    constructor() {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
 

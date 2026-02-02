@@ -1,15 +1,16 @@
-@import 'src/theme/theme-colors.scss';
+@use "sass:color";
+@use 'src/theme/theme-colors.scss';
 
 :host {
     text-align: center;
     color: white;
-    background-color: transparentize(black, 0.15);
+    background-color: color.adjust(black, $alpha: -0.15);
 }
 
 .home {
     padding: 50px;
     &__media {
-        background-color: $color-primary;
+        background-color: theme-colors.$color-primary;
         padding: 10px;
         img {
             width: 100%;

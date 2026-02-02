@@ -1,11 +1,12 @@
-@import 'src/theme/theme-colors.scss';
+@use "sass:color";
+@use 'src/theme/theme-colors.scss';
 
 // for some reason these are needed here to register, the ones in styles.scss have no effect
 :host {
-    --scicharts-accent: #{$color-accent};
-    --scicharts-info: #{$color-info};
-    --scicharts-primary: #{$color-primary};
-    --scicharts-primary-contrast: #{$color-primary-contrast};
+    --scicharts-accent: #{theme-colors.$color-accent};
+    --scicharts-info: #{theme-colors.$color-info};
+    --scicharts-primary: #{theme-colors.$color-primary};
+    --scicharts-primary-contrast: #{theme-colors.$color-primary-contrast};
 }
 
 .viz {
@@ -33,7 +34,7 @@
         justify-content: center;
         margin: 1rem;
         &--warn {
-            color: $color-warn;
+            color: theme-colors.$color-warn;
         }
     }
     &__fade {
@@ -55,7 +56,7 @@
         transform: translate(-50%, -50%);
         z-index: 1;
         &--disconnect {
-            color: transparentize(black, 0.3);
+            color: color.adjust(black, $alpha: -0.3);
             display: flex;
             flex-direction: column;
             align-items: center;

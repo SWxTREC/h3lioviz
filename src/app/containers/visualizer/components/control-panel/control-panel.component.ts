@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { ConfigLabels, IControlPanel } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
@@ -9,12 +9,10 @@ import { SiteConfigService } from 'src/app/services';
     standalone: false
 })
 export class ControlPanelComponent implements OnInit {
+    private _siteConfigService = inject(SiteConfigService);
+
     @Input() pvView: any;
     expansionState: IControlPanel;
-
-    constructor(
-        private _siteConfigService: SiteConfigService
-    ) {}
 
     ngOnInit(): void {
         this.expansionState = this._siteConfigService.getSiteConfig()?.[ ConfigLabels.cPanelExpansions ];

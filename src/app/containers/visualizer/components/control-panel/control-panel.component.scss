@@ -1,8 +1,8 @@
-@import 'src/theme/theme-colors.scss';
+@use 'src/theme/theme-colors.scss';
 .control {
     &__expander {
         border-radius: 0;
-        background-color: $color-primary;
+        background-color: theme-colors.$color-primary;
         ::ng-deep {
             .mat-expansion-panel-body {
                 background: white;

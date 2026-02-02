@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, HostListener, inject, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import * as d3 from 'd3';
 import { LaspVideoEncoderService } from 'lasp-video-encoder';
 import { LaspZipDownloaderService } from 'lasp-zip-downloader';
@@ -17,6 +17,13 @@ import { PlayingService } from 'src/app/services';
     standalone: false
 })
 export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy {
+    protected _playingService = inject(PlayingService);
+    private _imageViewerService = inject(ImageViewerService);
+    private _laspVideoEncoderService = inject(LaspVideoEncoderService);
+    private _plotsService = inject(PlotsService);
+    private _statusService = inject(StatusService);
+    private _zipDownloader = inject(LaspZipDownloaderService);
+
     @Input() pvContentElement: HTMLDivElement;
     @Input() pvView: any;
     @Input() timeIndex: number;
@@ -52,14 +59,7 @@ export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy 
         this.screenWidth = window.innerWidth;
     }
 
-    constructor(
-        protected _playingService: PlayingService,
-        private _imageViewerService: ImageViewerService,
-        private _laspVideoEncoderService: LaspVideoEncoderService,
-        private _plotsService: PlotsService,
-        private _statusService: StatusService,
-        private _zipDownloader: LaspZipDownloaderService
-    ) {
+    constructor() {
         this.subscriptions.push( this._playingService.playing$.pipe(
             debounceTime(300),
             filter( (playing: boolean) => playing === true )

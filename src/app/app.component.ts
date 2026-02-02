@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import {
@@ -22,6 +22,10 @@ import { environment } from '../environments/environment';
     standalone: false
 })
 export class AppComponent {
+    private _domSanitizer = inject(DomSanitizer);
+    private _matIconRegistry = inject(MatIconRegistry);
+    private _snippets = inject(LaspBaseAppSnippetsService);
+
     prodUrl = 'https://swx-trec.com/' + packageInfo.name;
     storageTimestamp: number = +localStorage.getItem(packageInfo.name); // evaluates to 0 if storage is empty
     dismissed = this.storageTimestamp + (1000 * 60 * 60 * 24 * 7) > Date.now();
@@ -75,11 +79,7 @@ export class AppComponent {
         }
     ];
 
-    constructor(
-        private _domSanitizer: DomSanitizer,
-        private _matIconRegistry: MatIconRegistry,
-        private _snippets: LaspBaseAppSnippetsService
-    ) {
+    constructor() {
         this._snippets.appComponent.all({ googleAnalyticsId: environment.googleAnalyticsId });
 
         this._matIconRegistry.addSvgIconSet( this._domSanitizer.bypassSecurityTrustResourceUrl('assets/chart/chart-icons.svg'));

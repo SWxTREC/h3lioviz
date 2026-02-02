@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@import './theme-palette';
+@use 'theme-palette';
 
 // from https://material.angular.io/guide/theming:
 // "The theme file should not be imported into other SCSS files.
@@ -11,9 +11,9 @@
 // this file defines color variables that can be used throughout the app
 // the initial variable declarations with the palettes need to be repeated from the theme file
 
-$primary:                   mat.m2-define-palette($swt-blue, 400);
-$accent:                    mat.m2-define-palette($swt-sky, 300, 500, 700);
-$warn:                      mat.m2-define-palette($lasp-red, 300, 500, 700);
+$primary:                   mat.m2-define-palette(theme-palette.$swt-blue, 400);
+$accent:                    mat.m2-define-palette(theme-palette.$swt-sky, 300, 500, 700);
+$warn:                      mat.m2-define-palette(theme-palette.$lasp-red, 300, 500, 700);
 
 $color-primary:             mat.m2-get-color-from-palette($primary);
 $color-primary-contrast:    mat.m2-get-color-from-palette($primary, default-contrast);

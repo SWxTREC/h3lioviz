@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { assign, cloneDeep } from 'lodash';
 import { compressToEncodedURIComponent } from 'lz-string';
@@ -13,15 +13,15 @@ import { ConfigLabels, ISiteConfig } from 'src/app/models/site-config';
     providedIn: 'root'
 })
 export class SiteConfigService {
+    location = inject(Location);
+    router = inject(Router);
+    private _activatedRoute = inject(ActivatedRoute);
+    private _paramsService = inject(ParamsService);
+    private _plotsService = inject(PlotsService);
+
     config$: BehaviorSubject<ISiteConfig> = new BehaviorSubject( undefined );
 
-    constructor(
-        public location: Location,
-        public router: Router,
-        private _activatedRoute: ActivatedRoute,
-        private _paramsService: ParamsService,
-        private _plotsService: PlotsService
-    ) {
+    constructor() {
         // subscribe to plot changes to update the site config, however, only update when plots exist to avoid
         // overwriting the config with an empty array on load
         // explicitly set the plot config when clearing plots via the clearAllPlots method in the plots
