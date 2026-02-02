@@ -13,7 +13,8 @@ import { PlayingService } from 'src/app/services';
 @Component({
     selector: 'swt-time-player',
     templateUrl: './time-player.component.html',
-    styleUrls: [ './time-player.component.scss' ]
+    styleUrls: ['./time-player.component.scss'],
+    standalone: false
 })
 export class TimePlayerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() pvContentElement: HTMLDivElement;

@@ -6,17 +6,20 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { IModelMetadata } from 'src/app/models';
 
-@Component({selector: 'swt-run-selector',
+@Component({
+    selector: 'swt-run-selector',
     templateUrl: './run-selector.component.html',
-    styleUrls: [ './run-selector.component.scss' ],
+    styleUrls: ['./run-selector.component.scss'],
     animations: [
         trigger('detailExpand', [
-            state('collapsed, void', style({height: '0px', minHeight: '0'})),
-            state('expanded', style({height: '*'})),
+            state('collapsed, void', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
             transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
             transition('expanded <=> void', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
         ])
-    ] })
+    ],
+    standalone: false
+})
 export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;

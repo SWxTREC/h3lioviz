@@ -9,7 +9,8 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-slices',
     templateUrl: './slices.component.html',
-    styleUrls: [  '../form.scss', './slices.component.scss' ]
+    styleUrls: ['../form.scss', './slices.component.scss'],
+    standalone: false
 })
 export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     @Input() pvView: any;

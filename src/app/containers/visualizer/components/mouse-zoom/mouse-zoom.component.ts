@@ -5,7 +5,8 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-mouse-zoom',
     templateUrl: './mouse-zoom.component.html',
-    styleUrls: [ './mouse-zoom.component.scss' ]
+    styleUrls: ['./mouse-zoom.component.scss'],
+    standalone: false
 })
 export class MouseZoomComponent implements OnChanges {
     @Input() pvView: any;

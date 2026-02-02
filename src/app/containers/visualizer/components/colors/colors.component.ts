@@ -20,7 +20,8 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-colors',
     templateUrl: './colors.component.html',
-    styleUrls: [  '../form.scss', './colors.component.scss' ]
+    styleUrls: ['../form.scss', './colors.component.scss'],
+    standalone: false
 })
 export class ColorsComponent implements OnChanges, OnDestroy {
     @Input() pvView: any;

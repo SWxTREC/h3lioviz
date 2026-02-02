@@ -40,7 +40,8 @@ const vizAccessoriesHeight = 112 + 45;
 @Component({
     selector: 'swt-visualizer',
     templateUrl: './visualizer.container.html',
-    styleUrls: [ './visualizer.container.scss' ]
+    styleUrls: ['./visualizer.container.scss'],
+    standalone: false
 })
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {

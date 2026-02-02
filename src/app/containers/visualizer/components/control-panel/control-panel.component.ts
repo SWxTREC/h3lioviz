@@ -5,7 +5,8 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-control-panel',
     templateUrl: './control-panel.component.html',
-    styleUrls: [ './control-panel.component.scss' ]
+    styleUrls: ['./control-panel.component.scss'],
+    standalone: false
 })
 export class ControlPanelComponent implements OnInit {
     @Input() pvView: any;
