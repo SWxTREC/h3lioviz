@@ -70,6 +70,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     showTitle: boolean;
     siteConfig: ISiteConfig;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
+    splitSizes: number[] = [];
     subscriptions: Subscription[] = [];
     timeIndex: number;
     timeTicks: number[];
@@ -268,13 +269,19 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     dragEnd( event: any ) {
+        this.splitSizes = event?.sizes ?? this.splitSizes;
         const newSize = event.sizes[0];
         if ( this.splitDirection === 'horizontal' ) {
             // landscape, new width
             this.vizDimensions[0] = newSize;
+            this.vizPanelSize = newSize;
+            if ( this.openPlots ) {
+                this.previousVizWidth = newSize;
+            }
         } else {
             // portrait, new height
             this.vizDimensions[1] = newSize - vizAccessoriesHeight;
+            this.vizPanelSize = newSize;
         }
         this.determineShowTitle();
         this.pvViewResize();
@@ -448,11 +455,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
         // plot panel only opens and closes in the horizontal direction
         if ( this.splitDirection === 'horizontal' ) {
-            // Gets the sizes of the visible panels
-            const sizes = this.splitElement.getVisibleAreaSizes();
-            const hasDefinedSize = sizes[0] && !isNaN( Number(sizes[0]));
-            // preserve the viz width so it can be restored
-            this.previousVizWidth = hasDefinedSize ? Number(sizes[0]) : this.previousVizWidth;
+            const currentSize = this.splitSizes?.[0] ?? this.vizDimensions[0];
+            const hasDefinedSize = currentSize && !isNaN( Number(currentSize));
+            if ( this.openPlots && hasDefinedSize ) {
+                this.previousVizWidth = Number(currentSize);
+            }
             const validPreviousWidth =
                 this.previousVizWidth && this.previousVizWidth < maximumVizWidth - this.gutterSize ?
                 this.previousVizWidth : undefined;
