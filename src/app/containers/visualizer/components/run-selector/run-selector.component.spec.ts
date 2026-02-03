@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IModelMetadata } from 'src/app/models';
 import { MaterialModule } from 'src/app/modules';
 
@@ -69,7 +68,6 @@ describe('RunSelectorComponent', () => {
                 RunSelectorComponent
             ],
             imports: [
-                BrowserAnimationsModule,
                 MaterialModule
             ]
         })

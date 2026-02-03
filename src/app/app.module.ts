@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { LaspFooterModule } from 'lasp-footer';
 import { LaspFullPageOverlayModule } from 'lasp-full-page-overlay';
@@ -26,7 +25,6 @@ import { AwsService } from './services';
     bootstrap: [ AppComponent ],
     imports: [
         BrowserModule,
-        BrowserAnimationsModule,
         ChartModule.forRoot({
             sendAnalytics: environment.production && !environment.dev,
             logAnalyticsCallsToConsole: false

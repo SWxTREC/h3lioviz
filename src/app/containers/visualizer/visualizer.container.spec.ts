@@ -2,7 +2,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
@@ -43,7 +42,6 @@ describe('VisualizerComponent', () => {
             ],
             imports: [
                 AngularSplitModule,
-                BrowserAnimationsModule,
                 ChartModule,
                 ComponentsModule,
                 ReactiveFormsModule,
