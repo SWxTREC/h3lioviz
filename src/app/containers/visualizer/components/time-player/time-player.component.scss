@@ -1,4 +1,5 @@
-@import 'src/theme/theme-colors.scss';
+@use "sass:color";
+@use 'src/theme/theme-colors.scss';
 
 $download-text-width: 220px;
 $icon-width: 50px;
@@ -75,7 +76,7 @@ $icon-width: 50px;
         &--hover{
             &:hover{
                 .mat-icon {
-                    color: $color-warn;
+                    color: theme-colors.$color-warn;
                 }
             }
         }
@@ -91,7 +92,7 @@ $icon-width: 50px;
         }
     }
     &__record {
-        color: $color-warn;
+        color: theme-colors.$color-warn;
         animation: none;
         &--active {
             animation: fade 2s linear infinite;
@@ -119,7 +120,7 @@ $icon-width: 50px;
         }
     }
     &__slider-labels {
-        color: transparentize(black, 0.3);
+        color: color.adjust(black, $alpha: -0.3);
         display: flex;
         flex-wrap: nowrap;
         font-size: 0.66rem;

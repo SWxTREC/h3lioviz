@@ -1,5 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ComponentsModule, MaterialModule } from 'src/app/modules';
@@ -20,16 +20,17 @@ describe('HomeComponent', () => {
 
     beforeEach(async() => {
         TestBed.configureTestingModule({
+            declarations: [ HomeComponent ],
             imports: [
                 ComponentsModule,
                 HomeRoutingModule,
-                HttpClientTestingModule,
                 MaterialModule
             ],
-            declarations: [ HomeComponent ],
             providers: [
                 AwsService,
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         });
         httpClient = TestBed.inject(HttpClient);

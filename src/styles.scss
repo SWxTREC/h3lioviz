@@ -1,26 +1,27 @@
 @use 'lasp-base-app-snippets/styles/global';
 
 /* You can add global styles to this file, and also import other style files */
-@import 'theme/theme-colors.scss';
+@use "sass:color";
+@use 'theme/theme-colors.scss';
 
 @include global.all((
-    'primary-color': $color-primary,
-    'primary-contrast-color': $color-primary-contrast,
-    'accent-color': $color-accent,
-    'info-color': $color-info,
-    'success-color': $color-success,
+    'primary-color': theme-colors.$color-primary,
+    'primary-contrast-color': theme-colors.$color-primary-contrast,
+    'accent-color': theme-colors.$color-accent,
+    'info-color': theme-colors.$color-info,
+    'success-color': theme-colors.$color-success,
     'background-color': #53576D,
-    'link-color': darken( $color-accent, 20%),
-    'heading-color': $color-primary
+    'link-color': color.adjust( theme-colors.$color-accent, $lightness: -20%),
+    'heading-color': theme-colors.$color-primary
 ));
 
 // you can add color variables from other libraries/name-spaces here as well
 // for some reason, these don't have any effect here, but keeping them in, in case
 :root {
-    --scicharts-accent: #{$color-accent};
-    --scicharts-info: #{$color-info};
-    --scicharts-primary: #{$color-primary};
-    --scicharts-primary-contrast: #{$color-primary-contrast};
+    --scicharts-accent: #{theme-colors.$color-accent};
+    --scicharts-info: #{theme-colors.$color-info};
+    --scicharts-primary: #{theme-colors.$color-primary};
+    --scicharts-primary-contrast: #{theme-colors.$color-primary-contrast};
 }
 
 .lower-footer__partners {
@@ -31,8 +32,12 @@
     }
 }
 
+.lower-footer__partner-logo {
+    max-height: 72px !important;
+}
+
 .mat-mdc-card-title {
-    color: $color-primary;
+    color: theme-colors.$color-primary;
 }
 
 body > * > .page-content > *:not(router-outlet) {
@@ -40,12 +45,12 @@ body > * > .page-content > *:not(router-outlet) {
 }
 
 .ngx-slider[laspEnhancedNgxSlider]{
-    @include global.custom-slider( $color-primary );
+    @include global.custom-slider( theme-colors.$color-primary );
     .ngx-slider-tick {
         pointer-events: none;
         margin-left: 4px;
         &.ngx-slider-selected {
-            background-color: $color-accent;
+            background-color: theme-colors.$color-accent;
         }
     }
 }

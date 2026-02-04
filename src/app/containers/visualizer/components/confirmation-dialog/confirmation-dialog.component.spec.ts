@@ -1,4 +1,5 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialModule } from 'src/app/modules';
 
@@ -11,12 +12,13 @@ describe('ConfirmationDialogComponent', () => {
     beforeEach(async() => {
         await TestBed.configureTestingModule({
             declarations: [ ConfirmationDialogComponent ],
-            imports: [
-                MaterialModule,
-                HttpClientTestingModule
+            imports: [ MaterialModule ],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
-    .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {

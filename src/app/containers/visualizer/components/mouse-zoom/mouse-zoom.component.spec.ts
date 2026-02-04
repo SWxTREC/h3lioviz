@@ -1,4 +1,5 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { ChartModule } from 'scicharts';
@@ -15,14 +16,15 @@ describe('MouseZoomComponent', () => {
             declarations: [ MouseZoomComponent ],
             imports: [
                 ChartModule,
-                HttpClientTestingModule,
                 MaterialModule
             ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
-    .compileComponents();
+            .compileComponents();
     });
 
     beforeEach(() => {

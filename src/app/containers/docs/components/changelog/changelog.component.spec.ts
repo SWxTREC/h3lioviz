@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
@@ -14,18 +14,17 @@ describe('ChangelogComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
+            declarations: [ ChangelogComponent ],
             imports: [
-                HttpClientModule,
                 MarkdownModule.forRoot({ loader: HttpClient }),
                 MaterialModule
             ],
-            declarations: [ ChangelogComponent ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi())
             ]
-
         })
-    .compileComponents();
+            .compileComponents();
     }));
 
     beforeEach(() => {

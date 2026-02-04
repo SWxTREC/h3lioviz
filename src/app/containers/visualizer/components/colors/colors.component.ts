@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { cloneDeep } from 'lodash';
@@ -20,9 +20,12 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-colors',
     templateUrl: './colors.component.html',
-    styleUrls: [  '../form.scss', './colors.component.scss' ]
+    styleUrls: [ '../form.scss', './colors.component.scss' ],
+    standalone: false
 })
 export class ColorsComponent implements OnChanges, OnDestroy {
+    private _siteCofigService = inject(SiteConfigService);
+
     @Input() pvView: any;
 
     additionalVariables = ADDITIONAL_VARIABLES;
@@ -64,9 +67,7 @@ export class ColorsComponent implements OnChanges, OnDestroy {
     variableConfigurations = VARIABLE_CONFIG;
 
 
-    constructor(
-        private _siteCofigService: SiteConfigService
-    ) {
+    constructor() {
         this.subscriptions.push(this._siteCofigService.config$.subscribe( () => this.siteConfig = this._siteCofigService.getSiteConfig() ));
         // initialize FormGroup with default color menu names and values
         Object.keys(COLOR_FORM_DEFAULT_VALUES).forEach( controlName => {

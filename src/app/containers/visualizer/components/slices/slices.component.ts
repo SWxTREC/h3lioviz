@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { assign, snakeCase } from 'lodash';
 import { Subject, Subscription } from 'rxjs';
@@ -9,9 +9,12 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-slices',
     templateUrl: './slices.component.html',
-    styleUrls: [  '../form.scss', './slices.component.scss' ]
+    styleUrls: [ '../form.scss', './slices.component.scss' ],
+    standalone: false
 })
 export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
+    private _siteConfigService = inject(SiteConfigService);
+
     @Input() pvView: any;
     lonSliceAngle: string;
     lonSliceOptions = {
@@ -25,9 +28,7 @@ export class SlicesComponent implements OnChanges, OnDestroy, OnInit {
     subscriptions: Subscription[] = [];
     variableConfigurations = VARIABLE_CONFIG;
 
-    constructor(
-        private _siteConfigService: SiteConfigService
-    ) {
+    constructor() {
         // initialize FormGroup from layers with default slice names and values
         Object.keys(LAYER_FORM_DEFAULT_VALUES).forEach( controlName => {
             if ( SLICES.includes( controlName ) ) {

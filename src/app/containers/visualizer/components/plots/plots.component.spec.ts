@@ -1,7 +1,7 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { ChartModule, GridComponent } from 'scicharts';
 import { MaterialModule } from 'src/app/modules';
@@ -19,14 +19,14 @@ describe('PlotsComponent', () => {
                 GridComponent
             ],
             imports: [
-                BrowserAnimationsModule,
                 ChartModule,
-                HttpClientTestingModule,
                 MaterialModule,
                 ReactiveFormsModule
             ],
             providers: [
-                provideRouter([])
+                provideRouter([]),
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting()
             ]
         })
             .compileComponents();

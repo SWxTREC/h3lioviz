@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { AngularSplitModule } from 'angular-split';
+import { LaspBaseAppSnippetsModule } from 'lasp-base-app-snippets';
 import { LaspEnhancedNgxSliderModule } from 'lasp-enhanced-ngx-slider';
 import { LaspEnhancedSelectModule } from 'lasp-enhanced-select';
 import { LaspVideoEncoderModule, LaspVideoEncoderService } from 'lasp-video-encoder';
@@ -35,6 +36,7 @@ import { VisualizerComponent } from './visualizer.container';
         ComponentsModule,
         ChartModule,
         FormsModule,
+        LaspBaseAppSnippetsModule,
         LaspEnhancedNgxSliderModule,
         LaspEnhancedSelectModule,
         LaspVideoEncoderModule,

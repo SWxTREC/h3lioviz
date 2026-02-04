@@ -1,19 +1,18 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges } from '@angular/core';
 import { ConfigLabels } from 'src/app/models';
 import { SiteConfigService } from 'src/app/services';
 
 @Component({
     selector: 'swt-mouse-zoom',
     templateUrl: './mouse-zoom.component.html',
-    styleUrls: [ './mouse-zoom.component.scss' ]
+    styleUrls: [ './mouse-zoom.component.scss' ],
+    standalone: false
 })
 export class MouseZoomComponent implements OnChanges {
+    private _siteConfigService = inject(SiteConfigService);
+
     @Input() pvView: any;
     zoomState: 'on' | 'off';
-
-    constructor(
-        private _siteConfigService: SiteConfigService
-    ) {}
 
     ngOnChanges() {
         // set zoom once pvView is defined

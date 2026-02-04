@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import {
@@ -18,9 +18,14 @@ import { environment } from '../environments/environment';
 @Component({
     selector: 'swt-root',
     templateUrl: './app.component.html',
-    styleUrls: [ './app.component.scss' ]
+    styleUrls: [ './app.component.scss' ],
+    standalone: false
 })
 export class AppComponent {
+    private _domSanitizer = inject(DomSanitizer);
+    private _matIconRegistry = inject(MatIconRegistry);
+    private _snippets = inject(LaspBaseAppSnippetsService);
+
     prodUrl = 'https://swx-trec.com/' + packageInfo.name;
     storageTimestamp: number = +localStorage.getItem(packageInfo.name); // evaluates to 0 if storage is empty
     dismissed = this.storageTimestamp + (1000 * 60 * 60 * 24 * 7) > Date.now();
@@ -47,7 +52,7 @@ export class AppComponent {
     partnerLogos: IImageLink[] = [
         {
             href: 'https://lasp.colorado.edu',
-            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.png'
+            src: 'https://lasp.colorado.edu/media/projects/base-app/images/footer-lasp-logo.2025.png'
         }
     ];
 
@@ -74,11 +79,7 @@ export class AppComponent {
         }
     ];
 
-    constructor(
-        private _domSanitizer: DomSanitizer,
-        private _matIconRegistry: MatIconRegistry,
-        private _snippets: LaspBaseAppSnippetsService
-    ) {
+    constructor() {
         this._snippets.appComponent.all({ googleAnalyticsId: environment.googleAnalyticsId });
 
         this._matIconRegistry.addSvgIconSet( this._domSanitizer.bypassSecurityTrustResourceUrl('assets/chart/chart-icons.svg'));

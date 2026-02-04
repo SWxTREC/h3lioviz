@@ -1,13 +1,4 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    HostListener,
-    OnDestroy,
-    OnInit,
-    ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ActivatedRoute } from '@angular/router';
@@ -40,10 +31,21 @@ const vizAccessoriesHeight = 112 + 45;
 @Component({
     selector: 'swt-visualizer',
     templateUrl: './visualizer.container.html',
-    styleUrls: [ './visualizer.container.scss' ]
+    styleUrls: [ './visualizer.container.scss' ],
+    standalone: false
 })
 
 export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
+    dialog = inject(MatDialog);
+    private _activatedRoute = inject(ActivatedRoute);
+    private _awsService = inject(AwsService);
+    private _catalogService = inject(CatalogService);
+    private _changeDetector = inject(ChangeDetectorRef);
+    private _laspNavService = inject(LaspNavService);
+    private _scripts = inject(LaspBaseAppSnippetsService);
+    private _siteConfigService = inject(SiteConfigService);
+    private _websocket = inject(WebsocketService);
+
     @ViewChild( 'pvContent', { read: ElementRef } ) pvContent: ElementRef;
     @ViewChild( 'drawer') drawer: MatSidenav;
     @ViewChild(SplitComponent) splitElement: SplitComponent;
@@ -68,6 +70,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     showTitle: boolean;
     siteConfig: ISiteConfig;
     splitDirection: 'horizontal' | 'vertical' = 'horizontal';
+    splitSizes: number[] = [];
     subscriptions: Subscription[] = [];
     timeIndex: number;
     timeTicks: number[];
@@ -90,17 +93,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.windowResize$.next();
     }
 
-    constructor(
-        public dialog: MatDialog,
-        private _activatedRoute: ActivatedRoute,
-        private _awsService: AwsService,
-        private _catalogService: CatalogService,
-        private _changeDetector: ChangeDetectorRef,
-        private _laspNavService: LaspNavService,
-        private _scripts: LaspBaseAppSnippetsService,
-        private _siteConfigService: SiteConfigService,
-        private _websocket: WebsocketService
-    ) {
+    constructor() {
         this._laspNavService.setAlwaysSticky(true);
         this._awsService.startUp();
 
@@ -276,13 +269,19 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     dragEnd( event: any ) {
+        this.splitSizes = event?.sizes ?? this.splitSizes;
         const newSize = event.sizes[0];
         if ( this.splitDirection === 'horizontal' ) {
             // landscape, new width
             this.vizDimensions[0] = newSize;
+            this.vizPanelSize = newSize;
+            if ( this.openPlots ) {
+                this.previousVizWidth = newSize;
+            }
         } else {
             // portrait, new height
             this.vizDimensions[1] = newSize - vizAccessoriesHeight;
+            this.vizPanelSize = newSize;
         }
         this.determineShowTitle();
         this.pvViewResize();
@@ -456,11 +455,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         const maximumVizWidth = this.openControls ? this.windowDimensions[0] - this.controlPanelSize : this.windowDimensions[0];
         // plot panel only opens and closes in the horizontal direction
         if ( this.splitDirection === 'horizontal' ) {
-            // Gets the sizes of the visible panels
-            const sizes = this.splitElement.getVisibleAreaSizes();
-            const hasDefinedSize = sizes[0] && !isNaN( Number(sizes[0]));
-            // preserve the viz width so it can be restored
-            this.previousVizWidth = hasDefinedSize ? Number(sizes[0]) : this.previousVizWidth;
+            const currentSize = this.splitSizes?.[0] ?? this.vizDimensions[0];
+            const hasDefinedSize = currentSize && !isNaN( Number(currentSize));
+            if ( this.openPlots && hasDefinedSize ) {
+                this.previousVizWidth = Number(currentSize);
+            }
             const validPreviousWidth =
                 this.previousVizWidth && this.previousVizWidth < maximumVizWidth - this.gutterSize ?
                 this.previousVizWidth : undefined;

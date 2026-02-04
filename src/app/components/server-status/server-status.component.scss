@@ -1,4 +1,4 @@
-@import 'src/theme/theme-colors.scss';
+@use 'src/theme/theme-colors.scss';
 
 @keyframes pulse {
   from {
@@ -17,9 +17,9 @@
         width: 100%;
     }
     &__status {
-        color: $color-primary;
+        color: theme-colors.$color-primary;
         &--started {
-            color: $color-success;
+            color: theme-colors.$color-success;
         }
         &--active {
             animation: pulse 1s infinite alternate ease-in-out;

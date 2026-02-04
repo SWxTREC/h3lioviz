@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ChangeContext, Options } from '@angular-slider/ngx-slider';
 import { snakeCase } from 'lodash';
@@ -18,9 +18,12 @@ import { SiteConfigService } from 'src/app/services';
 @Component({
     selector: 'swt-contours',
     templateUrl: './contours.component.html',
-    styleUrls: [ '../form.scss', './contours.component.scss' ]
+    styleUrls: [ '../form.scss', './contours.component.scss' ],
+    standalone: false
 })
 export class ContoursComponent implements OnChanges {
+    private _siteConfigService = inject(SiteConfigService);
+
     @Input() pvView: any;
     defaultContourVariable: IVariableInfo = CONTOUR_FORM_DEFAULT_VALUES.contourVariable;
 
@@ -45,9 +48,7 @@ export class ContoursComponent implements OnChanges {
     userContourRanges: { [parameter: string]: [ number, number ] } = {};
     variableConfigurations = VARIABLE_CONFIG;
 
-    constructor(
-        private _siteConfigService: SiteConfigService
-    ) {
+    constructor() {
         this.subscriptions.push(
             this._siteConfigService.config$.subscribe( () => {
                 // setting this.siteConfig this way applies default values

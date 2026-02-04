@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -36,9 +36,19 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 @Component({
     selector: 'swt-plots',
     templateUrl: './plots.component.html',
-    styleUrls: [ './plots.component.scss' ]
+    styleUrls: [ './plots.component.scss' ],
+    standalone: false
 })
 export class PlotsComponent implements OnChanges {
+    confirmationDialog = inject(MatDialog);
+    protected _playingService = inject(PlayingService);
+    private _imageViewerService = inject(ImageViewerService);
+    private _menuOptionsService = inject(MenuOptionsService);
+    private _plotsService = inject(PlotsService);
+    private _siteConfigService = inject(SiteConfigService);
+    private _uiOptionsService = inject(UiOptionsService);
+    private _xRangeService = inject(XRangeService);
+
     @Input() timeRange: number[];
     @Input() runId: string;
     @Input() plotConfig: IPlotParams[];
@@ -49,16 +59,7 @@ export class PlotsComponent implements OnChanges {
     legendCardToggle = new FormControl();
     siteConfig: ISiteConfig;
 
-    constructor(
-        public confirmationDialog: MatDialog,
-        protected _playingService: PlayingService,
-        private _imageViewerService: ImageViewerService,
-        private _menuOptionsService: MenuOptionsService,
-        private _plotsService: PlotsService,
-        private _siteConfigService: SiteConfigService,
-        private _uiOptionsService: UiOptionsService,
-        private _xRangeService: XRangeService
-    ) {
+    constructor() {
         this._menuOptionsService.setGlobalMenuOptions( cloneDeep(DEFAULT_PLOT_OPTIONS) );
         // use methods to set uiOptions
         const uiOptions = this._uiOptionsService.getUiOptions();

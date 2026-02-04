@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { environmentConfig } from 'src/environments/environment';
@@ -16,14 +16,14 @@ import { AwsService } from '../aws/aws.service';
     providedIn: 'root'
 })
 export class WebsocketService {
+    private _awsService = inject(AwsService);
+
     pvView: any;
     errorMessage$: BehaviorSubject<string> = new BehaviorSubject(null);
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject( false );
     validConnection$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-    constructor(
-        private _awsService: AwsService
-    ) {
+    constructor() {
         // the AwsService is triggered to start connecting once the visualizer page is loaded
         this._awsService.pvServerStarted$.pipe(
             filter( started => started === true),

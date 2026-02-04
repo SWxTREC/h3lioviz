@@ -1,5 +1,5 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, interval, Observable, of, Subscription } from 'rxjs';
 import { catchError, startWith, switchMap, takeWhile, throttleTime } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
@@ -8,14 +8,12 @@ import { environment, environmentConfig } from 'src/environments/environment';
     providedIn: 'root'
 })
 export class AwsService {
+    private _http = inject(HttpClient);
+
     awsUrl: string = environment.aws.api;
     pvServerStarted$: BehaviorSubject<boolean> = new BehaviorSubject(false);
     startEc2Subscription: Subscription;
     monitoringInterval: Subscription;
-
-    constructor(
-        private _http: HttpClient
-    ) {}
 
     getParaviewServerStatus(): Observable<HttpResponse<string>> {
         // add a random query parameter to the request, the easiest way to keep the request from being cached in the browser

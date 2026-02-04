@@ -1,4 +1,4 @@
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { MarkdownModule } from 'ngx-markdown';
 import { MaterialModule } from 'src/app/modules';
@@ -13,12 +13,12 @@ describe('DocsComponent', () => {
         TestBed.configureTestingModule({
             declarations: [ DocsComponent ],
             imports: [
-                HttpClientModule,
                 MarkdownModule.forRoot({ loader: HttpClient }),
                 MaterialModule
-            ]
+            ],
+            providers: [ provideHttpClient(withInterceptorsFromDi()) ]
         })
-    .compileComponents();
+            .compileComponents();
     }));
 
     beforeEach(() => {

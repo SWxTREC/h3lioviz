@@ -1,4 +1,13 @@
-@import 'src/theme/theme-colors.scss';
+@use 'src/theme/theme-colors.scss';
+
+$expand-collapse-duration: 225ms;
+$more-info-height: 200px;
+$paginator-height: 56px;
+
+@keyframes expand-collapse {
+    from { height: 0px; }
+    to { height: $more-info-height; }
+}
 
 :host {
     position: relative;
@@ -22,10 +31,9 @@
     }
 }
 
-$height-of-paginator: 56px;
 .selector-table {
     &__container {
-        max-height: calc(63dvh - #{$height-of-paginator});
+        max-height: calc(63dvh - #{$paginator-height});
         overflow-y: auto;
     }
     &__detail {
@@ -37,14 +45,22 @@ $height-of-paginator: 56px;
     }
     &__expand {
         overflow: hidden;
+
+        &--collapse {
+            animation: expand-collapse $expand-collapse-duration ease-in reverse;
+        }
+
+        &--expand {
+            animation: expand-collapse $expand-collapse-duration ease-out;
+        }
     }
     &__info {
-        color: $color-info;
+        color: theme-colors.$color-info;
     }
     &__more {
         text-align: left;
         padding: 1rem;
-        height: 200px;
+        height: $more-info-height;
         overflow: scroll;
         background: #eee;
         cursor: default;
