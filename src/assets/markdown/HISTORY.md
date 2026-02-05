@@ -1,4 +1,9 @@
 ### Changed
+- Updated to Angular 20 and new logo
+
+## 2026-01-14 v2.3.2
+
+### Changed
 - Paginate table in dialog to select a run
 
 ### Fixed
