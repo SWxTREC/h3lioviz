@@ -31,12 +31,17 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if ( changes.catalog && this.catalog?.length ) {
-            this.initDataSource();
+            if ( !this.tableData ) {
+                this.initDataSource();
+            } else {
+                this.tableData.data = this.catalog;
+                this.allMetadata = Object.keys(this.catalog[0]).sort();
+                this.syncPaginator();
+            }
         }
     }
 
     ngOnInit() {
-        this.initDataSource();
         this.headers = {
             program: 'Model',
             institute: 'Institute',
@@ -106,7 +111,19 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         this.expandedRun = null;
     }
 
+    syncPaginator() {
+        if ( this.paginator ) {
+            const maxPageIndex = Math.max( Math.ceil( this.catalog.length / this.paginator.pageSize ) - 1, 0 );
+            this.paginator.pageIndex = Math.min( this.paginator.pageIndex, maxPageIndex );
+            this.paginator._changePageSize( this.paginator.pageSize );
+        }
+    }
+
     toggleExpandedRun( run: IModelMetadata ) {
         this.expandedRun = this.expandedRun?.run_id === run.run_id ? null : run;
+    }
+
+    trackByRunId(index: number, run: IModelMetadata): string {
+        return run.run_id;
     }
 }

@@ -177,7 +177,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 setTimeout(() => {
                     if ( (this.catalog && !this.runId$.value ) ||
                         (this.catalog && !this.pvServerStarted) ) {
-                        this.openDialog();
+                        // only open dialog once as catalog is updated
+                        if ( !this.dialog.openDialogs.length ) {
+                            this.openDialog();
+                        }
                     } else {
                         this.dialog.closeAll();
                     }
