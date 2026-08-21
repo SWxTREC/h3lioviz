@@ -436,10 +436,10 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: {
-                catalogLoading$: this.catalogLoading$,
-                selectedRun: this.selectedRunMetadata,
                 catalog: this.catalog,
-                screenDimensions: this.windowDimensions
+                catalogLoading$: this.catalogLoading$,
+                screenDimensions: this.windowDimensions,
+                selectedRun: this.selectedRunMetadata
             },
             disableClose: !this.runId$.value
         });

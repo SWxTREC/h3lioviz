@@ -16,7 +16,7 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { cloneDeep, truncate } from 'lodash';
+import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import { IModelMetadata } from 'src/app/models';
 

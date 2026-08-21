@@ -15,13 +15,13 @@ export class RunSelectorDialogComponent implements OnInit {
     dialogRef = inject<MatDialogRef<RunSelectorDialogComponent>>(MatDialogRef);
     private _destroyRef = inject( DestroyRef );
     data = inject<{
-        selectedRun: IModelMetadata;
         catalog: IModelMetadata[];
         catalogLoading$: BehaviorSubject<boolean>;
         screenDimensions: [
             number,
             number
         ];
+        selectedRun: IModelMetadata;
     }>(MAT_DIALOG_DATA);
     private _catalogService = inject(CatalogService);
 
