@@ -87,6 +87,7 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // dimensions are [ width, height ]
     windowDimensions: number[];
     protected _cmeMetadata: ICmeMetadata;
+    catalogLoading$ = new BehaviorSubject<boolean>(true);
 
     @HostListener('window:resize')
     onResize() {
@@ -99,18 +100,23 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this._laspNavService.setAlwaysSticky(true);
 
         // get catalog on visualizer load
-        this._catalogService.getCatalog().subscribe( catalog => {
-            // sort catalog by `creation`, then sort by `run_id`to ensure consistent ordering
-            catalog.sort( ( a, b ) =>
-                moment(b['creation']).valueOf() - moment(a['creation']).valueOf() || b['run_id'] - (a['run_id'])
-            );
-            const formattedCatalog = this._catalogService.formatCatalog(catalog);
-            this._catalogService.catalog$.next(formattedCatalog);
-            this._catalogService.runTitles = Array.from(this._catalogService.catalog$.value).reduce( (aggregator, run) => {
-                const time = moment.utc( run['creation'] ).format('YYYY-MM-DDTHH');
-                aggregator[ run['run_id'] ] = `${time} (${run.institute} #${run.run_id})`;
-                return aggregator;
-            }, {});
+        this._catalogService.getCatalog().subscribe({
+            next: (catalog) => {
+                // sort catalog by `creation`, then sort by `run_id`to ensure consistent ordering
+                catalog.sort( ( a, b ) =>
+                    moment(b['creation']).valueOf() - moment(a['creation']).valueOf() || b['run_id'] - (a['run_id'])
+                );
+                const formattedCatalog = this._catalogService.formatCatalog(catalog);
+                this._catalogService.catalog$.next(formattedCatalog);
+                this._catalogService.runTitles = Array.from(this._catalogService.catalog$.value).reduce( (aggregator, run) => {
+                    const time = moment.utc( run['creation'] ).format('YYYY-MM-DDTHH');
+                    aggregator[ run['run_id'] ] = `${time} (${run.institute} #${run.run_id})`;
+                    return aggregator;
+                }, {});
+            },
+            complete: () => {
+                this.catalogLoading$.next(false);
+            }
         });
 
         const queryParamMap = this._activatedRoute.snapshot.queryParamMap;
@@ -429,7 +435,12 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     // opens if AWS server is starting up to give the user something to do
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
-            data: { selectedRun: this.selectedRunMetadata, catalog: this.catalog, screenDimensions: this.windowDimensions },
+            data: {
+                catalogLoading$: this.catalogLoading$,
+                selectedRun: this.selectedRunMetadata,
+                catalog: this.catalog,
+                screenDimensions: this.windowDimensions
+            },
             disableClose: !this.runId$.value
         });
         dialogRef.afterClosed().subscribe( result => {

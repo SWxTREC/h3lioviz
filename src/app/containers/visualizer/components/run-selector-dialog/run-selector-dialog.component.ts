@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { BehaviorSubject } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
 import { CatalogService } from 'src/app/services';
 
@@ -16,6 +17,7 @@ export class RunSelectorDialogComponent implements OnInit {
     data = inject<{
         selectedRun: IModelMetadata;
         catalog: IModelMetadata[];
+        catalogLoading$: BehaviorSubject<boolean>;
         screenDimensions: [
             number,
             number

@@ -3,6 +3,7 @@
 $expand-collapse-duration: 225ms;
 $more-info-height: 200px;
 $paginator-height: 56px;
+$formfield-height: 78px;
 
 @keyframes expand-collapse {
     from { height: 0px; }
@@ -31,9 +32,19 @@ $paginator-height: 56px;
     }
 }
 
+.selector-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+
+    &__datepicker {
+        width: min( 100%, 320px );
+    }
+}
+
 .selector-table {
     &__container {
-        max-height: calc(63dvh - #{$paginator-height});
+        max-height: calc(63dvh - #{$paginator-height} - #{$formfield-height});
         overflow-y: auto;
     }
     &__detail {

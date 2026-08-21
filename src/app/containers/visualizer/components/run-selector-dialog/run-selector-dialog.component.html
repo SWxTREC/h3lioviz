@@ -7,6 +7,7 @@
             [selectedRun]="data.selectedRun"
             [catalog]="data.catalog"
             [screenDimensions]="data.screenDimensions"
+            [catalogLoading]="data.catalogLoading$ | async"
             (updateRunSelection)="updateRunSelection($event)"
         >
         </swt-run-selector>

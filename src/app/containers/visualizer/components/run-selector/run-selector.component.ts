@@ -1,8 +1,23 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
+    ViewChild
+
+} from '@angular/core';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { cloneDeep, truncate } from 'lodash';
+import moment from 'moment';
 import { IModelMetadata } from 'src/app/models';
 
 @Component({
@@ -14,8 +29,11 @@ import { IModelMetadata } from 'src/app/models';
 export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild('runDateInput') runDateInput: ElementRef<HTMLInputElement>;
+    @ViewChild('runDatepicker') runDatepicker: MatDatepicker<moment.Moment>;
 
     @Input() catalog: IModelMetadata[];
+    @Input() catalogLoading = true;
     @Input() screenDimensions: [number, number];
     @Input() selectedRun: IModelMetadata;
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
@@ -28,13 +46,18 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     selectedRunIndex: number;
     selection = new SelectionModel<IModelMetadata>(false, []);
     tableData: MatTableDataSource<IModelMetadata>;
+    earliestRunDate: moment.Moment;
+    maxRunDate: moment.Moment = moment.utc().add(1, 'day');
 
     ngOnChanges(changes: SimpleChanges) {
+        if ( !this.catalogLoading ) {
+            this.earliestRunDate = this.getEarliestRunDate(this.catalog[this.catalog.length - 1]);
+        }
         if ( changes.catalog && this.catalog?.length ) {
             if ( !this.tableData ) {
                 this.initDataSource();
             } else {
-                this.tableData.data = this.catalog;
+                this.tableData.data = cloneDeep(this.catalog);
                 this.allMetadata = Object.keys(this.catalog[0]).sort();
                 this.syncPaginator();
             }
@@ -82,6 +105,54 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         this.tableData.paginator = this.paginator;
     }
 
+    centerResultsAroundDate(dateValue: moment.Moment) {
+        if ( !this.paginator || !this.tableData || !dateValue ) {
+            return;
+        }
+
+        const selectedTimestamp = dateValue.valueOf();
+        if ( selectedTimestamp === null ) {
+            return;
+        }
+
+        const sortedData = cloneDeep( this.tableData.data );
+        let closestIndex = -1;
+        let smallestDelta = Number.POSITIVE_INFINITY;
+
+        sortedData.forEach((run, index) => {
+            const runTimestamp = moment.utc(run.creation).valueOf() ?? moment.utc(run.rundate_cal).valueOf();
+            if ( runTimestamp === null ) {
+                return;
+            }
+
+            const delta = Math.abs( runTimestamp - selectedTimestamp );
+            if ( delta < smallestDelta ) {
+                smallestDelta = delta;
+                closestIndex = index;
+            }
+        });
+
+        if ( closestIndex < 0 || this.paginator.pageSize <= 0 ) {
+            return;
+        }
+
+        const centeredStartIndex = Math.max( closestIndex - Math.floor( this.paginator.pageSize / 2 ), 0 );
+        const maxPageIndex = Math.max( Math.ceil( sortedData.length / this.paginator.pageSize ) - 1, 0 );
+        // navigate to the page that contains the closest run to the selected date, centering it in the page if possible
+        this.paginator.pageIndex = Math.min( Math.floor( centeredStartIndex / this.paginator.pageSize ), maxPageIndex );
+        // this forces the paginator to update the view after changing the pageIndex
+        this.paginator._changePageSize( this.paginator.pageSize );
+        this.expandedRun = null;
+    }
+
+    getEarliestRunDate(run: IModelMetadata): moment.Moment {
+        const runDate = run?.rundate_cal ?? run?.creation;
+        if ( !runDate ) {
+            return null;
+        }
+        return moment.utc(runDate);
+    }
+
     initDataSource() {
         const storedPageSize = sessionStorage.getItem('runSelectorPageSize');
         this.pageSize = storedPageSize ? +storedPageSize : this.pageSizeOptions[1];
@@ -109,6 +180,15 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     paginationChange( event: PageEvent ) {
         sessionStorage.setItem('runSelectorPageSize', event.pageSize.toString());
         this.expandedRun = null;
+        // Arrow clicks (next/prev/first/last) change pageIndex
+        if (event.previousPageIndex !== undefined && event.pageIndex !== event.previousPageIndex) {
+            this.resetDatepicker();
+        }
+    }
+
+    resetDatepicker(): void {
+        this.runDatepicker.select(null);
+        this.runDateInput.nativeElement.value = '';
     }
 
     syncPaginator() {

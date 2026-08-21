@@ -11,7 +11,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatNativeDateModule, MatRippleModule } from '@angular/material/core';
+import { MatRippleModule } from '@angular/material/core';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
     MAT_DIALOG_DATA,
@@ -45,8 +46,18 @@ import {
     MAT_MOMENT_DATE_ADAPTER_OPTIONS, MatMomentDateModule
 } from '@angular/material-moment-adapter';
 
+const MOMENT_DATE_FORMATS = {
+    parse: {
+        dateInput: 'YYYY-MM-DD'
+    },
+    display: {
+        dateInput: 'YYYY-MM-DD',
+        monthYearLabel: 'MMM YYYY',
+        dateA11yLabel: 'LL',
+        monthYearA11yLabel: 'MMMM YYYY'
+    }
+};
 // TODO remove unused Angular Material modules
-
 @NgModule({
     exports: [
         CdkTableModule,
@@ -71,7 +82,6 @@ import {
         MatListModule,
         MatMenuModule,
         MatMomentDateModule,
-        MatNativeDateModule,
         MatPaginatorModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
@@ -92,6 +102,7 @@ import {
     ],
     providers: [
         { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
+        { provide: MAT_DATE_FORMATS, useValue: MOMENT_DATE_FORMATS },
         { provide: MAT_DIALOG_DATA, useValue: {} },
         { provide: MatDialogRef, useValue: {} }
     ]

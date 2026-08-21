@@ -1,3 +1,26 @@
+<div class="selector__controls">
+    <mat-form-field class="selector__datepicker">
+        <mat-label>Find runs near date</mat-label>
+        <input #runDateInput
+            matInput
+            readonly
+            [disabled]="catalogLoading"
+            [min]="earliestRunDate"
+            [max]="maxRunDate"
+            [matDatepicker]="runDatepicker"
+            (dateChange)="centerResultsAroundDate($event.value)"
+        />
+        <mat-datepicker-toggle
+        matIconSuffix
+            [for]="runDatepicker"
+            [disabled]="catalogLoading"
+        ></mat-datepicker-toggle>
+        <mat-datepicker
+            #runDatepicker
+            [disabled]="catalogLoading"
+        ></mat-datepicker>
+    </mat-form-field>
+</div>
 <div class="selector-table__container">
     <table mat-table recycleRows [dataSource]="tableData" [trackBy]="trackByRunId" matSort multiTemplateDataRows>
         @for (column of displayedColumns; track column) {
