@@ -1,24 +1,19 @@
-<div>
-    <mat-form-field>
+<div class="selector-controls">
+    <mat-form-field class="selector-controls__datepicker" (click)="!catalogLoading && runDatepicker.open()">
         <mat-label>Find runs near date</mat-label>
         <input #runDateInput
             matInput
             readonly
+            tabindex="-1"
             [disabled]="catalogLoading"
             [min]="earliestRunDate"
             [max]="maxRunDate"
             [matDatepicker]="runDatepicker"
+            (focus)="runDateInput.blur()"
             (dateChange)="centerResultsAroundDate($event.value)"
         />
-        <mat-datepicker-toggle
-        matIconSuffix
-            [for]="runDatepicker"
-            [disabled]="catalogLoading"
-        ></mat-datepicker-toggle>
-        <mat-datepicker
-            #runDatepicker
-            [disabled]="catalogLoading"
-        ></mat-datepicker>
+        <mat-datepicker-toggle matIconSuffix [for]="runDatepicker"></mat-datepicker-toggle>
+        <mat-datepicker #runDatepicker></mat-datepicker>
     </mat-form-field>
 </div>
 <div class="selector-table__container">

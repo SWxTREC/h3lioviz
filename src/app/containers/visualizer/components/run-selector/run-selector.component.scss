@@ -32,6 +32,14 @@ $formfield-height: 78px;
     }
 }
 
+.selector-controls {
+    &__datepicker:not(.mat-form-field-disabled) {
+        &, * {
+            cursor: pointer;
+        }
+    }
+}
+
 .selector-table {
     &__container {
         max-height: calc(63dvh - #{$paginator-height} - #{$formfield-height});
