@@ -99,21 +99,9 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
     constructor() {
         this._laspNavService.setAlwaysSticky(true);
 
-        // get catalog on visualizer load
+        // get catalog on visualizer load and set catalogLoading$ to false when complete
+        // if it is desired to load the catalog on app load, move this call to the catalog service
         this._catalogService.getCatalog().subscribe({
-            next: (catalog) => {
-                // sort catalog by `creation`, then sort by `run_id`to ensure consistent ordering
-                catalog.sort( ( a, b ) =>
-                    moment(b['creation']).valueOf() - moment(a['creation']).valueOf() || b['run_id'] - (a['run_id'])
-                );
-                const formattedCatalog = this._catalogService.formatCatalog(catalog);
-                this._catalogService.catalog$.next(formattedCatalog);
-                this._catalogService.runTitles = Array.from(this._catalogService.catalog$.value).reduce( (aggregator, run) => {
-                    const time = moment.utc( run['creation'] ).format('YYYY-MM-DDTHH');
-                    aggregator[ run['run_id'] ] = `${time} (${run.institute} #${run.run_id})`;
-                    return aggregator;
-                }, {});
-            },
             complete: () => {
                 this.catalogLoading$.next(false);
             }

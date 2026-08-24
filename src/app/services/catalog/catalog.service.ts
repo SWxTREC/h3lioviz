@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, EMPTY, expand, map, Observable, scan } from 'rxjs';
+import moment from 'moment';
+import { BehaviorSubject, EMPTY, expand, map, Observable, scan, tap } from 'rxjs';
 import { ICmeMetadata, IModelMetadata } from 'src/app/models';
 import { environment, localUrls } from 'src/environments/environment';
 
@@ -85,10 +86,26 @@ export class CatalogService {
                     data: this.formatCatalog( page.data )
                 })),
                 scan( ( runs: IModelMetadata[], page: ICatalogPage) => runs.concat( page.data ), [] ),
+                tap( catalog => this._setCatalog( catalog ) )
             );
         } else {
             return this._http.get( this._catalogUrl );
         }
+    }
+
+    private _setCatalog(catalog: IModelMetadata[] = []): void {
+        const sortedCatalog = [ ...catalog ].sort((a, b) =>
+            moment(b['creation']).valueOf() - moment(a['creation']).valueOf()
+            || Number(b['run_id']) - Number(a['run_id'])
+        );
+
+        this.catalog$.next(sortedCatalog);
+
+        this.runTitles = sortedCatalog.reduce((aggregator, run) => {
+            const time = moment.utc(run['creation']).format('YYYY-MM-DDTHH');
+            aggregator[run['run_id']] = `${time} (${run.institute} #${run.run_id})`;
+            return aggregator;
+        }, {});
     }
 
     private _getPageUrlWithToken( token?: string ) {
