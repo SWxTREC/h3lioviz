@@ -10,7 +10,7 @@
             [max]="maxRunDate"
             [matDatepicker]="runDatepicker"
             (focus)="runDateInput.blur()"
-            (dateChange)="centerResultsAroundDate($event.value)"
+            (dateChange)="goToPageWithDate($event.value)"
         />
         <mat-datepicker-toggle matIconSuffix [for]="runDatepicker"></mat-datepicker-toggle>
         <mat-datepicker #runDatepicker></mat-datepicker>

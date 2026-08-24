@@ -102,7 +102,8 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         this.tableData.paginator = this.paginator;
     }
 
-    centerResultsAroundDate(dateValue: moment.Moment) {
+    goToPageWithDate(dateValue: moment.Moment) {
+        this.expandedRun = null;
         if ( !this.paginator || !this.tableData || !dateValue ) {
             return;
         }
@@ -113,33 +114,34 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         }
 
         const sortedData = cloneDeep( this.tableData.data );
-        let closestIndex = -1;
-        let smallestDelta = Number.POSITIVE_INFINITY;
 
-        sortedData.forEach((run, index) => {
-            const runTimestamp = moment.utc(run.creation).valueOf() ?? moment.utc(run.rundate_cal).valueOf();
-            if ( runTimestamp === null ) {
-                return;
-            }
+        const closestEntry = sortedData.reduce(
+            (aggregator, run, index) => {
+                const runTimestamp = moment.utc(run.creation ?? run.rundate_cal).valueOf();
+                if (runTimestamp == null) {
+                    return aggregator;
+                }
 
-            const delta = Math.abs( runTimestamp - selectedTimestamp );
-            if ( delta < smallestDelta ) {
-                smallestDelta = delta;
-                closestIndex = index;
-            }
-        });
+                const newDistance = Math.abs(runTimestamp - selectedTimestamp);
 
+                if (newDistance < aggregator.distance) {
+                    return { index, distance: newDistance };
+                }
+
+                return aggregator;
+            },
+            { index: -1, distance: Number.POSITIVE_INFINITY }
+        );
+        const closestIndex = closestEntry.index;
         if ( closestIndex < 0 || this.paginator.pageSize <= 0 ) {
             return;
         }
 
-        const centeredStartIndex = Math.max( closestIndex - Math.floor( this.paginator.pageSize / 2 ), 0 );
-        const maxPageIndex = Math.max( Math.ceil( sortedData.length / this.paginator.pageSize ) - 1, 0 );
-        // navigate to the page that contains the closest run to the selected date, centering it in the page if possible
-        this.paginator.pageIndex = Math.min( Math.floor( centeredStartIndex / this.paginator.pageSize ), maxPageIndex );
+        const maxPageIndex = Math.max( Math.ceil( sortedData.length / this.paginator.pageSize ), 0 );
+        // navigate to the page that contains the closest run to the selected date
+        this.paginator.pageIndex = Math.min( Math.floor( closestIndex / this.paginator.pageSize ), maxPageIndex );
         // this forces the paginator to update the view after changing the pageIndex
         this.paginator._changePageSize( this.paginator.pageSize );
-        this.expandedRun = null;
     }
 
     getEarliestRunDate(run: IModelMetadata): moment.Moment {
