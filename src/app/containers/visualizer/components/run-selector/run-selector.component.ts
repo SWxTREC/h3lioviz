@@ -27,7 +27,7 @@ import { IModelMetadata } from 'src/app/models';
     standalone: false
 })
 export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
-    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatSort) sortTable: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild('runDateInput') runDateInput: ElementRef<HTMLInputElement>;
     @ViewChild('runDatepicker') runDatepicker: MatDatepicker<moment.Moment>;
@@ -100,7 +100,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     }
 
     ngAfterViewInit() {
-        this.tableData.sort = this.sort;
+        this.tableData.sort = this.sortTable;
         this.paginator.pageIndex = this.selectedRunIndex >= 0 ? Math.floor( this.selectedRunIndex / this.paginator.pageSize ) : 0;
         this.tableData.paginator = this.paginator;
     }

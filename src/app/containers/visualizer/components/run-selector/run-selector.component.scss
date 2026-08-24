@@ -32,16 +32,6 @@ $formfield-height: 78px;
     }
 }
 
-.selector-controls {
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 0.5rem;
-
-    &__datepicker {
-        width: min( 100%, 320px );
-    }
-}
-
 .selector-table {
     &__container {
         max-height: calc(63dvh - #{$paginator-height} - #{$formfield-height});
