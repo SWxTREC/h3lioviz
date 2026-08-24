@@ -14,7 +14,6 @@ import {
 } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
@@ -27,7 +26,6 @@ import { IModelMetadata } from 'src/app/models';
     standalone: false
 })
 export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
-    @ViewChild(MatSort) sortTable: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild('runDateInput') runDateInput: ElementRef<HTMLInputElement>;
     @ViewChild('runDatepicker') runDatepicker: MatDatepicker<moment.Moment>;
@@ -100,7 +98,6 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     }
 
     ngAfterViewInit() {
-        this.tableData.sort = this.sortTable;
         this.paginator.pageIndex = this.selectedRunIndex >= 0 ? Math.floor( this.selectedRunIndex / this.paginator.pageSize ) : 0;
         this.tableData.paginator = this.paginator;
     }

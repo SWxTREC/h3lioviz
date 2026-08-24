@@ -17,11 +17,11 @@
     </mat-form-field>
 </div>
 <div class="selector-table__container">
-    <table mat-table recycleRows [dataSource]="tableData" [trackBy]="trackByRunId" matSort multiTemplateDataRows>
+    <table mat-table recycleRows [dataSource]="tableData" [trackBy]="trackByRunId" multiTemplateDataRows>
         @for (column of displayedColumns; track column) {
             <ng-container [matColumnDef]="column">
                 @if (column !== 'more') {
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column] }} </th>
+                    <th mat-header-cell *matHeaderCellDef> {{ headers[column] }} </th>
                     <td mat-cell *matCellDef="let run" > {{ run[column] }} </td>
                 }
                 @if (column === 'more') {
