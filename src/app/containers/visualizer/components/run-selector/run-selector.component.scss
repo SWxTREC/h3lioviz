@@ -33,6 +33,7 @@ $formfield-height: 78px;
 }
 
 .selector-controls {
+    padding-top: 0.1rem;
     &__datepicker:not(.mat-form-field-disabled) {
         &, * {
             cursor: pointer;
