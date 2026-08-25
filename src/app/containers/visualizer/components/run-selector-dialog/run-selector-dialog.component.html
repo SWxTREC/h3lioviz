@@ -5,7 +5,7 @@
     @if (data.catalog) {
         <swt-run-selector
             [catalog]="data.catalog"
-            [catalogLoading]="data.catalogLoading$ | async"
+            [catalogLoading$]="data.catalogLoading$"
             [selectedRun]="data.selectedRun"
             [screenDimensions]="data.screenDimensions"
             (updateRunSelection)="updateRunSelection($event)"

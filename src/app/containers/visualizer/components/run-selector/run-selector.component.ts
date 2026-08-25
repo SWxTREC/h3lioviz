@@ -2,8 +2,10 @@ import { SelectionModel } from '@angular/cdk/collections';
 import {
     AfterViewInit,
     Component,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnChanges,
     OnInit,
@@ -12,11 +14,13 @@ import {
     ViewChild
 
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
+import { BehaviorSubject } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
 
 @Component({
@@ -26,30 +30,45 @@ import { IModelMetadata } from 'src/app/models';
     standalone: false
 })
 export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
+    destroyRef = inject( DestroyRef );
+
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild('runDateInput') runDateInput: ElementRef<HTMLInputElement>;
     @ViewChild('runDatepicker') runDatepicker: MatDatepicker<moment.Moment>;
 
     @Input() catalog: IModelMetadata[];
-    @Input() catalogLoading = true;
+    @Input() catalogLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     @Input() screenDimensions: [number, number];
     @Input() selectedRun: IModelMetadata;
     @Output() updateRunSelection: EventEmitter<IModelMetadata> = new EventEmitter(undefined);
+    catalogLoading = true;
     expandedRun: IModelMetadata = null;
     displayedColumns: string[];
     pageSize: number;
     pageSizeOptions = [ 5, 10, 25 ];
+    pendingDateNavigation: moment.Moment = null;
     headers: { [ parameter: string ]: string };
     allMetadata: string[];
     selectedRunIndex: number;
     selection = new SelectionModel<IModelMetadata>(false, []);
     tableData: MatTableDataSource<IModelMetadata>;
-    earliestRunDate: moment.Moment;
+    earliestRunDate: moment.Moment = null;
     maxRunDate: moment.Moment = moment.utc().add(1, 'day');
 
     ngOnChanges(changes: SimpleChanges) {
-        if ( !this.catalogLoading ) {
-            this.earliestRunDate = this.getEarliestRunDate(this.catalog[this.catalog.length - 1]);
+        if ( changes.catalogLoading$ && this.catalogLoading$ ) {
+            this.catalogLoading$.pipe(
+                takeUntilDestroyed( this.destroyRef )
+            ).subscribe( loading => {
+                this.catalogLoading = loading;
+                if ( !loading && this.catalog?.length ) {
+                    // wait a beat for last page to load before calculating earliest run date
+                    setTimeout(() => {
+                        this.earliestRunDate = this.getEarliestRunDate(this.catalog[this.catalog.length - 1]);
+                        this.runPendingDateNavigation();
+                    }, 0);
+                }
+            });
         }
         if ( changes.catalog && this.catalog?.length ) {
             if ( !this.tableData ) {
@@ -104,9 +123,16 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
 
     goToPageWithDate(dateValue: moment.Moment) {
         this.expandedRun = null;
-        if ( !this.paginator || !this.tableData || !dateValue ) {
+        if ( !dateValue ) {
             return;
         }
+
+        if ( this.catalogLoading || !this.paginator || !this.tableData ) {
+            this.pendingDateNavigation = dateValue.clone();
+            return;
+        }
+
+        this.pendingDateNavigation = null;
 
         const selectedTimestamp = dateValue.valueOf();
         if ( selectedTimestamp === null ) {
@@ -145,7 +171,7 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     }
 
     getEarliestRunDate(run: IModelMetadata): moment.Moment {
-        const runDate = run?.rundate_cal ?? run?.creation;
+        const runDate = run?.creation ?? run?.rundate_cal;
         if ( !runDate ) {
             return null;
         }
@@ -188,6 +214,16 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
     resetDatepicker(): void {
         this.runDatepicker.select(null);
         this.runDateInput.nativeElement.value = '';
+    }
+
+    runPendingDateNavigation(): void {
+        if ( this.catalogLoading || !this.pendingDateNavigation || !this.paginator || !this.tableData ) {
+            return;
+        }
+
+        const pendingDate = this.pendingDateNavigation.clone();
+        this.pendingDateNavigation = null;
+        this.goToPageWithDate(pendingDate);
     }
 
     syncPaginator() {

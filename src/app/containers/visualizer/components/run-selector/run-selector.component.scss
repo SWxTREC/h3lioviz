@@ -33,6 +33,9 @@ $formfield-height: 78px;
 }
 
 .selector-controls {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
     padding-top: 0.1rem;
     &__datepicker:not(.mat-form-field-disabled) {
         &, * {

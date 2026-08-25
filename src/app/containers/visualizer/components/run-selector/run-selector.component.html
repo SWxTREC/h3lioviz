@@ -1,11 +1,10 @@
 <div class="selector-controls">
-    <mat-form-field class="selector-controls__datepicker" (click)="!catalogLoading && runDatepicker.open()">
+    <mat-form-field class="selector-controls__datepicker" (click)="runDatepicker.open()">
         <mat-label>Find runs near date</mat-label>
         <input #runDateInput
             matInput
             readonly
             tabindex="-1"
-            [disabled]="catalogLoading"
             [min]="earliestRunDate"
             [max]="maxRunDate"
             [matDatepicker]="runDatepicker"
@@ -15,6 +14,9 @@
         <mat-datepicker-toggle matIconSuffix [for]="runDatepicker"></mat-datepicker-toggle>
         <mat-datepicker #runDatepicker></mat-datepicker>
     </mat-form-field>
+    @if ( catalogLoading && pendingDateNavigation ) {
+        <mat-spinner class="selector-controls__spinner" diameter="24"></mat-spinner>
+    }
 </div>
 <div class="selector-table__container">
     <table mat-table recycleRows [dataSource]="tableData" [trackBy]="trackByRunId" multiTemplateDataRows>
