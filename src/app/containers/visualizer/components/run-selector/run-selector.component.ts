@@ -168,6 +168,10 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         this.paginator.pageIndex = Math.min( Math.floor( closestIndex / this.paginator.pageSize ), maxPageIndex );
         // this forces the paginator to update the view after changing the pageIndex
         this.paginator._changePageSize( this.paginator.pageSize );
+        document.querySelector('.mdc-data-table__table')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
     }
 
     getEarliestRunDate(run: IModelMetadata): moment.Moment {
@@ -208,6 +212,10 @@ export class RunSelectorComponent implements AfterViewInit, OnInit, OnChanges {
         // Arrow clicks (next/prev/first/last) change pageIndex
         if (event.previousPageIndex !== undefined && event.pageIndex !== event.previousPageIndex) {
             this.resetDatepicker();
+            document.querySelector('.mdc-data-table__table')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
     }
 
