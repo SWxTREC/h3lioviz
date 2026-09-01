@@ -1,5 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { BehaviorSubject } from 'rxjs';
 import { IModelMetadata } from 'src/app/models';
 import { CatalogService } from 'src/app/services';
 
@@ -11,13 +13,15 @@ import { CatalogService } from 'src/app/services';
 })
 export class RunSelectorDialogComponent implements OnInit {
     dialogRef = inject<MatDialogRef<RunSelectorDialogComponent>>(MatDialogRef);
+    private _destroyRef = inject( DestroyRef );
     data = inject<{
-        selectedRun: IModelMetadata;
         catalog: IModelMetadata[];
+        catalogLoading$: BehaviorSubject<boolean>;
         screenDimensions: [
             number,
             number
         ];
+        selectedRun: IModelMetadata;
     }>(MAT_DIALOG_DATA);
     private _catalogService = inject(CatalogService);
 
@@ -25,6 +29,13 @@ export class RunSelectorDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.previousSelection = this.data.selectedRun;
+        this._catalogService.catalog$.pipe(
+            takeUntilDestroyed(this._destroyRef)
+        ).subscribe( catalog => {
+            if ( catalog ) {
+                this.data.catalog = catalog;
+            }
+        });
     }
 
     updateRunSelection( runInfo: IModelMetadata ) {

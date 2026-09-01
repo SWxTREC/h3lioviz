@@ -4,8 +4,9 @@
 <div mat-dialog-content class="dialog__content">
     @if (data.catalog) {
         <swt-run-selector
-            [selectedRun]="data.selectedRun"
             [catalog]="data.catalog"
+            [catalogLoading$]="data.catalogLoading$"
+            [selectedRun]="data.selectedRun"
             [screenDimensions]="data.screenDimensions"
             (updateRunSelection)="updateRunSelection($event)"
         >

@@ -77,7 +77,8 @@ describe('RunSelectorComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(RunSelectorComponent);
         component = fixture.componentInstance;
-        component.catalog = catalog;
+        fixture.componentRef.setInput('catalog', catalog);
+        fixture.componentRef.setInput('catalogLoading', false);
         fixture.detectChanges();
     });
 

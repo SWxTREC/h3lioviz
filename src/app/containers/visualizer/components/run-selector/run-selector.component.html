@@ -1,9 +1,29 @@
+<div class="selector-controls">
+    <mat-form-field class="selector-controls__datepicker" (click)="runDatepicker.open()">
+        <mat-label>Find runs near date</mat-label>
+        <input #runDateInput
+            matInput
+            readonly
+            tabindex="-1"
+            [min]="earliestRunDate"
+            [max]="maxRunDate"
+            [matDatepicker]="runDatepicker"
+            (focus)="runDateInput.blur()"
+            (dateChange)="goToPageWithDate($event.value)"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="runDatepicker"></mat-datepicker-toggle>
+        <mat-datepicker #runDatepicker></mat-datepicker>
+    </mat-form-field>
+    @if ( catalogLoading && pendingDateNavigation ) {
+        <mat-spinner class="selector-controls__spinner" diameter="24"></mat-spinner>
+    }
+</div>
 <div class="selector-table__container">
-    <table mat-table recycleRows [dataSource]="tableData" matSort multiTemplateDataRows>
+    <table mat-table recycleRows [dataSource]="tableData" [trackBy]="trackByRunId" multiTemplateDataRows>
         @for (column of displayedColumns; track column) {
             <ng-container [matColumnDef]="column">
                 @if (column !== 'more') {
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ headers[column] }} </th>
+                    <th mat-header-cell *matHeaderCellDef> {{ headers[column] }} </th>
                     <td mat-cell *matCellDef="let run" > {{ run[column] }} </td>
                 }
                 @if (column === 'more') {
