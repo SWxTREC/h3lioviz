@@ -1,3 +1,8 @@
+## Added
+- Ability to search the run catalog by date
+
+## 2026-08-11 v2.3.5
+
 ### Changed
 - Performance improvements
 
