@@ -323,9 +323,11 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
             timeIndex = timeIndex ?? defaultTimeIndex;
             this.setTimestep( timeIndex );
             // after everything is loaded, trigger equatorial slice snapping if applicable
-            if ( this.siteConfig[ ConfigLabels.layers]?.lonSliceType ) {
-                const lonSliceType = this.siteConfig[ ConfigLabels.layers ].lonSliceType;
-                this.pvView?.get().session.call('pv.h3lioviz.snap_solar_plane', [ lonSliceType ]);
+            // (read the current config, and send the server's name for the plane as the slices panel does)
+            const lonSliceType = this._siteConfigService.getSiteConfig()[ ConfigLabels.layers ]?.lonSliceType;
+            if ( lonSliceType ) {
+                const plane = lonSliceType === 'solar-equator' ? 'equator' : 'ecliptic';
+                this.pvView?.get().session.call('pv.h3lioviz.snap_solar_plane', [ plane ]);
             }
         });
     }
