@@ -4,8 +4,13 @@ import { BehaviorSubject, interval, Observable, of, Subject, Subscription } from
 import { catchError, exhaustMap, map, startWith, switchMap, takeWhile } from 'rxjs/operators';
 import { environment, environmentConfig } from 'src/environments/environment';
 
-// 500 means Apache is up but the launcher cannot spawn a session yet, so it is not ready.
-const LAUNCHER_READY_STATUS = 400;
+// Ready only when the launcher itself answers the readiness GET, which it does with an
+// error since the probe has no session id: 400 from ParaView 5.x's wslink, 405 from the
+// wslink 1.12 in the ParaView 6.x image (it routes GET only when WSLINK_LAUNCHER_GET is set).
+// The proxies in front answer 5xx while the launcher is down or cannot spawn a session yet.
+const LAUNCHER_READY_STATUSES = [ 400, 405 ];
+
+export const isLauncherReadyStatus = ( status: number ): boolean => LAUNCHER_READY_STATUSES.includes( status );
 
 @Injectable({
     providedIn: 'root'
@@ -70,7 +75,7 @@ export class AwsService {
                         return of( false );
                     }
                     return this.getParaviewServerStatus().pipe(
-                        map( status => status === LAUNCHER_READY_STATUS )
+                        map( status => isLauncherReadyStatus( status ) )
                     );
                 })
             ))
