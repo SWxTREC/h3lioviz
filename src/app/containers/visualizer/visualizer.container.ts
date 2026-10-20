@@ -10,7 +10,7 @@ import { decompressFromEncodedURIComponent } from 'lz-string';
 import moment from 'moment';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, first } from 'rxjs/operators';
 import { IPlotParams } from 'scicharts';
 import { ConfigLabels, DEFAULT_SITE_CONFIG, ICmeMetadata, IModelMetadata, ISiteConfig } from 'src/app/models';
 import {
@@ -167,16 +167,18 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.subscriptions.push(
             this._catalogService.catalog$.subscribe( catalog => {
                 this.catalog = catalog;
+            })
+        );
+
+        // decide once, on the first catalog page: the run list adds later pages itself
+        this.subscriptions.push(
+            this._catalogService.catalog$.pipe(
+                first( catalog => catalog != null )
+            ).subscribe(() => {
                 // if waiting for aws server, open the dialog so the user has something to do
                 setTimeout(() => {
-                    if ( (this.catalog && !this.runId$.value ) ||
-                        (this.catalog && !this.pvServerStarted) ) {
-                        // only open dialog once as catalog is updated
-                        if ( !this.dialog.openDialogs.length ) {
-                            this.openDialog();
-                        }
-                    } else {
-                        this.dialog.closeAll();
+                    if ( ( !this.runId$.value || !this.pvServerStarted ) && !this.dialog.openDialogs.length ) {
+                        this.openDialog();
                     }
                 }, 0);
             })
