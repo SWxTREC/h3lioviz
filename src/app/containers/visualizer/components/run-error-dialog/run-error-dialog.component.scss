@@ -1,0 +1,7 @@
+@use 'src/theme/theme-colors.scss';
+
+.dialog {
+    &__message {
+        color: theme-colors.$color-warn;
+    }
+}

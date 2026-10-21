@@ -22,8 +22,6 @@ export class RunSelectorDialogComponent implements OnInit {
             number
         ];
         selectedRun: IModelMetadata;
-        // why the list is shown, such as a run that failed to load
-        message?: string;
     }>(MAT_DIALOG_DATA);
     private _catalogService = inject(CatalogService);
 
