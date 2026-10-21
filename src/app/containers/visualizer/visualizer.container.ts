@@ -417,15 +417,26 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
             // remove bad runId and allow user to try again…
             this.updateRunId( null );
+            // forget the run in the URL, or a reload loads it again
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: undefined });
+            // and in the run list, so it opens with no run selected and cannot load the failed run again
+            this.selectedRunMetadata = undefined;
+            // with no run the run button is hidden, so offer the run list, saying why it is back;
+            // close any list opened during the load first, so only one is shown
+            this.dialog.closeAll();
+            const runTitle = this._catalogService.runTitles?.[ runId ] ?? runId;
+            this.openDialog( `Run ${runTitle} could not be loaded. Please select another run.` );
         });
     }
 
-    // opens if AWS server is starting up to give the user something to do
-    openDialog(): void {
+    // opens the run list: while the AWS server starts, from the run button, or after a run fails to load
+    // message, if given, says why the list is shown
+    openDialog( message?: string ): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: {
                 catalog: this.catalog,
                 catalogLoading$: this.catalogLoading$,
+                message,
                 screenDimensions: this.windowDimensions,
                 selectedRun: this.selectedRunMetadata
             },

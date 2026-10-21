@@ -1,6 +1,9 @@
 <h2 mat-dialog-title class="dialog__title">
     Select a model run:
 </h2>
+@if (data.message) {
+    <p class="dialog__message">{{ data.message }}</p>
+}
 <div mat-dialog-content class="dialog__content">
     @if (data.catalog) {
         <swt-run-selector
