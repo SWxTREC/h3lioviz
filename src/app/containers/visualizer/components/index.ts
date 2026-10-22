@@ -8,6 +8,7 @@ export * from './slices/slices.component';
 export * from './orientation-menu/orientation-menu.component';
 export * from './mouse-zoom/mouse-zoom.component';
 export * from './plots/plots.component';
+export * from './run-error-dialog/run-error-dialog.component';
 export * from './run-selector/run-selector.component';
 export * from './run-selector-dialog/run-selector-dialog.component';
 export * from './time-player/time-player.component';

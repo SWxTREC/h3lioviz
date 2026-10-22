@@ -1,10 +1,12 @@
+@use 'src/theme/theme-colors.scss';
+
 .dialog {
-    &__title {
-        margin: 0;
-        padding: 1rem;
-    }
     &__content {
         margin: 0;
         padding: 0;
+    }
+    &__title {
+        margin: 0;
+        padding: 1rem;
     }
 }

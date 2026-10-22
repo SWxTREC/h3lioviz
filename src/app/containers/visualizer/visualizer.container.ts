@@ -20,7 +20,7 @@ import {
 } from 'src/app/services';
 import { environment } from 'src/environments/environment';
 
-import { RunSelectorDialogComponent } from './components';
+import { RunErrorDialogComponent, RunSelectorDialogComponent } from './components';
 
 // change these values if the height of the header or footer changes
 const headerFooterHeight = 44 + 28;
@@ -421,10 +421,22 @@ export class VisualizerComponent implements AfterViewInit, OnInit, OnDestroy {
                 (error.data ? error.data.exception + ' ': 'unknown error loading ') + runId;
             // remove bad runId and allow user to try again…
             this.updateRunId( null );
+            // remove the runId from the site config and sessionStorage so it doesn't load again on refresh
+            this._siteConfigService.updateSiteConfig({ [ConfigLabels.runId]: undefined });
+            // remove the run from the run list, so it opens with no run selected and cannot load the failed run again
+            this.selectedRunMetadata = undefined;
+            // close any list opened during the load first
+            this.dialog.closeAll();
+            const runTitle = this._catalogService.runTitles?.[ runId ] ?? runId;
+            // show a dialog with the error message and then reopen the run list so the user can try again
+            this.dialog.open(RunErrorDialogComponent, {
+                data: { message: `Run ${runTitle} could not be loaded.` },
+                disableClose: true
+            }).afterClosed().subscribe(() => this.openDialog());
         });
     }
 
-    // opens if AWS server is starting up to give the user something to do
+    // opens the run list: while the AWS server starts or from the run button
     openDialog(): void {
         const dialogRef = this.dialog.open(RunSelectorDialogComponent, {
             data: {
