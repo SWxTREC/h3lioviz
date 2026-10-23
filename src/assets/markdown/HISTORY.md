@@ -1,4 +1,13 @@
-## Added
+### Changed
+- Upgrade ParaView to v6.1.1
+
+### Fixed
+- Solar equator slice synced to selections
+- Show error message for runs not in catalog and allow reselecting
+
+## 2026-09-02 v2.4.0
+
+### Added
 - Ability to search the run catalog by date
 
 ## 2026-08-11 v2.3.5
