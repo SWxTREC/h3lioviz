@@ -11,6 +11,23 @@ import SmartConnect from 'wslink/src/SmartConnect';
 
 import { AwsService } from '../aws/aws.service';
 
+// Passed to connect(): moves the websocket URL the launcher returns onto the launcher's
+// own scheme, host and port, keeping path and query. The launcher names SERVER_NAME's
+// host, which the browser may not reach (as at SWPC). Returns a copy, so
+// environmentConfig is never changed.
+// eslint-disable-next-line @typescript-eslint/naming-convention -- wslink's URL key names
+export const onLauncherHost = ( config: { sessionManagerURL: string; sessionURL?: string } ) => {
+    const decorated = { ...config };
+    if ( decorated.sessionURL ) {
+        const session = new URL( decorated.sessionURL );
+        const launcher = new URL( decorated.sessionManagerURL );
+        session.protocol = launcher.protocol === 'https:' ? 'wss:' : 'ws:';
+        session.host = launcher.host;
+        session.port = launcher.port; // the host setter keeps the old port otherwise
+        decorated.sessionURL = session.toString();
+    }
+    return decorated;
+};
 
 @Injectable({
     providedIn: 'root'
@@ -74,7 +91,7 @@ export class WebsocketService {
         // TODO?: after login, access clientId and client credentials to this config: config?
 
         // Connect
-        clientToConnect.connect( config ).then( () => {
+        clientToConnect.connect( config, onLauncherHost ).then( () => {
             // if connection fails, add error message
             if ( !clientToConnect.isConnected() ) {
                 this.errorMessage$.next( 'Failed to connect to socket' );

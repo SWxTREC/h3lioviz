@@ -10,9 +10,12 @@ if ( siteRootUrl.split('/').filter( pathString => pathString.length ).pop() !== 
     siteRootUrl += name + '/';
 }
 
+// SWPC's backend host. It is not the page's host, whose CDN cannot reach the backend.
+const backendUrl = 'https://h3lioviz.swpc-dev.woc.noaa.gov/h3lioviz/';
+
 export const environment = {
     aws: {
-        api: 'https://h3lioviz-api.prod.swx-trec.com/'
+        api: backendUrl + 'app/'
     },
     dev: false,
     googleAnalyticsId: '',
@@ -25,7 +28,7 @@ export const environment = {
 
 export const environmentConfig = {
     application: 'visualizer',
-    sessionManagerURL: 'https://dev-01-alb-h3lioviz-swpc.woc.noaa.gov/h3lioviz/paraview/'
+    sessionManagerURL: backendUrl + 'paraview/'
 };
 
 // these need to be in file, but are not used for 'production' builds
