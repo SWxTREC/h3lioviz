@@ -1,6 +1,6 @@
 {
   "name": "h3lioviz",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "engines": {
     "node": ">=20.19.3 <21"
   },
