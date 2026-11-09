@@ -1,3 +1,5 @@
+## 2026-10-23 v2.6.0
+
 ### Changed
 - Upgrade ParaView to v6.1.1
 
